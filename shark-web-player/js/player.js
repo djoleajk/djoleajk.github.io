@@ -191,15 +191,37 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function makeItemSelectable(element) {
-        element.addEventListener('click', () => {
-            // Remove selection from other items
-            playlist.querySelectorAll('.playlist-item').forEach(item => {
-                item.classList.remove('selected');
-            });
-            element.classList.add('selected');
+        let pressTimer;
+        let isLongPress = false;
+
+        element.addEventListener('touchstart', () => {
+            pressTimer = setTimeout(() => {
+                isLongPress = true;
+                // Remove selection from other items
+                playlist.querySelectorAll('.playlist-item').forEach(item => {
+                    item.classList.remove('selected');
+                });
+                element.classList.add('selected');
+            }, 500);
         });
 
-        // Add context menu
+        element.addEventListener('touchend', (e) => {
+            clearTimeout(pressTimer);
+            if (!isLongPress) {
+                const index = Array.from(playlist.children).indexOf(element) - 1;
+                currentTrackIndex = index;
+                playTrack(index);
+            }
+            isLongPress = false;
+        });
+
+        element.addEventListener('click', (e) => {
+            const index = Array.from(playlist.children).indexOf(element) - 1;
+            currentTrackIndex = index;
+            playTrack(index);
+        });
+
+        // Existing context menu code
         element.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             
