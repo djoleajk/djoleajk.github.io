@@ -1,19 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Core elements
+     
     const progress = document.querySelector('.progress');
     const progressBar = document.querySelector('.progress-bar');
     const timer = document.querySelector('.timer');
     const playlist = document.getElementById('playlist');
     
-    // Create single audio instance
+     
     const audioPlayer = new Audio();
     
-    // Add volume control elements
+    
     const volumeSlider = document.getElementById('volume');
     const volumeIcon = document.querySelector('.volume-icon');
     let lastVolume = 1;
 
-    // Add volume control functionality
+    
     volumeSlider.addEventListener('input', (e) => {
         const value = e.target.value / 100;
         audioPlayer.volume = value;
@@ -39,21 +39,21 @@ document.addEventListener('DOMContentLoaded', function() {
         else volumeIcon.textContent = '🔊';
     }
     
-    // Control buttons
+     
     const prevBtn = document.getElementById('prev');
     const playPauseBtn = document.getElementById('play-pause');
     const stopBtn = document.getElementById('stop');
     const nextBtn = document.getElementById('next');
     
-    // Footer buttons
+     
     const footerBtns = document.querySelectorAll('.footer-btn');
     const [addBtn, delBtn, miscBtn, sortBtn, infoBtn] = footerBtns;
 
-    // Playlist management
+     
     let tracks = [];
     let currentTrackIndex = 0;
 
-    // Default radio stations
+     
     const defaultStations = [
         { name: "AS FM", url: "https://asfmonair-masterasfm.radioca.st/stream" },
         { name: "NAXI RADIO", url: "https://naxi128.streaming.rs:9152/;*.mp3" },
@@ -77,17 +77,17 @@ document.addEventListener('DOMContentLoaded', function() {
         { name: "RED", url: "https://stream.redradio.rs/sid=1" }
     ];
 
-    // Function to load default stations
+     
     function loadDefaultStations() {
         defaultStations.forEach(station => {
             addStreamToPlaylist(station.name, station.url);
         });
     }
 
-    // Load default stations when player starts
+    
     loadDefaultStations();
 
-    // Play/Pause functionality
+     
     playPauseBtn.addEventListener('click', () => {
         const audio = getCurrentAudio();
         if (!audio) return;
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Previous track
+     
     prevBtn.addEventListener('click', () => {
         if (currentTrackIndex > 0) {
             currentTrackIndex--;
@@ -109,13 +109,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Next track
+     
     nextBtn.addEventListener('click', () => {
         currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
         playTrack(currentTrackIndex);
     });
 
-    // Stop
+    
     stopBtn.addEventListener('click', () => {
         const audio = getCurrentAudio();
         if (!audio) return;
@@ -123,21 +123,21 @@ document.addEventListener('DOMContentLoaded', function() {
         audio.currentTime = 0;
         playPauseBtn.textContent = '▶';
         
-        // Reset display
+         
         const trackInfo = document.querySelector('.track-info');
         trackInfo.textContent = 'No track playing';
     });
 
-    // Stream Dialog Elements
+     
     const streamDialog = document.getElementById('streamDialog');
     const streamName = document.getElementById('streamName');
     const streamUrl = document.getElementById('streamUrl');
     const addStreamBtn = document.getElementById('addStreamBtn');
     const cancelStreamBtn = document.getElementById('cancelStreamBtn');
 
-    // Modified ADD button functionality
+     
     addBtn.addEventListener('click', () => {
-        // Check if options already exist and remove them first
+         
         const existingOptions = document.querySelector('.add-options');
         if (existingOptions) {
             existingOptions.remove();
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         document.body.appendChild(options);
         
-        // Close options when clicking outside
+         
         document.addEventListener('click', (e) => {
             if (!options.contains(e.target) && e.target !== addBtn) {
                 options.remove();
@@ -182,10 +182,10 @@ document.addEventListener('DOMContentLoaded', function() {
         input.click();
     }
 
-    // Modify stream dialog functions
+    
     function showStreamDialog() {
         streamDialog.style.display = 'block';
-        // Close dialog when clicking outside
+        
         document.addEventListener('click', closeStreamDialogOutside);
     }
 
@@ -197,7 +197,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Modified stream dialog button handlers
+    
     addStreamBtn.addEventListener('click', () => {
         const name = streamName.value.trim();
         const url = streamUrl.value.trim();
@@ -228,29 +228,29 @@ document.addEventListener('DOMContentLoaded', function() {
         element.addEventListener('mouseup', (e) => {
             const clickDuration = Date.now() - mouseDownTime;
             
-            // If click was held for less than 200ms, consider it a click
+           
             if (clickDuration < 200) {
                 const index = Array.from(playlist.children).indexOf(element) - 1;
                 currentTrackIndex = index;
                 playTrack(index);
             }
 
-            // Remove selection from other items
+            
             playlist.querySelectorAll('.playlist-item').forEach(item => {
                 item.classList.remove('selected');
             });
             element.classList.add('selected');
         });
 
-        // Keep the context menu functionality
+        
         element.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             
-            // Remove any existing context menus
+            
             const existingMenu = document.querySelector('.context-menu');
             if (existingMenu) existingMenu.remove();
 
-            // Create context menu
+            
             const contextMenu = document.createElement('div');
             contextMenu.className = 'context-menu';
             contextMenu.innerHTML = `
@@ -259,13 +259,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="menu-item" data-action="delete">Delete</div>
             `;
 
-            // Position the menu
+            
             contextMenu.style.position = 'fixed';
             contextMenu.style.left = `${e.clientX}px`;
             contextMenu.style.top = `${e.clientY}px`;
             document.body.appendChild(contextMenu);
 
-            // Handle menu item clicks
+            
             contextMenu.addEventListener('click', (event) => {
                 const action = event.target.dataset.action;
                 const index = Array.from(playlist.children).indexOf(element) - 1; // Adjust for header
@@ -293,14 +293,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 contextMenu.remove();
             });
 
-            // Close menu when clicking outside
+           
             document.addEventListener('click', () => {
                 contextMenu.remove();
             }, { once: true });
         });
     }
 
-    // Modify addStreamToPlaylist function
+    
     function addStreamToPlaylist(name, url) {
         const stream = {
             name: name,
@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
         playlist.appendChild(streamElement);
     }
 
-    // Modify addTrackToPlaylist function
+    
     function addTrackToPlaylist(file) {
         const track = {
             name: file.name,
@@ -350,14 +350,14 @@ document.addEventListener('DOMContentLoaded', function() {
         playlist.appendChild(trackElement);
     }
 
-    // Modify playTrack function
+    
     function playTrack(index) {
         const track = tracks[index];
         if (!track) return;
 
         audioPlayer.src = track.url;
         
-        // Update track display
+        
         const trackInfo = document.querySelector('.track-info');
         trackInfo.textContent = track.name;
         
@@ -369,20 +369,20 @@ document.addEventListener('DOMContentLoaded', function() {
         audioPlayer.play();
         playPauseBtn.textContent = '⏸';
         
-        // Clear all highlights first
+        
         playlist.querySelectorAll('.playlist-item').forEach(item => {
             item.classList.remove('active');
             item.classList.remove('selected');
         });
         
-        // Add active class to currently playing track
+        
         const playlistItems = Array.from(playlist.children);
         if (playlistItems[index + 1]) { // +1 to account for header
             playlistItems[index + 1].classList.add('active');
         }
     }
 
-    // Update footer button event listeners
+    
     delBtn.addEventListener('click', () => {
         const selected = playlist.querySelector('.playlist-item.selected');
         if (selected) {
@@ -404,7 +404,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             document.body.appendChild(deleteWarning);
 
-            // Handle confirm delete
+            
             deleteWarning.querySelector('.confirm').addEventListener('click', () => {
                 const index = Array.from(playlist.children).indexOf(selected);
                 if (index !== -1) {
@@ -414,12 +414,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 deleteWarning.remove();
             });
 
-            // Handle cancel
+            
             deleteWarning.querySelector('.cancel').addEventListener('click', () => {
                 deleteWarning.remove();
             });
 
-            // Close on click outside
+            
             document.addEventListener('click', (e) => {
                 if (!deleteWarning.querySelector('.warning-content').contains(e.target) && 
                     e.target !== delBtn) {
@@ -476,16 +476,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
             }
 
-            // Update tracks array
+            
             tracks = sortedTracks;
             
-            // Rebuild playlist
+            
             refreshPlaylist();
             
             sortMenu.remove();
         });
 
-        // Close menu when clicking outside
+        
         document.addEventListener('click', (e) => {
             if (!sortMenu.contains(e.target) && e.target !== sortBtn) {
                 sortMenu.remove();
@@ -531,7 +531,7 @@ document.addEventListener('DOMContentLoaded', function() {
             `;
             document.body.appendChild(details);
 
-            // Close on click outside
+            
             document.addEventListener('click', (e) => {
                 if (!details.contains(e.target) && e.target !== miscBtn) {
                     details.remove();
@@ -559,11 +559,11 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         document.body.appendChild(infoModal);
         
-        // Zatvaranje info modala
+        
         const closeBtn = infoModal.querySelector('.close-info');
         closeBtn.addEventListener('click', () => infoModal.remove());
         
-        // Zatvaranje na klik van modala
+        
         infoModal.addEventListener('click', (e) => {
             if (e.target === infoModal) {
                 infoModal.remove();
@@ -571,13 +571,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Helper functions
+    
     function updateProgress(e) {
         const audio = e.target;
         const percent = (audio.currentTime / audio.duration) * 100;
         progress.style.width = percent + '%';
         
-        // Update timer
+        
         const time = formatTime(audio.currentTime);
         timer.textContent = time;
     }
