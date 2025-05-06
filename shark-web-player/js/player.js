@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function() {
         { name: "Radio S XTRA", url: "https://stream.radios.rs:9026/;*.mp3" },
         { name: "NAXI ROCK", url: "https://stream.radios.rs:9032/;*.mp3" },
         { name: "RADIO IN", url: "https://radio3-64ssl.streaming.rs:9212/;*.mp3" },
-        { name: "ROCK RADIO", url: "https://mastermedia.shoutca.st/proxy/rockradio?mp=/stream" },
+        { name: "ROCK RADIO", url: "https://edge9.pink.rs/rockstream" },
         { name: "SUPER FM", url: "https://onair.superfm.rs/superfm.mp3" },
         { name: "NAXI 80s", url: "https://naxidigital-80s128ssl.streaming.rs:8042/;*.mp3" },
         { name: "PRVI Radio", url: "https://mastermedia.shoutca.st/proxy/prviradions?mp=/stream" },
