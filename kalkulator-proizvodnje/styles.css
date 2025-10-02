@@ -387,3 +387,17 @@ input[type="number"]:focus {
         line-height: 1.5;
     }
 }
+
+/* Author Footer */
+.author-footer {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #f0f0f0;
+    text-align: center;
+}
+
+.author-footer p {
+    color: #666;
+    font-size: 0.9em;
+    font-weight: 500;
+}
