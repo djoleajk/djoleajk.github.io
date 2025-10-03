@@ -20,7 +20,10 @@
         </div>
         
         <div class="current-time">
-            <div class="time-label">Trenutno vreme:</div>
+            <div class="time-label">
+                <span>⏰ Precizno vreme</span>
+                <span class="sync-badge" title="Sinhronizovano sa atomskim satom">🔄 Atomski sat</span>
+            </div>
             <div id="currentTime" class="time-display">--:--:--</div>
         </div>
 
@@ -71,6 +74,7 @@
         </div>
     </div>
 
+    <script src="time-sync.js"></script>
     <script src="robot.js"></script>
 </body>
 </html>

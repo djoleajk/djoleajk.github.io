@@ -18,8 +18,12 @@
         </div>
         
         <div class="current-time">
-            <div class="time-label">Trenutno vreme:</div>
+            <div class="time-label">
+                <span>⏰ Precizno vreme</span>
+                <span class="sync-badge" title="Sinhronizovano sa atomskim satom">🔄 Atomski sat</span>
+            </div>
             <div id="currentTime" class="time-display">--:--:--</div>
+            <div id="currentDate" class="date-display"></div>
         </div>
 
         <div class="menu-grid">
@@ -59,26 +63,24 @@
                 <div class="menu-description">Kalkulacija za BEM presu</div>
             </a>
         </div>
+
+        <div class="weather-widget-container">
+            <div id="weatherWidget"></div>
+        </div>
         
         <div class="author-footer">
             <p>© 2025 Đorđe Živanović</p>
         </div>
     </div>
 
+    <script src="time-sync.js"></script>
+    <script src="weather.js"></script>
     <script>
-        // Ažuriranje trenutnog vremena
-        function updateCurrentTime() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('sr-RS', { 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit' 
-            });
-            document.getElementById('currentTime').textContent = timeString;
-        }
-
-        updateCurrentTime();
-        setInterval(updateCurrentTime, 1000);
+        // Pokreni sat sa prikazom datuma
+        atomicClock.startClock('currentTime', { 
+            showDate: true, 
+            dateElementId: 'currentDate' 
+        });
     </script>
 </body>
 </html>

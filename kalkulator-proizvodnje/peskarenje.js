@@ -1,13 +1,3 @@
-function updateCurrentTime() {
-    const now = new Date();
-    const timeString = now.toLocaleTimeString('sr-RS', { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit' 
-    });
-    document.getElementById('currentTime').textContent = timeString;
-}
-
 function formatTime(date) {
     return date.toLocaleTimeString('sr-RS', { 
         hour: '2-digit', 
@@ -31,7 +21,7 @@ function formatDuration(seconds) {
 }
 
 function createDateFromTime(timeString) {
-    const now = new Date();
+    const now = atomicClock.getCurrentTime();
     const [hours, minutes] = timeString.split(':');
     const customDate = new Date(now);
     customDate.setHours(parseInt(hours, 10));
@@ -61,7 +51,7 @@ function calculate() {
     if (startTimeInput) {
         startTime = createDateFromTime(startTimeInput);
     } else {
-        startTime = new Date();
+        startTime = atomicClock.getCurrentTime();
     }
 
     const numberOfCycles = Math.ceil(numberOfMines / 2);
@@ -96,6 +86,3 @@ document.getElementById('startTimeInput').addEventListener('keypress', function(
         calculate();
     }
 });
-
-updateCurrentTime();
-setInterval(updateCurrentTime, 1000);
