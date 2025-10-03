@@ -27,10 +27,10 @@ class WeatherForecast {
             this.weatherData = await response.json();
             this.lastUpdate = new Date();
             
-            console.log('✓ Vremenska prognoza ažurirana za Valjevo');
+            console.log('✓ Временска прогноза ажурирана за Ваљево');
             return this.weatherData;
         } catch (error) {
-            console.warn('⚠ Greška pri preuzimanju vremenske prognoze:', error.message);
+            console.warn('⚠ Грешка при преузимању временске прогнозе:', error.message);
             return null;
         }
     }
@@ -40,33 +40,33 @@ class WeatherForecast {
      */
     getWeatherInfo(code) {
         const weatherCodes = {
-            0: { icon: '☀️', desc: 'Vedro', color: '#FFD700' },
-            1: { icon: '🌤️', desc: 'Pretežno vedro', color: '#FDB813' },
-            2: { icon: '⛅', desc: 'Delimično oblačno', color: '#87CEEB' },
-            3: { icon: '☁️', desc: 'Oblačno', color: '#B0C4DE' },
-            45: { icon: '🌫️', desc: 'Magla', color: '#D3D3D3' },
-            48: { icon: '🌫️', desc: 'Inje', color: '#E0E0E0' },
-            51: { icon: '🌦️', desc: 'Slaba kiša', color: '#4682B4' },
-            53: { icon: '🌧️', desc: 'Umerena kiša', color: '#4169E1' },
-            55: { icon: '🌧️', desc: 'Jaka kiša', color: '#0000CD' },
-            61: { icon: '🌦️', desc: 'Slaba kiša', color: '#4682B4' },
-            63: { icon: '🌧️', desc: 'Umerena kiša', color: '#4169E1' },
-            65: { icon: '🌧️', desc: 'Jaka kiša', color: '#0000CD' },
-            71: { icon: '🌨️', desc: 'Slab sneg', color: '#B0E0E6' },
-            73: { icon: '❄️', desc: 'Umeren sneg', color: '#87CEEB' },
-            75: { icon: '❄️', desc: 'Jak sneg', color: '#4682B4' },
-            77: { icon: '🌨️', desc: 'Susnežica', color: '#ADD8E6' },
-            80: { icon: '🌦️', desc: 'Pljusak', color: '#4682B4' },
-            81: { icon: '⛈️', desc: 'Jak pljusak', color: '#4169E1' },
-            82: { icon: '⛈️', desc: 'Jak pljusak', color: '#0000CD' },
-            85: { icon: '🌨️', desc: 'Snežni pljusak', color: '#87CEEB' },
-            86: { icon: '❄️', desc: 'Jak sneg', color: '#4682B4' },
-            95: { icon: '⛈️', desc: 'Grmljavina', color: '#8B0000' },
-            96: { icon: '⛈️', desc: 'Grmljavina sa gradom', color: '#8B0000' },
-            99: { icon: '⛈️', desc: 'Jaka grmljavina', color: '#800000' }
+            0: { icon: '☀️', desc: 'Ведро', color: '#FFD700' },
+            1: { icon: '🌤️', desc: 'Претежно ведро', color: '#FDB813' },
+            2: { icon: '⛅', desc: 'Делимично облачно', color: '#87CEEB' },
+            3: { icon: '☁️', desc: 'Облачно', color: '#B0C4DE' },
+            45: { icon: '🌫️', desc: 'Магла', color: '#D3D3D3' },
+            48: { icon: '🌫️', desc: 'Иње', color: '#E0E0E0' },
+            51: { icon: '🌦️', desc: 'Слаба киша', color: '#4682B4' },
+            53: { icon: '🌧️', desc: 'Умерена киша', color: '#4169E1' },
+            55: { icon: '🌧️', desc: 'Јака киша', color: '#0000CD' },
+            61: { icon: '🌦️', desc: 'Слаба киша', color: '#4682B4' },
+            63: { icon: '🌧️', desc: 'Умерена киша', color: '#4169E1' },
+            65: { icon: '🌧️', desc: 'Јака киша', color: '#0000CD' },
+            71: { icon: '🌨️', desc: 'Слаб снег', color: '#B0E0E6' },
+            73: { icon: '❄️', desc: 'Умерен снег', color: '#87CEEB' },
+            75: { icon: '❄️', desc: 'Јак снег', color: '#4682B4' },
+            77: { icon: '🌨️', desc: 'Суснежица', color: '#ADD8E6' },
+            80: { icon: '🌦️', desc: 'Пљусак', color: '#4682B4' },
+            81: { icon: '⛈️', desc: 'Јак пљусак', color: '#4169E1' },
+            82: { icon: '⛈️', desc: 'Јак пљусак', color: '#0000CD' },
+            85: { icon: '🌨️', desc: 'Снежни пљусак', color: '#87CEEB' },
+            86: { icon: '❄️', desc: 'Јак снег', color: '#4682B4' },
+            95: { icon: '⛈️', desc: 'Грмљавина', color: '#8B0000' },
+            96: { icon: '⛈️', desc: 'Грмљавина са градом', color: '#8B0000' },
+            99: { icon: '⛈️', desc: 'Јака грмљавина', color: '#800000' }
         };
 
-        return weatherCodes[code] || { icon: '🌡️', desc: 'Nepoznato', color: '#808080' };
+        return weatherCodes[code] || { icon: '🌡️', desc: 'Непознато', color: '#808080' };
     }
 
     /**
@@ -81,13 +81,13 @@ class WeatherForecast {
         }
 
         // Prikaži loading
-        container.innerHTML = '<div class="weather-loading">📡 Učitavam vremensku prognozu...</div>';
+        container.innerHTML = '<div class="weather-loading">📡 Учитавам временску прогнозу...</div>';
 
         // Fetch podatke
         const data = await this.fetchWeather();
         
         if (!data || !data.current) {
-            container.innerHTML = '<div class="weather-error">⚠️ Vremenska prognoza trenutno nije dostupna</div>';
+            container.innerHTML = '<div class="weather-error">⚠️ Временска прогноза тренутно није доступна</div>';
             return;
         }
 
@@ -100,10 +100,10 @@ class WeatherForecast {
             <div class="weather-card">
                 <div class="weather-header">
                     <div class="weather-location">
-                        📍 Valjevo
+                        📍 Ваљево
                     </div>
                     <div class="weather-time">
-                        Ažurirano: ${this.lastUpdate.toLocaleTimeString('sr-RS', { hour: '2-digit', minute: '2-digit' })}
+                        Ажурирано: ${this.lastUpdate.toLocaleTimeString('sr-RS', { hour: '2-digit', minute: '2-digit' })}
                     </div>
                 </div>
                 
@@ -118,25 +118,25 @@ class WeatherForecast {
                         ${weatherInfo.desc}
                     </div>
                     <div class="weather-feels-like">
-                        Osećaj: ${Math.round(current.apparent_temperature)}°C
+                        Осећај: ${Math.round(current.apparent_temperature)}°C
                     </div>
                 </div>
 
                 <div class="weather-details">
                     <div class="weather-detail-item">
                         <div class="weather-detail-icon">💧</div>
-                        <div class="weather-detail-label">Vlažnost</div>
+                        <div class="weather-detail-label">Влажност</div>
                         <div class="weather-detail-value">${current.relative_humidity_2m}%</div>
                     </div>
                     <div class="weather-detail-item">
                         <div class="weather-detail-icon">💨</div>
-                        <div class="weather-detail-label">Vetar</div>
+                        <div class="weather-detail-label">Ветар</div>
                         <div class="weather-detail-value">${Math.round(current.wind_speed_10m)} km/h</div>
                     </div>
                 </div>
 
                 <div class="weather-forecast">
-                    <div class="forecast-title">Prognoza za naredna 3 dana:</div>
+                    <div class="forecast-title">Прогноза за наредна 3 дана:</div>
                     <div class="forecast-days">
                         ${this.generateForecastDays(daily)}
                     </div>
@@ -156,12 +156,12 @@ class WeatherForecast {
     generateForecastDays(daily) {
         if (!daily || !daily.time) return '';
 
-        const days = ['Nedelja', 'Ponedeljak', 'Utorak', 'Sreda', 'Četvrtak', 'Petak', 'Subota'];
+        const days = ['Недеља', 'Понедељак', 'Уторак', 'Среда', 'Четвртак', 'Петак', 'Субота'];
         let html = '';
 
         for (let i = 0; i < 3; i++) {
             const date = new Date(daily.time[i]);
-            const dayName = i === 0 ? 'Danas' : (i === 1 ? 'Sutra' : days[date.getDay()]);
+            const dayName = i === 0 ? 'Данас' : (i === 1 ? 'Сутра' : days[date.getDay()]);
             const weatherInfo = this.getWeatherInfo(daily.weather_code[i]);
             const maxTemp = Math.round(daily.temperature_2m_max[i]);
             const minTemp = Math.round(daily.temperature_2m_min[i]);

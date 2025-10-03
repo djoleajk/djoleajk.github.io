@@ -3,68 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Presa Italijanka - Kalkulator</title>
+    <title>Преса Италијанка - Калкулатор</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <a href="index.html" class="back-btn">← Nazad na meni</a>
+        <a href="index.html" class="back-btn">← Назад на мени</a>
         
-        <h1>Presa "Italijanka"</h1>
-        <p class="subtitle">Izračunaj vreme završetka serije</p>
+        <h1>Преса "Италијанка"</h1>
+        <p class="subtitle">Израчунај време завршетка серије</p>
         
         <div class="dedication-banner">
             <div class="gift-text">
-                Poklon kolegama <strong>Kovačkog Centra</strong>
+                Поклон колегама <strong>Ковачког Центра</strong>
             </div>
         </div>
         
         <div class="current-time">
             <div class="time-label">
-                <span>⏰ Precizno vreme</span>
-                <span class="sync-badge" title="Sinhronizovano sa atomskim satom">🔄 Atomski sat</span>
+                <span>⏰ Прецизно време</span>
+                <span class="sync-badge" title="Синхронизовано са атомским сатом">🔄 Атомски сат</span>
             </div>
             <div id="currentTime" class="time-display">--:--:--</div>
         </div>
 
         <div class="input-section">
             <div class="input-group">
-                <label for="timePerPiece">Vreme po komadu (sekunde):</label>
-                <input type="number" id="timePerPiece" min="1" placeholder="npr. 22">
+                <label for="timePerPiece">Време по комаду (секунде):</label>
+                <input type="number" id="timePerPiece" min="1" placeholder="нпр. 22">
             </div>
 
             <div class="input-group">
-                <label for="numberOfPieces">Broj komada:</label>
-                <input type="number" id="numberOfPieces" min="1" placeholder="npr. 50">
+                <label for="numberOfPieces">Број комада:</label>
+                <input type="number" id="numberOfPieces" min="1" placeholder="нпр. 50">
             </div>
 
             <div class="input-group bem-special">
-                <label for="startTimeInput">Početak rada (opcionalno):</label>
+                <label for="startTimeInput">Почетак рада (опционално):</label>
                 <input type="time" id="startTimeInput" class="time-input">
-                <small class="input-note">⚠️ Ostavi prazno za trenutno vreme ili unesi kada indukcija bude spremna</small>
+                <small class="input-note">⚠️ Остави празно за тренутно време или унеси када индукција буде спремна</small>
             </div>
 
-            <button id="calculateBtn" class="btn-calculate">Izračunaj</button>
+            <button id="calculateBtn" class="btn-calculate">Израчунај</button>
         </div>
 
         <div id="results" class="results hidden">
             <div class="result-card">
-                <div class="result-label">Početak rada</div>
+                <div class="result-label">Почетак рада</div>
                 <div id="startTime" class="result-value">--:--:--</div>
             </div>
 
             <div class="result-card highlight">
-                <div class="result-label">Ukupno trajanje</div>
-                <div id="totalDuration" class="result-value">-- min -- sek</div>
+                <div class="result-label">Укупно трајање</div>
+                <div id="totalDuration" class="result-value">-- мин -- сек</div>
             </div>
 
             <div class="result-card success">
-                <div class="result-label">Završetak rada</div>
+                <div class="result-label">Завршетак рада</div>
                 <div id="endTime" class="result-value">--:--:--</div>
             </div>
 
             <div class="result-card info">
-                <div class="result-label">Ukupno komada</div>
+                <div class="result-label">Укупно комада</div>
                 <div id="totalPieces" class="result-value">--</div>
             </div>
         </div>

@@ -36,13 +36,13 @@ class AtomicTimeSynchronizer {
             this.timeOffset = serverTime - localTime;
             this.lastSync = new Date();
             
-            console.log('✓ Vreme sinhronizovano sa atomskim satom');
-            console.log(`Offset: ${this.timeOffset}ms`);
+            console.log('✓ Време синхронизовано са атомским сатом');
+            console.log(`Офсет: ${this.timeOffset}ms`);
             
             return true;
         } catch (error) {
-            console.warn('⚠ Greška pri sinhronizaciji:', error.message);
-            console.log('Koristi se lokalno vreme');
+            console.warn('⚠ Грешка при синхронизацији:', error.message);
+            console.log('Користи се локално време');
             return false;
         } finally {
             this.syncInProgress = false;
@@ -63,7 +63,7 @@ class AtomicTimeSynchronizer {
         const clockElement = document.getElementById(elementId);
         
         if (!clockElement) {
-            console.error('Element za sat nije pronađen:', elementId);
+            console.error('Елемент за сат није пронађен:', elementId);
             return;
         }
 

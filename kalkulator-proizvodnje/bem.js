@@ -11,12 +11,22 @@ function formatDuration(seconds) {
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
 
+    // Gramatika za sate
+    let hourText = '';
+    if (hours === 1) {
+        hourText = 'сат';
+    } else if (hours >= 2 && hours <= 4) {
+        hourText = 'сата';
+    } else if (hours >= 5) {
+        hourText = 'сати';
+    }
+
     if (hours > 0) {
-        return `${hours}h ${minutes}min ${secs}sek`;
+        return `${hours} ${hourText} ${minutes}мин ${secs}сек`;
     } else if (minutes > 0) {
-        return `${minutes}min ${secs}sek`;
+        return `${minutes}мин ${secs}сек`;
     } else {
-        return `${secs}sek`;
+        return `${secs}сек`;
     }
 }
 
@@ -38,12 +48,12 @@ function calculate() {
     const startTimeInput = document.getElementById('startTimeInput').value;
 
     if (!timePerPiece || timePerPiece <= 0) {
-        alert('Molimo unesite validno vreme po komadu!');
+        alert('Молимо унесите валидно време по комаду!');
         return;
     }
 
     if (!numberOfPieces || numberOfPieces <= 0) {
-        alert('Molimo unesite validan broj komada!');
+        alert('Молимо унесите валидан број комада!');
         return;
     }
 
@@ -60,7 +70,7 @@ function calculate() {
     document.getElementById('startTime').textContent = formatTime(startTime);
     document.getElementById('totalDuration').textContent = formatDuration(totalSeconds);
     document.getElementById('endTime').textContent = formatTime(endTime);
-    document.getElementById('totalPieces').textContent = numberOfPieces + ' kom';
+    document.getElementById('totalPieces').textContent = numberOfPieces + ' ком';
 
     document.getElementById('results').classList.remove('hidden');
 }
