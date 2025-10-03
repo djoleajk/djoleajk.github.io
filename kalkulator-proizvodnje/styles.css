@@ -62,37 +62,15 @@ h1 {
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
 
-.time-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+.time-label {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9em;
+    margin-bottom: 5px;
+    display: flex;
+    justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     gap: 10px;
-    margin-bottom: 0;
-}
-
-.time-left {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    min-width: 0;
-}
-
-.time-center {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 5px;
-    min-width: 0;
-}
-
-.time-right {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    width: 100%;
-    min-width: 0;
 }
 
 .sync-badge {
@@ -116,38 +94,6 @@ h1 {
     }
 }
 
-.temp-badge {
-    color: rgba(255, 255, 255, 0.85);
-    background: rgba(255, 255, 255, 0.2);
-    padding: 12px 20px;
-    border-radius: 30px;
-    font-size: 1.2em;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 100%;
-    justify-content: center;
-    box-sizing: border-box;
-}
-
-.temp-icon {
-    font-size: 1.2em;
-}
-
-.temp-value {
-    font-family: 'Courier New', monospace;
-    font-size: 1em;
-}
-
-.temp-location {
-    font-size: 0.85em;
-    opacity: 0.85;
-    font-weight: 500;
-}
 
 .time-display {
     color: white;
@@ -158,24 +104,10 @@ h1 {
 
 .date-display {
     color: rgba(255, 255, 255, 0.85);
-    font-size: 1.2em;
-    font-weight: 600;
+    font-size: 0.85em;
+    margin-top: 8px;
+    font-weight: 500;
     text-transform: capitalize;
-    background: rgba(255, 255, 255, 0.2);
-    padding: 12px 20px;
-    border-radius: 30px;
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    width: 100%;
-    text-align: center;
-    box-sizing: border-box;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    letter-spacing: 0.5px;
 }
 
 .input-section {
@@ -773,18 +705,13 @@ input[type="number"]:focus {
         font-size: 2em;
     }
 
-    .time-row {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-
-    .time-left,
-    .time-right {
-        justify-content: center;
-    }
-
     .time-display {
         font-size: 2em;
+    }
+
+    .time-label {
+        justify-content: center;
+        gap: 8px;
     }
 
     .sync-badge {
@@ -792,15 +719,8 @@ input[type="number"]:focus {
         padding: 3px 8px;
     }
 
-    .temp-badge {
-        font-size: 0.9em;
-        padding: 10px 15px;
-        gap: 6px;
-    }
-
     .date-display {
-        font-size: 0.9em;
-        padding: 10px 15px;
+        font-size: 0.75em;
     }
 
     .results {
