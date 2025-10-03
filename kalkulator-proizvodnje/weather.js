@@ -27,11 +27,35 @@ class WeatherForecast {
             this.weatherData = await response.json();
             this.lastUpdate = new Date();
             
+            // Ažuriraj temperaturu u time widget-u
+            this.updateTemperatureBadge();
+            
             console.log('✓ Временска прогноза ажурирана за Ваљево');
             return this.weatherData;
         } catch (error) {
             console.warn('⚠ Грешка при преузимању временске прогнозе:', error.message);
             return null;
+        }
+    }
+
+    /**
+     * Ažurira temperaturu u badge-u iznad sata
+     */
+    updateTemperatureBadge() {
+        const tempBadge = document.getElementById('currentTemp');
+        
+        if (!tempBadge) return;
+        
+        if (this.weatherData && this.weatherData.current) {
+            const temp = Math.round(this.weatherData.current.temperature_2m);
+            const weatherInfo = this.getWeatherInfo(this.weatherData.current.weather_code);
+            
+            tempBadge.innerHTML = `
+                <span class="temp-icon">${weatherInfo.icon}</span>
+                <span class="temp-value">${temp}°C</span>
+                <span class="temp-location">Ваљево</span>
+            `;
+            tempBadge.title = `${weatherInfo.desc} - ${temp}°C - Ваљево`;
         }
     }
 
@@ -191,13 +215,31 @@ const weatherForecast = new WeatherForecast();
 // Automatski pokreni prikaz vremena kada se strana učita
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
+        // Učitaj temperaturu za badge
+        weatherForecast.fetchWeather();
+        
+        // Učitaj pun widget ako postoji
         if (document.getElementById('weatherWidget')) {
             weatherForecast.displayCurrentWeather();
         }
+        
+        // Automatsko osvežavanje temperature svakih 30 minuta
+        setInterval(() => {
+            weatherForecast.fetchWeather();
+        }, 30 * 60 * 1000);
     });
 } else {
+    // Učitaj temperaturu za badge
+    weatherForecast.fetchWeather();
+    
+    // Učitaj pun widget ako postoji
     if (document.getElementById('weatherWidget')) {
         weatherForecast.displayCurrentWeather();
     }
+    
+    // Automatsko osvežavanje temperature svakih 30 minuta
+    setInterval(() => {
+        weatherForecast.fetchWeather();
+    }, 30 * 60 * 1000);
 }
 

@@ -18,12 +18,22 @@
         </div>
         
         <div class="current-time">
-            <div class="time-label">
-                <span>⏰ Прецизно време</span>
-                <span class="sync-badge" title="Синхронизовано са атомским сатом">🔄 Атомски сат</span>
+            <div class="time-row">
+                <div class="time-left">
+                    <div id="currentDate" class="date-display"></div>
+                </div>
+                <div class="time-center">
+                    <div id="currentTime" class="time-display">--:--:--</div>
+                    <span class="sync-badge" title="Синхронизовано са атомским сатом">🔄 Атомски сат</span>
+                </div>
+                <div class="time-right">
+                    <span class="temp-badge" id="currentTemp" title="Тренутна температура">
+                        <span class="temp-icon">🌡️</span>
+                        <span class="temp-value">--°C</span>
+                        <span class="temp-location">Ваљево</span>
+                    </span>
+                </div>
             </div>
-            <div id="currentTime" class="time-display">--:--:--</div>
-            <div id="currentDate" class="date-display"></div>
         </div>
 
         <div class="menu-grid">
@@ -64,6 +74,10 @@
             </a>
         </div>
 
+        <div class="news-widget-container">
+            <div id="newsWidget"></div>
+        </div>
+
         <div class="weather-widget-container">
             <div id="weatherWidget"></div>
         </div>
@@ -74,6 +88,7 @@
     </div>
 
     <script src="time-sync.js"></script>
+    <script src="news.js"></script>
     <script src="weather.js"></script>
     <script>
         // Pokreni sat sa prikazom datuma
