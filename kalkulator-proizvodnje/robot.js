@@ -67,12 +67,61 @@ function calculate() {
     const totalSeconds = timePerPiece * numberOfPieces;
     const endTime = new Date(startTime.getTime() + totalSeconds * 1000);
 
-    document.getElementById('startTime').textContent = formatTime(startTime);
-    document.getElementById('totalDuration').textContent = formatDuration(totalSeconds);
-    document.getElementById('endTime').textContent = formatTime(endTime);
+    const startTimeStr = formatTime(startTime);
+    const endTimeStr = formatTime(endTime);
+    const durationStr = formatDuration(totalSeconds);
+
+    document.getElementById('startTime').textContent = startTimeStr;
+    document.getElementById('totalDuration').textContent = durationStr;
+    document.getElementById('endTime').textContent = endTimeStr;
     document.getElementById('totalPieces').textContent = numberOfPieces + ' ком';
 
     document.getElementById('results').classList.remove('hidden');
+
+    // Sačuvaj u istoriju
+    if (typeof historyManager !== 'undefined') {
+        historyManager.addCalculation({
+            operation: 'Робот',
+            timePerPiece: timePerPiece,
+            numberOfPieces: numberOfPieces,
+            startTime: startTimeStr,
+            endTime: endTimeStr,
+            totalDuration: totalSeconds
+        });
+    }
+
+    // Zakazi notifikaciju za završetak
+    if (typeof notificationManager !== 'undefined' && notificationManager.areNotificationsEnabled()) {
+        const now = atomicClock.getCurrentTime();
+        const delayMs = endTime.getTime() - now.getTime();
+        
+        if (delayMs > 0) {
+            notificationManager.scheduleNotification(
+                'calculation-complete',
+                delayMs,
+                '✅ Робот завршен!',
+                {
+                    body: `${numberOfPieces} комада успешно завршено`,
+                    icon: '🤖',
+                    tag: 'calculation-complete',
+                    requireInteraction: true
+                }
+            );
+
+            if (delayMs > 60000) {
+                notificationManager.scheduleNotification(
+                    'calculation-midpoint',
+                    delayMs / 2,
+                    '⏰ Половина времена',
+                    {
+                        body: `Робот: Још ${formatDuration(totalSeconds / 2)} до краја`,
+                        icon: '⏰',
+                        tag: 'calculation-midpoint'
+                    }
+                );
+            }
+        }
+    }
 }
 
 document.getElementById('calculateBtn').addEventListener('click', calculate);
