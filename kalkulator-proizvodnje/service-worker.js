@@ -15,6 +15,7 @@ const urlsToCache = [
     './peskarenje.html',
     './history.html',
     './styles.css',
+    './favicon.svg',
     './time-sync.js',
     './weather.js',
     './bem.js',
