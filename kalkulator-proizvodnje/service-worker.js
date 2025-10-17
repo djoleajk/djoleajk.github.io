@@ -127,7 +127,7 @@ self.addEventListener('push', (event) => {
     };
 
     event.waitUntil(
-        self.registration.showNotification('Калкулатор производње', options)
+        self.registration.showNotification('Калкулатор времена', options)
     );
 });
 
