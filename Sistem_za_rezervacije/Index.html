@@ -1,0 +1,1339 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem za Rezervacije</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        /* Header & Navigation */
+        .header {
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-name {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 0.938rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #d97706;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-small {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.813rem;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Landing Page */
+        .landing-page {
+            text-align: center;
+            padding: 4rem 2rem;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hero {
+            background: var(--card-bg);
+            padding: 3rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-lg);
+            max-width: 600px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: var(--primary-color);
+        }
+
+        .close-btn {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            background: none;
+            border: none;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: var(--border-color);
+            color: var(--danger-color);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-footer {
+            margin-top: 1.5rem;
+            text-align: center;
+        }
+
+        .form-footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* User Panel */
+        .user-panel,
+        .admin-panel {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .user-panel.active,
+        .admin-panel.active {
+            display: block;
+        }
+
+        .panel-header {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .panel-header p {
+            color: var(--text-muted);
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card h3 {
+            color: var(--primary-color);
+            margin-bottom: 0.75rem;
+        }
+
+        .card-info {
+            color: var(--text-muted);
+            font-size: 0.938rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        /* Table */
+        .table-container {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+
+        .table-container h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg-color);
+        }
+
+        th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tbody tr:hover {
+            background: var(--bg-color);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.813rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-confirmed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-cancelled {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 2rem;
+            background: var(--card-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-lg);
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+            max-width: 400px;
+        }
+
+        .notification.active {
+            display: flex;
+        }
+
+        .notification.success {
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .notification.error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .notification.info {
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .notification-icon {
+            font-size: 1.5rem;
+        }
+
+        .notification-message {
+            flex: 1;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 1.875rem;
+            }
+
+            .hero {
+                padding: 2rem 1.5rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .cards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .table-container {
+                padding: 1rem;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+
+            .notification {
+                right: 1rem;
+                left: 1rem;
+                max-width: calc(100% - 2rem);
+            }
+
+            .modal-content {
+                padding: 1.5rem;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Action Buttons Group */
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="nav-container">
+            <div class="logo">
+                <span>📅</span>
+                Sistem za Rezervacije
+            </div>
+            <div class="nav-buttons">
+                <div id="userInfo" class="user-info hidden">
+                    <span class="user-name" id="userName"></span>
+                    <button class="btn btn-danger btn-small" onclick="logout()">Odjavi se</button>
+                </div>
+                <div id="guestButtons" class="nav-buttons">
+                    <button class="btn btn-primary btn-small" onclick="openLoginModal()">Prijava</button>
+                    <button class="btn btn-outline btn-small" onclick="openRegisterModal()">Registracija</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Landing Page -->
+        <section id="landingPage" class="landing-page">
+            <div class="hero">
+                <h1>Dobrodošli u Sistem za Rezervacije</h1>
+                <p>Lako rezervišite termine, upravite svojim rezervacijama i pratite dostupnost usluga.</p>
+                <div class="hero-buttons">
+                    <button class="btn btn-primary" onclick="openRegisterModal()">Započnite sada</button>
+                    <button class="btn btn-outline" onclick="openLoginModal()">Prijavite se</button>
+                    <button class="btn btn-secondary" onclick="openAdminLoginModal()">Admin pristup</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- User Panel -->
+        <section id="userPanel" class="user-panel container">
+            <div class="panel-header">
+                <h1>Korisnički Panel</h1>
+                <p>Pregledajte dostupne termine i napravite rezervaciju</p>
+            </div>
+
+            <div class="table-container" style="margin-bottom: 2rem;">
+                <h2>Dostupne Usluge</h2>
+                <div id="servicesGrid" class="cards-grid"></div>
+            </div>
+
+            <div class="table-container">
+                <h2>Moje Rezervacije</h2>
+                <div id="userReservations"></div>
+            </div>
+        </section>
+
+        <!-- Admin Panel -->
+        <section id="adminPanel" class="admin-panel container">
+            <div class="panel-header">
+                <h1>Administratorski Panel</h1>
+                <p>Upravljajte rezervacijama i uslugama</p>
+            </div>
+
+            <div class="table-container" style="margin-bottom: 2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>Sve Rezervacije</h2>
+                    <button class="btn btn-secondary btn-small" onclick="openManageServicesModal()">Upravljaj uslugama</button>
+                </div>
+                <div id="allReservations"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Prijava</h2>
+                <button class="close-btn" onclick="closeModal('loginModal')">&times;</button>
+            </div>
+            <form onsubmit="login(event)">
+                <div class="form-group">
+                    <label for="loginEmail">Email:</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Lozinka:</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Prijavi se</button>
+                <div class="form-footer">
+                    <p>Nemate nalog? <a onclick="switchToRegister()">Registrujte se</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Registracija</h2>
+                <button class="close-btn" onclick="closeModal('registerModal')">&times;</button>
+            </div>
+            <form onsubmit="register(event)">
+                <div class="form-group">
+                    <label for="registerName">Ime i Prezime:</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email:</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Lozinka:</label>
+                    <input type="password" id="registerPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="registerPhone">Telefon:</label>
+                    <input type="tel" id="registerPhone" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Registruj se</button>
+                <div class="form-footer">
+                    <p>Već imate nalog? <a onclick="switchToLogin()">Prijavite se</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div id="adminLoginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Admin Prijava</h2>
+                <button class="close-btn" onclick="closeModal('adminLoginModal')">&times;</button>
+            </div>
+            <form onsubmit="adminLogin(event)">
+                <div class="form-group">
+                    <label for="adminEmail">Email:</label>
+                    <input type="email" id="adminEmail" value="admin@rezervacije.com">
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Lozinka:</label>
+                    <input type="password" id="adminPassword" value="admin123">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Prijavi se</button>
+                <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-muted);">
+                    Demo: admin@rezervacije.com / admin123
+                </p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reservation Modal -->
+    <div id="reservationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Nova Rezervacija</h2>
+                <button class="close-btn" onclick="closeModal('reservationModal')">&times;</button>
+            </div>
+            <form onsubmit="createReservation(event)">
+                <input type="hidden" id="reservationServiceId">
+                <div class="form-group">
+                    <label for="reservationService">Usluga:</label>
+                    <input type="text" id="reservationService" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="reservationDate">Datum:</label>
+                    <input type="date" id="reservationDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="reservationTime">Vreme:</label>
+                    <input type="time" id="reservationTime" required>
+                </div>
+                <div class="form-group">
+                    <label for="reservationNotes">Napomena (opciono):</label>
+                    <textarea id="reservationNotes" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Rezerviši</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Manage Services Modal -->
+    <div id="manageServicesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Upravljanje Uslugama</h2>
+                <button class="close-btn" onclick="closeModal('manageServicesModal')">&times;</button>
+            </div>
+            
+            <form onsubmit="addService(event)" style="margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 2px solid var(--border-color);">
+                <h3 style="margin-bottom: 1rem; color: var(--primary-color);">Dodaj Novu Uslugu</h3>
+                <div class="form-group">
+                    <label for="serviceName">Naziv:</label>
+                    <input type="text" id="serviceName" required>
+                </div>
+                <div class="form-group">
+                    <label for="serviceDescription">Opis:</label>
+                    <textarea id="serviceDescription" rows="2" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="servicePrice">Cena (RSD):</label>
+                    <input type="number" id="servicePrice" required>
+                </div>
+                <div class="form-group">
+                    <label for="serviceDuration">Trajanje (min):</label>
+                    <input type="number" id="serviceDuration" required>
+                </div>
+                <button type="submit" class="btn btn-secondary" style="width: 100%;">Dodaj Uslugu</button>
+            </form>
+
+            <div>
+                <h3 style="margin-bottom: 1rem; color: var(--primary-color);">Postojeće Usluge</h3>
+                <div id="servicesList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification">
+        <div class="notification-icon" id="notificationIcon"></div>
+        <div class="notification-message" id="notificationMessage"></div>
+        <button class="close-btn" onclick="hideNotification()">&times;</button>
+    </div>
+
+    <script>
+        // Initialize data structure
+        let currentUser = null;
+        let isAdmin = false;
+
+        // Initialize default data if not exists
+        function initializeData() {
+            if (!localStorage.getItem('users')) {
+                localStorage.setItem('users', JSON.stringify([]));
+            }
+            
+            if (!localStorage.getItem('services')) {
+                const defaultServices = [
+                    {
+                        id: Date.now() + 1,
+                        name: 'Konferencijska sala A',
+                        description: 'Sala sa kapacitetom 50 osoba, projektor i whiteboard',
+                        price: 3000,
+                        duration: 60
+                    },
+                    {
+                        id: Date.now() + 2,
+                        name: 'Mala sala za sastanke',
+                        description: 'Intimna sala za 10 osoba sa TV ekranom',
+                        price: 1500,
+                        duration: 60
+                    },
+                    {
+                        id: Date.now() + 3,
+                        name: 'Radna soba',
+                        description: 'Tiha soba za rad sa internetom i štampačem',
+                        price: 800,
+                        duration: 120
+                    }
+                ];
+                localStorage.setItem('services', JSON.stringify(defaultServices));
+            }
+            
+            if (!localStorage.getItem('reservations')) {
+                localStorage.setItem('reservations', JSON.stringify([]));
+            }
+        }
+
+        // Notification System
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notificationIcon');
+            const messageEl = document.getElementById('notificationMessage');
+            
+            notification.className = 'notification active ' + type;
+            messageEl.textContent = message;
+            
+            if (type === 'success') {
+                icon.textContent = '✓';
+            } else if (type === 'error') {
+                icon.textContent = '✕';
+            } else {
+                icon.textContent = 'ℹ';
+            }
+            
+            setTimeout(() => {
+                hideNotification();
+            }, 4000);
+        }
+
+        function hideNotification() {
+            document.getElementById('notification').classList.remove('active');
+        }
+
+        // Modal Functions
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        function openRegisterModal() {
+            document.getElementById('registerModal').classList.add('active');
+        }
+
+        function openAdminLoginModal() {
+            document.getElementById('adminLoginModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function switchToRegister() {
+            closeModal('loginModal');
+            openRegisterModal();
+        }
+
+        function switchToLogin() {
+            closeModal('registerModal');
+            openLoginModal();
+        }
+
+        // Authentication
+        function register(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const phone = document.getElementById('registerPhone').value.trim();
+            
+            if (!name || !email || !password || !phone) {
+                showNotification('Molimo popunite sva polja!', 'error');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('users'));
+            
+            if (users.find(u => u.email === email)) {
+                showNotification('Korisnik sa ovim email-om već postoji!', 'error');
+                return;
+            }
+            
+            const newUser = {
+                id: Date.now(),
+                name,
+                email,
+                password,
+                phone,
+                createdAt: new Date().toISOString()
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showNotification('Uspešno ste se registrovali!', 'success');
+            closeModal('registerModal');
+            
+            // Auto login
+            currentUser = newUser;
+            updateUI();
+        }
+
+        function login(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            
+            const users = JSON.parse(localStorage.getItem('users'));
+            const user = users.find(u => u.email === email && u.password === password);
+            
+            if (!user) {
+                showNotification('Pogrešan email ili lozinka!', 'error');
+                return;
+            }
+            
+            currentUser = user;
+            isAdmin = false;
+            updateUI();
+            closeModal('loginModal');
+            showNotification(`Dobrodošli, ${user.name}!`, 'success');
+        }
+
+        function adminLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value;
+            
+            // Simple admin check (in production, this should be more secure)
+            if (email === 'admin@rezervacije.com' && password === 'admin123') {
+                currentUser = { id: 0, name: 'Administrator', email };
+                isAdmin = true;
+                updateUI();
+                closeModal('adminLoginModal');
+                showNotification('Dobrodošli, Administratore!', 'success');
+            } else {
+                showNotification('Pogrešni admin kredencijali!', 'error');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            isAdmin = false;
+            updateUI();
+            showNotification('Uspešno ste se odjavili!', 'info');
+        }
+
+        // UI Update
+        function updateUI() {
+            const landingPage = document.getElementById('landingPage');
+            const userPanel = document.getElementById('userPanel');
+            const adminPanel = document.getElementById('adminPanel');
+            const userInfo = document.getElementById('userInfo');
+            const guestButtons = document.getElementById('guestButtons');
+            
+            if (currentUser) {
+                landingPage.classList.add('hidden');
+                userInfo.classList.remove('hidden');
+                guestButtons.classList.add('hidden');
+                document.getElementById('userName').textContent = currentUser.name;
+                
+                if (isAdmin) {
+                    userPanel.classList.remove('active');
+                    adminPanel.classList.add('active');
+                    loadAllReservations();
+                } else {
+                    adminPanel.classList.remove('active');
+                    userPanel.classList.add('active');
+                    loadServices();
+                    loadUserReservations();
+                }
+            } else {
+                landingPage.classList.remove('hidden');
+                userPanel.classList.remove('active');
+                adminPanel.classList.remove('active');
+                userInfo.classList.add('hidden');
+                guestButtons.classList.remove('hidden');
+            }
+        }
+
+        // Services Management
+        function loadServices() {
+            const services = JSON.parse(localStorage.getItem('services'));
+            const servicesGrid = document.getElementById('servicesGrid');
+            
+            if (services.length === 0) {
+                servicesGrid.innerHTML = '<div class="empty-state"><h3>Nema dostupnih usluga</h3></div>';
+                return;
+            }
+            
+            servicesGrid.innerHTML = services.map(service => `
+                <div class="card">
+                    <h3>${service.name}</h3>
+                    <p class="card-info">${service.description}</p>
+                    <p class="card-info"><strong>Cena:</strong> ${service.price} RSD</p>
+                    <p class="card-info"><strong>Trajanje:</strong> ${service.duration} min</p>
+                    <div class="card-actions">
+                        <button class="btn btn-primary btn-small" onclick="openReservationModal(${service.id})">Rezerviši</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openReservationModal(serviceId) {
+            const services = JSON.parse(localStorage.getItem('services'));
+            const service = services.find(s => s.id === serviceId);
+            
+            document.getElementById('reservationServiceId').value = serviceId;
+            document.getElementById('reservationService').value = service.name;
+            
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('reservationDate').min = today;
+            document.getElementById('reservationDate').value = today;
+            
+            document.getElementById('reservationModal').classList.add('active');
+        }
+
+        function createReservation(event) {
+            event.preventDefault();
+            
+            if (!currentUser) {
+                showNotification('Molimo prijavite se da biste rezervisali!', 'error');
+                return;
+            }
+            
+            const serviceId = parseInt(document.getElementById('reservationServiceId').value);
+            const date = document.getElementById('reservationDate').value;
+            const time = document.getElementById('reservationTime').value;
+            const notes = document.getElementById('reservationNotes').value.trim();
+            
+            const services = JSON.parse(localStorage.getItem('services'));
+            const service = services.find(s => s.id === serviceId);
+            
+            const reservation = {
+                id: Date.now(),
+                userId: currentUser.id,
+                userName: currentUser.name,
+                userEmail: currentUser.email,
+                serviceId,
+                serviceName: service.name,
+                date,
+                time,
+                notes,
+                status: 'pending',
+                createdAt: new Date().toISOString()
+            };
+            
+            const reservations = JSON.parse(localStorage.getItem('reservations'));
+            reservations.push(reservation);
+            localStorage.setItem('reservations', JSON.stringify(reservations));
+            
+            closeModal('reservationModal');
+            showNotification('Rezervacija uspešno kreirana! Čeka se potvrda.', 'success');
+            loadUserReservations();
+            
+            // Clear form
+            document.getElementById('reservationNotes').value = '';
+        }
+
+        // User Reservations
+        function loadUserReservations() {
+            if (!currentUser) return;
+            
+            const reservations = JSON.parse(localStorage.getItem('reservations'));
+            const userReservations = reservations.filter(r => r.userId === currentUser.id);
+            const container = document.getElementById('userReservations');
+            
+            if (userReservations.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>Nemate rezervacija</h3><p>Kliknite na "Rezerviši" da napravite novu rezervaciju</p></div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Usluga</th>
+                            <th>Datum</th>
+                            <th>Vreme</th>
+                            <th>Status</th>
+                            <th>Akcije</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${userReservations.map(res => `
+                            <tr>
+                                <td>${res.serviceName}</td>
+                                <td>${formatDate(res.date)}</td>
+                                <td>${res.time}</td>
+                                <td><span class="status-badge status-${res.status}">${getStatusText(res.status)}</span></td>
+                                <td>
+                                    ${res.status === 'pending' ? `
+                                        <button class="btn btn-danger btn-small" onclick="cancelReservation(${res.id})">Otkaži</button>
+                                    ` : ''}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function cancelReservation(reservationId) {
+            if (!confirm('Da li ste sigurni da želite da otkažete rezervaciju?')) return;
+            
+            const reservations = JSON.parse(localStorage.getItem('reservations'));
+            const index = reservations.findIndex(r => r.id === reservationId);
+            
+            if (index !== -1) {
+                reservations[index].status = 'cancelled';
+                localStorage.setItem('reservations', JSON.stringify(reservations));
+                showNotification('Rezervacija je otkazana.', 'info');
+                loadUserReservations();
+            }
+        }
+
+        // Admin Functions
+        function loadAllReservations() {
+            const reservations = JSON.parse(localStorage.getItem('reservations'));
+            const container = document.getElementById('allReservations');
+            
+            if (reservations.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>Nema rezervacija</h3></div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Korisnik</th>
+                            <th>Email</th>
+                            <th>Usluga</th>
+                            <th>Datum</th>
+                            <th>Vreme</th>
+                            <th>Status</th>
+                            <th>Akcije</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${reservations.map(res => `
+                            <tr>
+                                <td>${res.userName}</td>
+                                <td>${res.userEmail}</td>
+                                <td>${res.serviceName}</td>
+                                <td>${formatDate(res.date)}</td>
+                                <td>${res.time}</td>
+                                <td><span class="status-badge status-${res.status}">${getStatusText(res.status)}</span></td>
+                                <td>
+                                    <div class="action-buttons">
+                                        ${res.status === 'pending' ? `
+                                            <button class="btn btn-secondary btn-small" onclick="confirmReservation(${res.id})">Potvrdi</button>
+                                        ` : ''}
+                                        <button class="btn btn-danger btn-small" onclick="deleteReservation(${res.id})">Obriši</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function confirmReservation(reservationId) {
+            const reservations = JSON.parse(localStorage.getItem('reservations'));
+            const index = reservations.findIndex(r => r.id === reservationId);
+            
+            if (index !== -1) {
+                reservations[index].status = 'confirmed';
+                localStorage.setItem('reservations', JSON.stringify(reservations));
+                showNotification('Rezervacija je potvrđena!', 'success');
+                loadAllReservations();
+            }
+        }
+
+        function deleteReservation(reservationId) {
+            if (!confirm('Da li ste sigurni da želite da obrišete rezervaciju?')) return;
+            
+            const reservations = JSON.parse(localStorage.getItem('reservations'));
+            const filtered = reservations.filter(r => r.id !== reservationId);
+            localStorage.setItem('reservations', JSON.stringify(filtered));
+            showNotification('Rezervacija je obrisana.', 'info');
+            loadAllReservations();
+        }
+
+        // Services Management for Admin
+        function openManageServicesModal() {
+            document.getElementById('manageServicesModal').classList.add('active');
+            loadServicesList();
+        }
+
+        function loadServicesList() {
+            const services = JSON.parse(localStorage.getItem('services'));
+            const container = document.getElementById('servicesList');
+            
+            if (services.length === 0) {
+                container.innerHTML = '<div class="empty-state"><h3>Nema usluga</h3></div>';
+                return;
+            }
+            
+            container.innerHTML = services.map(service => `
+                <div class="card">
+                    <h3>${service.name}</h3>
+                    <p class="card-info">${service.description}</p>
+                    <p class="card-info"><strong>Cena:</strong> ${service.price} RSD | <strong>Trajanje:</strong> ${service.duration} min</p>
+                    <div class="card-actions">
+                        <button class="btn btn-danger btn-small" onclick="deleteService(${service.id})">Obriši</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addService(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('serviceName').value.trim();
+            const description = document.getElementById('serviceDescription').value.trim();
+            const price = parseInt(document.getElementById('servicePrice').value);
+            const duration = parseInt(document.getElementById('serviceDuration').value);
+            
+            if (!name || !description || !price || !duration) {
+                showNotification('Molimo popunite sva polja!', 'error');
+                return;
+            }
+            
+            const service = {
+                id: Date.now(),
+                name,
+                description,
+                price,
+                duration
+            };
+            
+            const services = JSON.parse(localStorage.getItem('services'));
+            services.push(service);
+            localStorage.setItem('services', JSON.stringify(services));
+            
+            showNotification('Usluga uspešno dodata!', 'success');
+            loadServicesList();
+            
+            // Clear form
+            document.getElementById('serviceName').value = '';
+            document.getElementById('serviceDescription').value = '';
+            document.getElementById('servicePrice').value = '';
+            document.getElementById('serviceDuration').value = '';
+        }
+
+        function deleteService(serviceId) {
+            if (!confirm('Da li ste sigurni da želite da obrišete ovu uslugu?')) return;
+            
+            const services = JSON.parse(localStorage.getItem('services'));
+            const filtered = services.filter(s => s.id !== serviceId);
+            localStorage.setItem('services', JSON.stringify(filtered));
+            
+            showNotification('Usluga je obrisana!', 'info');
+            loadServicesList();
+        }
+
+        // Utility Functions
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}.${month}.${year}`;
+        }
+
+        function getStatusText(status) {
+            const statusTexts = {
+                'pending': 'Na čekanju',
+                'confirmed': 'Potvrđeno',
+                'cancelled': 'Otkazano'
+            };
+            return statusTexts[status] || status;
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // Initialize app
+        initializeData();
+        updateUI();
+    </script>
+</body>
+</html>
+
