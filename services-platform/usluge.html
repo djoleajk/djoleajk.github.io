@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Platforma za Usluge - Naslovna</title>
+    <title>Platforma za Usluge - Pretraga</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
@@ -16,8 +16,8 @@
                 <span>Platforma za Usluge</span>
             </div>
             <ul class="nav-menu" id="navMenu">
-                <li><a href="index.html" class="active">Naslovna</a></li>
-                <li><a href="usluge.html">Usluge</a></li>
+                <li><a href="index.html">Naslovna</a></li>
+                <li><a href="usluge.html" class="active">Usluge</a></li>
                 <li><a href="#" id="navDashboard" style="display:none;">Moj Panel</a></li>
                 <li><a href="admin.html" id="navAdmin" style="display:none;">Admin</a></li>
             </ul>
@@ -43,128 +43,156 @@
         </div>
     </nav>
 
-    <!-- Hero Sekcija -->
-    <section class="hero">
-        <div class="hero-overlay"></div>
-        <div class="container hero-content">
-            <h1 class="hero-title">Pronađite Savršenu Uslugu</h1>
-            <p class="hero-subtitle">Povezujemo vas sa najboljim pružaocima usluga u vašem gradu</p>
-            <div class="hero-search">
-                <div class="search-input-group">
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="container">
+            <h1>Pretraga Usluga</h1>
+            <p>Pronađite savršenog pružaoca usluga za vaše potrebe</p>
+        </div>
+    </div>
+
+    <!-- Pretraga i Filteri -->
+    <div class="search-section">
+        <div class="container">
+            <div class="search-bar">
+                <div class="search-input-wrapper">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Šta tražite? (npr. vodoinstalater, električar...)" id="heroSearchInput">
+                    <input type="text" id="searchInput" placeholder="Pretraži usluge...">
                 </div>
-                <div class="search-input-group">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <input type="text" placeholder="Lokacija" id="heroLocationInput">
-                </div>
-                <button class="btn btn-search" id="heroSearchBtn">
-                    <i class="fas fa-search"></i> Pretraži
+                <button class="btn btn-filter" id="toggleFilters">
+                    <i class="fas fa-filter"></i> Filteri
                 </button>
             </div>
-        </div>
-    </section>
-
-    <!-- Popularne Kategorije -->
-    <section class="categories-section">
-        <div class="container">
-            <h2 class="section-title">Popularne Kategorije</h2>
-            <div class="categories-grid">
-                <div class="category-card" data-category="Popravke">
-                    <div class="category-icon">
-                        <i class="fas fa-tools"></i>
+            
+            <div class="filters-panel" id="filtersPanel">
+                <div class="filters-grid">
+                    <div class="filter-group">
+                        <label>Kategorija</label>
+                        <select id="filterCategory">
+                            <option value="">Sve kategorije</option>
+                            <option>Popravke</option>
+                            <option>Dom i Bašta</option>
+                            <option>Lepota i Wellness</option>
+                            <option>IT i Tehnologija</option>
+                            <option>Edukacija</option>
+                            <option>Transport</option>
+                        </select>
                     </div>
-                    <h3>Popravke</h3>
-                    <p>Vodoinstalateri, Električari, Stolari</p>
-                </div>
-                <div class="category-card" data-category="Dom i Bašta">
-                    <div class="category-icon">
-                        <i class="fas fa-home"></i>
+                    <div class="filter-group">
+                        <label>Lokacija</label>
+                        <input type="text" id="filterLocation" placeholder="Unesite grad...">
                     </div>
-                    <h3>Dom i Bašta</h3>
-                    <p>Čišćenje, Baštovani, Dizajneri</p>
-                </div>
-                <div class="category-card" data-category="Lepota i Wellness">
-                    <div class="category-icon">
-                        <i class="fas fa-spa"></i>
+                    <div class="filter-group">
+                        <label>Cena (po satu)</label>
+                        <div class="price-range">
+                            <input type="number" id="filterPriceMin" placeholder="Min" min="0">
+                            <span>-</span>
+                            <input type="number" id="filterPriceMax" placeholder="Max" min="0">
+                        </div>
                     </div>
-                    <h3>Lepota i Wellness</h3>
-                    <p>Frizeri, Masažeri, Kozmetičari</p>
-                </div>
-                <div class="category-card" data-category="IT i Tehnologija">
-                    <div class="category-icon">
-                        <i class="fas fa-laptop-code"></i>
+                    <div class="filter-group">
+                        <label>Ocena</label>
+                        <select id="filterRating">
+                            <option value="">Sve ocene</option>
+                            <option value="4">4+ ⭐</option>
+                            <option value="3">3+ ⭐</option>
+                            <option value="2">2+ ⭐</option>
+                        </select>
                     </div>
-                    <h3>IT i Tehnologija</h3>
-                    <p>Web Development, Dizajn, IT Podrška</p>
-                </div>
-                <div class="category-card" data-category="Edukacija">
-                    <div class="category-icon">
-                        <i class="fas fa-graduation-cap"></i>
+                    <div class="filter-group">
+                        <label>Sortiranje</label>
+                        <select id="sortBy">
+                            <option value="rating">Najbolje ocenjeni</option>
+                            <option value="price-low">Cena: Niska - Visoka</option>
+                            <option value="price-high">Cena: Visoka - Niska</option>
+                            <option value="reviews">Broj recenzija</option>
+                        </select>
                     </div>
-                    <h3>Edukacija</h3>
-                    <p>Privatni Časovi, Online Kursevi</p>
-                </div>
-                <div class="category-card" data-category="Transport">
-                    <div class="category-icon">
-                        <i class="fas fa-truck"></i>
+                    <div class="filter-actions">
+                        <button class="btn btn-outline" id="clearFilters">Očisti</button>
+                        <button class="btn btn-primary" id="applyFilters">Primeni</button>
                     </div>
-                    <h3>Transport</h3>
-                    <p>Selidbe, Dostava, Taxi</p>
                 </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Top Pružaoci Usluga -->
-    <section class="providers-section">
+    <!-- Rezultati Pretrage -->
+    <div class="results-section">
         <div class="container">
-            <h2 class="section-title">Najcenjeniji Pružaoci Usluga</h2>
-            <div class="providers-grid" id="topProviders">
+            <div class="results-header">
+                <h2>Pronađeno Pružalaca: <span id="resultsCount">0</span></h2>
+            </div>
+            
+            <div class="services-grid" id="servicesGrid">
+                <!-- Dinamički učitano JavaScript-om -->
+            </div>
+
+            <div class="no-results" id="noResults" style="display:none;">
+                <i class="fas fa-search"></i>
+                <h3>Nema rezultata</h3>
+                <p>Pokušajte sa drugačijim filterima ili pretraživanjem</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal za Profil Pružaoca -->
+    <div class="modal modal-large" id="providerModal">
+        <div class="modal-content">
+            <span class="modal-close" data-modal="providerModal">&times;</span>
+            <div class="provider-detail" id="providerDetail">
                 <!-- Dinamički učitano JavaScript-om -->
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Kako Funkcioniše -->
-    <section class="how-it-works">
-        <div class="container">
-            <h2 class="section-title">Kako Funkcioniše</h2>
-            <div class="steps-grid">
-                <div class="step-card">
-                    <div class="step-number">1</div>
-                    <h3>Pretražite Usluge</h3>
-                    <p>Unesite željenu uslugu i lokaciju kako biste pronašli idealne pružaoce</p>
+    <!-- Modal za Zakazivanje -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <span class="modal-close" data-modal="bookingModal">&times;</span>
+            <h2>Zakaži Termin</h2>
+            <form id="bookingForm">
+                <input type="hidden" id="bookingProviderId">
+                <div class="form-group">
+                    <label>Datum</label>
+                    <input type="date" id="bookingDate" required>
                 </div>
-                <div class="step-card">
-                    <div class="step-number">2</div>
-                    <h3>Uporedite Profile</h3>
-                    <p>Pregledajte profile, ocene, cene i recenzije pružalaca usluga</p>
+                <div class="form-group">
+                    <label>Vreme</label>
+                    <input type="time" id="bookingTime" required>
                 </div>
-                <div class="step-card">
-                    <div class="step-number">3</div>
-                    <h3>Zakažite Termin</h3>
-                    <p>Izaberite odgovarajući termin i kontaktirajte pružaoca</p>
+                <div class="form-group">
+                    <label>Opis posla</label>
+                    <textarea id="bookingDescription" rows="4" required placeholder="Opišite detaljno šta vam je potrebno..."></textarea>
                 </div>
-                <div class="step-card">
-                    <div class="step-number">4</div>
-                    <h3>Ostavite Recenziju</h3>
-                    <p>Podelite svoje iskustvo i pomozite drugima u izboru</p>
+                <div class="form-group">
+                    <label>Kontakt Telefon</label>
+                    <input type="tel" id="bookingPhone" required>
                 </div>
-            </div>
+                <button type="submit" class="btn btn-primary btn-block">Pošalji Zahtev</button>
+            </form>
         </div>
-    </section>
+    </div>
 
-    <!-- CTA Sekcija -->
-    <section class="cta-section">
-        <div class="container">
-            <div class="cta-content">
-                <h2>Nudite Usluge?</h2>
-                <p>Pridružite se našoj platformi i dosegnite hiljade potencijalnih klijenata</p>
-                <button class="btn btn-large btn-white" id="becomeProviderBtn">Postanite Pružalac Usluga</button>
-            </div>
+    <!-- Modal za Poruke -->
+    <div class="modal" id="messageModal">
+        <div class="modal-content">
+            <span class="modal-close" data-modal="messageModal">&times;</span>
+            <h2>Pošalji Poruku</h2>
+            <form id="messageForm">
+                <input type="hidden" id="messageProviderId">
+                <div class="form-group">
+                    <label>Naslov</label>
+                    <input type="text" id="messageSubject" required>
+                </div>
+                <div class="form-group">
+                    <label>Poruka</label>
+                    <textarea id="messageContent" rows="5" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Pošalji</button>
+            </form>
         </div>
-    </section>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -176,7 +204,6 @@
                         <li><a href="#">O Nama</a></li>
                         <li><a href="#">Kako Funkcioniše</a></li>
                         <li><a href="#">Blog</a></li>
-                        <li><a href="#">Karijera</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -184,15 +211,6 @@
                     <ul>
                         <li><a href="usluge.html">Pregledaj Usluge</a></li>
                         <li><a href="#">Najčešća Pitanja</a></li>
-                        <li><a href="#">Podrška</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <h4>Za Pružaoce</h4>
-                    <ul>
-                        <li><a href="#">Postani Pružalac</a></li>
-                        <li><a href="#">Cenovnik</a></li>
-                        <li><a href="#">Uslovi Korišćenja</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
@@ -200,11 +218,6 @@
                     <ul>
                         <li><i class="fas fa-envelope"></i> info@platforma.rs</li>
                         <li><i class="fas fa-phone"></i> +381 11 123 4567</li>
-                        <li class="social-links">
-                            <a href="#"><i class="fab fa-facebook"></i></a>
-                            <a href="#"><i class="fab fa-instagram"></i></a>
-                            <a href="#"><i class="fab fa-linkedin"></i></a>
-                        </li>
                     </ul>
                 </div>
             </div>
@@ -287,6 +300,7 @@
     </div>
 
     <script src="app.js"></script>
+    <script src="services.js"></script>
 </body>
 </html>
 
