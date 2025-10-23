@@ -1,221 +1,241 @@
+// ===== PROVERA AUTENTIFIKACIJE =====
+let currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+// Ako korisnik nije ulogovan, preusmeri na login
+if (!currentUser) {
+    window.location.href = 'login.html';
+}
+
 // ===== DATA - SPORTSKI DOGAĐAJI =====
-const matches = [
-    // FUDBAL
-    {
-        id: 1,
-        sport: 'fudbal',
-        league: 'Superliga Srbije',
-        homeTeam: 'Crvena Zvezda',
-        awayTeam: 'Partizan',
-        date: '2025-10-23',
-        time: '20:00',
-        odds: { home: 2.10, draw: 3.20, away: 3.80 },
-        stats: {
-            home: { wins: 12, draws: 3, losses: 2, goalsScored: 34, goalsConceded: 12 },
-            away: { wins: 10, draws: 5, losses: 2, goalsScored: 28, goalsConceded: 15 }
-        }
-    },
-    {
-        id: 2,
-        sport: 'fudbal',
-        league: 'Premier League',
-        homeTeam: 'Manchester United',
-        awayTeam: 'Liverpool',
-        date: '2025-10-23',
-        time: '18:30',
-        odds: { home: 3.40, draw: 3.50, away: 2.15 },
-        stats: {
-            home: { wins: 8, draws: 4, losses: 3, goalsScored: 24, goalsConceded: 18 },
-            away: { wins: 11, draws: 3, losses: 1, goalsScored: 32, goalsConceded: 10 }
-        }
-    },
-    {
-        id: 3,
-        sport: 'fudbal',
-        league: 'La Liga',
-        homeTeam: 'Real Madrid',
-        awayTeam: 'Barcelona',
-        date: '2025-10-24',
-        time: '21:00',
-        odds: { home: 2.50, draw: 3.30, away: 2.90 },
-        stats: {
-            home: { wins: 10, draws: 2, losses: 3, goalsScored: 30, goalsConceded: 14 },
-            away: { wins: 9, draws: 4, losses: 2, goalsScored: 28, goalsConceded: 12 }
-        }
-    },
-    {
-        id: 4,
-        sport: 'fudbal',
-        league: 'Bundesliga',
-        homeTeam: 'Bayern Munich',
-        awayTeam: 'Borussia Dortmund',
-        date: '2025-10-24',
-        time: '17:30',
-        odds: { home: 1.85, draw: 3.80, away: 4.20 },
-        stats: {
-            home: { wins: 13, draws: 2, losses: 0, goalsScored: 38, goalsConceded: 8 },
-            away: { wins: 9, draws: 3, losses: 3, goalsScored: 26, goalsConceded: 16 }
-        }
-    },
-    {
-        id: 5,
-        sport: 'fudbal',
-        league: 'Serie A',
-        homeTeam: 'Juventus',
-        awayTeam: 'Inter Milan',
-        date: '2025-10-25',
-        time: '19:45',
-        odds: { home: 2.65, draw: 3.10, away: 2.75 },
-        stats: {
-            home: { wins: 9, draws: 5, losses: 1, goalsScored: 25, goalsConceded: 11 },
-            away: { wins: 10, draws: 3, losses: 2, goalsScored: 29, goalsConceded: 13 }
-        }
-    },
-    {
-        id: 6,
-        sport: 'fudbal',
-        league: 'Liga Prvaka',
-        homeTeam: 'PSG',
-        awayTeam: 'Manchester City',
-        date: '2025-10-26',
-        time: '21:00',
-        odds: { home: 3.10, draw: 3.40, away: 2.25 },
-        stats: {
-            home: { wins: 4, draws: 1, losses: 0, goalsScored: 12, goalsConceded: 3 },
-            away: { wins: 4, draws: 0, losses: 1, goalsScored: 14, goalsConceded: 5 }
-        }
-    },
+// Učitavanje utakmica iz localStorage ili korišćenje default vrednosti
+let matches = JSON.parse(localStorage.getItem('matches')) || getDefaultMatches();
 
-    // KOŠARKA
-    {
-        id: 7,
-        sport: 'kosarka',
-        league: 'ABA Liga',
-        homeTeam: 'Crvena Zvezda',
-        awayTeam: 'Partizan',
-        date: '2025-10-23',
-        time: '19:00',
-        odds: { home: 1.75, draw: null, away: 2.05 },
-        stats: {
-            home: { wins: 14, losses: 3, pointsScored: 1456, pointsConceded: 1289 },
-            away: { wins: 12, losses: 5, pointsScored: 1398, pointsConceded: 1312 }
-        }
-    },
-    {
-        id: 8,
-        sport: 'kosarka',
-        league: 'NBA',
-        homeTeam: 'LA Lakers',
-        awayTeam: 'Boston Celtics',
-        date: '2025-10-23',
-        time: '02:00',
-        odds: { home: 2.20, draw: null, away: 1.65 },
-        stats: {
-            home: { wins: 8, losses: 4, pointsScored: 1234, pointsConceded: 1189 },
-            away: { wins: 10, losses: 2, pointsScored: 1298, pointsConceded: 1145 }
-        }
-    },
-    {
-        id: 9,
-        sport: 'kosarka',
-        league: 'Evroliga',
-        homeTeam: 'Real Madrid',
-        awayTeam: 'Barcelona',
-        date: '2025-10-24',
-        time: '20:30',
-        odds: { home: 1.90, draw: null, away: 1.90 },
-        stats: {
-            home: { wins: 7, losses: 2, pointsScored: 789, pointsConceded: 745 },
-            away: { wins: 6, losses: 3, pointsScored: 756, pointsConceded: 734 }
-        }
-    },
-    {
-        id: 10,
-        sport: 'kosarka',
-        league: 'NBA',
-        homeTeam: 'Golden State Warriors',
-        awayTeam: 'Milwaukee Bucks',
-        date: '2025-10-25',
-        time: '03:30',
-        odds: { home: 1.95, draw: null, away: 1.85 },
-        stats: {
-            home: { wins: 9, losses: 3, pointsScored: 1267, pointsConceded: 1198 },
-            away: { wins: 10, losses: 2, pointsScored: 1289, pointsConceded: 1167 }
-        }
-    },
+// Ako nema utakmica, postavi default
+if (matches.length === 0) {
+    matches = getDefaultMatches();
+    localStorage.setItem('matches', JSON.stringify(matches));
+}
 
-    // TENIS
-    {
-        id: 11,
-        sport: 'tenis',
-        league: 'ATP Masters',
-        homeTeam: 'Novak Đoković',
-        awayTeam: 'Carlos Alcaraz',
-        date: '2025-10-23',
-        time: '16:00',
-        odds: { home: 1.80, draw: null, away: 2.00 },
-        stats: {
-            home: { rank: 1, titlesThisYear: 5, winRate: 87 },
-            away: { rank: 2, titlesThisYear: 4, winRate: 84 }
+// Default utakmice
+function getDefaultMatches() {
+    return [
+        // FUDBAL
+        {
+            id: 1,
+            sport: 'fudbal',
+            league: 'Superliga Srbije',
+            homeTeam: 'Crvena Zvezda',
+            awayTeam: 'Partizan',
+            date: '2025-10-23',
+            time: '20:00',
+            odds: { home: 2.10, draw: 3.20, away: 3.80 },
+            stats: {
+                home: { wins: 12, draws: 3, losses: 2, goalsScored: 34, goalsConceded: 12 },
+                away: { wins: 10, draws: 5, losses: 2, goalsScored: 28, goalsConceded: 15 }
+            }
+        },
+        {
+            id: 2,
+            sport: 'fudbal',
+            league: 'Premier League',
+            homeTeam: 'Manchester United',
+            awayTeam: 'Liverpool',
+            date: '2025-10-23',
+            time: '18:30',
+            odds: { home: 3.40, draw: 3.50, away: 2.15 },
+            stats: {
+                home: { wins: 8, draws: 4, losses: 3, goalsScored: 24, goalsConceded: 18 },
+                away: { wins: 11, draws: 3, losses: 1, goalsScored: 32, goalsConceded: 10 }
+            }
+        },
+        {
+            id: 3,
+            sport: 'fudbal',
+            league: 'La Liga',
+            homeTeam: 'Real Madrid',
+            awayTeam: 'Barcelona',
+            date: '2025-10-24',
+            time: '21:00',
+            odds: { home: 2.50, draw: 3.30, away: 2.90 },
+            stats: {
+                home: { wins: 10, draws: 2, losses: 3, goalsScored: 30, goalsConceded: 14 },
+                away: { wins: 9, draws: 4, losses: 2, goalsScored: 28, goalsConceded: 12 }
+            }
+        },
+        {
+            id: 4,
+            sport: 'fudbal',
+            league: 'Bundesliga',
+            homeTeam: 'Bayern Munich',
+            awayTeam: 'Borussia Dortmund',
+            date: '2025-10-24',
+            time: '17:30',
+            odds: { home: 1.85, draw: 3.80, away: 4.20 },
+            stats: {
+                home: { wins: 13, draws: 2, losses: 0, goalsScored: 38, goalsConceded: 8 },
+                away: { wins: 9, draws: 3, losses: 3, goalsScored: 26, goalsConceded: 16 }
+            }
+        },
+        {
+            id: 5,
+            sport: 'fudbal',
+            league: 'Serie A',
+            homeTeam: 'Juventus',
+            awayTeam: 'Inter Milan',
+            date: '2025-10-25',
+            time: '19:45',
+            odds: { home: 2.65, draw: 3.10, away: 2.75 },
+            stats: {
+                home: { wins: 9, draws: 5, losses: 1, goalsScored: 25, goalsConceded: 11 },
+                away: { wins: 10, draws: 3, losses: 2, goalsScored: 29, goalsConceded: 13 }
+            }
+        },
+        {
+            id: 6,
+            sport: 'fudbal',
+            league: 'Liga Prvaka',
+            homeTeam: 'PSG',
+            awayTeam: 'Manchester City',
+            date: '2025-10-26',
+            time: '21:00',
+            odds: { home: 3.10, draw: 3.40, away: 2.25 },
+            stats: {
+                home: { wins: 4, draws: 1, losses: 0, goalsScored: 12, goalsConceded: 3 },
+                away: { wins: 4, draws: 0, losses: 1, goalsScored: 14, goalsConceded: 5 }
+            }
+        },
+
+        // KOŠARKA
+        {
+            id: 7,
+            sport: 'kosarka',
+            league: 'ABA Liga',
+            homeTeam: 'Crvena Zvezda',
+            awayTeam: 'Partizan',
+            date: '2025-10-23',
+            time: '19:00',
+            odds: { home: 1.75, draw: null, away: 2.05 },
+            stats: {
+                home: { wins: 14, losses: 3, pointsScored: 1456, pointsConceded: 1289 },
+                away: { wins: 12, losses: 5, pointsScored: 1398, pointsConceded: 1312 }
+            }
+        },
+        {
+            id: 8,
+            sport: 'kosarka',
+            league: 'NBA',
+            homeTeam: 'LA Lakers',
+            awayTeam: 'Boston Celtics',
+            date: '2025-10-23',
+            time: '02:00',
+            odds: { home: 2.20, draw: null, away: 1.65 },
+            stats: {
+                home: { wins: 8, losses: 4, pointsScored: 1234, pointsConceded: 1189 },
+                away: { wins: 10, losses: 2, pointsScored: 1298, pointsConceded: 1145 }
+            }
+        },
+        {
+            id: 9,
+            sport: 'kosarka',
+            league: 'Evroliga',
+            homeTeam: 'Real Madrid',
+            awayTeam: 'Barcelona',
+            date: '2025-10-24',
+            time: '20:30',
+            odds: { home: 1.90, draw: null, away: 1.90 },
+            stats: {
+                home: { wins: 7, losses: 2, pointsScored: 789, pointsConceded: 745 },
+                away: { wins: 6, losses: 3, pointsScored: 756, pointsConceded: 734 }
+            }
+        },
+        {
+            id: 10,
+            sport: 'kosarka',
+            league: 'NBA',
+            homeTeam: 'Golden State Warriors',
+            awayTeam: 'Milwaukee Bucks',
+            date: '2025-10-25',
+            time: '03:30',
+            odds: { home: 1.95, draw: null, away: 1.85 },
+            stats: {
+                home: { wins: 9, losses: 3, pointsScored: 1267, pointsConceded: 1198 },
+                away: { wins: 10, losses: 2, pointsScored: 1289, pointsConceded: 1167 }
+            }
+        },
+
+        // TENIS
+        {
+            id: 11,
+            sport: 'tenis',
+            league: 'ATP Masters',
+            homeTeam: 'Novak Đoković',
+            awayTeam: 'Carlos Alcaraz',
+            date: '2025-10-23',
+            time: '16:00',
+            odds: { home: 1.80, draw: null, away: 2.00 },
+            stats: {
+                home: { rank: 1, titlesThisYear: 5, winRate: 87 },
+                away: { rank: 2, titlesThisYear: 4, winRate: 84 }
+            }
+        },
+        {
+            id: 12,
+            sport: 'tenis',
+            league: 'ATP Masters',
+            homeTeam: 'Jannik Sinner',
+            awayTeam: 'Daniil Medvedev',
+            date: '2025-10-23',
+            time: '19:00',
+            odds: { home: 1.95, draw: null, away: 1.85 },
+            stats: {
+                home: { rank: 4, titlesThisYear: 3, winRate: 81 },
+                away: { rank: 3, titlesThisYear: 2, winRate: 79 }
+            }
+        },
+        {
+            id: 13,
+            sport: 'tenis',
+            league: 'WTA Finals',
+            homeTeam: 'Iga Świątek',
+            awayTeam: 'Aryna Sabalenka',
+            date: '2025-10-24',
+            time: '14:00',
+            odds: { home: 1.70, draw: null, away: 2.10 },
+            stats: {
+                home: { rank: 1, titlesThisYear: 6, winRate: 89 },
+                away: { rank: 2, titlesThisYear: 4, winRate: 83 }
+            }
+        },
+        {
+            id: 14,
+            sport: 'tenis',
+            league: 'ATP Masters',
+            homeTeam: 'Rafael Nadal',
+            awayTeam: 'Stefanos Tsitsipas',
+            date: '2025-10-25',
+            time: '17:00',
+            odds: { home: 2.20, draw: null, away: 1.65 },
+            stats: {
+                home: { rank: 5, titlesThisYear: 2, winRate: 76 },
+                away: { rank: 6, titlesThisYear: 3, winRate: 78 }
+            }
+        },
+        {
+            id: 15,
+            sport: 'tenis',
+            league: 'WTA Finals',
+            homeTeam: 'Coco Gauff',
+            awayTeam: 'Jessica Pegula',
+            date: '2025-10-26',
+            time: '15:30',
+            odds: { home: 1.90, draw: null, away: 1.90 },
+            stats: {
+                home: { rank: 3, titlesThisYear: 3, winRate: 82 },
+                away: { rank: 4, titlesThisYear: 2, winRate: 79 }
+            }
         }
-    },
-    {
-        id: 12,
-        sport: 'tenis',
-        league: 'ATP Masters',
-        homeTeam: 'Jannik Sinner',
-        awayTeam: 'Daniil Medvedev',
-        date: '2025-10-23',
-        time: '19:00',
-        odds: { home: 1.95, draw: null, away: 1.85 },
-        stats: {
-            home: { rank: 4, titlesThisYear: 3, winRate: 81 },
-            away: { rank: 3, titlesThisYear: 2, winRate: 79 }
-        }
-    },
-    {
-        id: 13,
-        sport: 'tenis',
-        league: 'WTA Finals',
-        homeTeam: 'Iga Świątek',
-        awayTeam: 'Aryna Sabalenka',
-        date: '2025-10-24',
-        time: '14:00',
-        odds: { home: 1.70, draw: null, away: 2.10 },
-        stats: {
-            home: { rank: 1, titlesThisYear: 6, winRate: 89 },
-            away: { rank: 2, titlesThisYear: 4, winRate: 83 }
-        }
-    },
-    {
-        id: 14,
-        sport: 'tenis',
-        league: 'ATP Masters',
-        homeTeam: 'Rafael Nadal',
-        awayTeam: 'Stefanos Tsitsipas',
-        date: '2025-10-25',
-        time: '17:00',
-        odds: { home: 2.20, draw: null, away: 1.65 },
-        stats: {
-            home: { rank: 5, titlesThisYear: 2, winRate: 76 },
-            away: { rank: 6, titlesThisYear: 3, winRate: 78 }
-        }
-    },
-    {
-        id: 15,
-        sport: 'tenis',
-        league: 'WTA Finals',
-        homeTeam: 'Coco Gauff',
-        awayTeam: 'Jessica Pegula',
-        date: '2025-10-26',
-        time: '15:30',
-        odds: { home: 1.90, draw: null, away: 1.90 },
-        stats: {
-            home: { rank: 3, titlesThisYear: 3, winRate: 82 },
-            away: { rank: 4, titlesThisYear: 2, winRate: 79 }
-        }
-    }
-];
+    ];
+}
 
 // ===== GLOBALNE PROMENLJIVE =====
 let currentSport = 'all';
@@ -243,11 +263,32 @@ const successModal = document.getElementById('successModal');
 
 // ===== INICIJALIZACIJA =====
 function init() {
+    displayUserInfo();
     displayCurrentDate();
     populateLeagueFilter();
     displayMatches();
     displayTicket();
     setupEventListeners();
+}
+
+// ===== PRIKAZ KORISNIČKIH INFORMACIJA =====
+function displayUserInfo() {
+    const userName = document.getElementById('userName');
+    const userBalance = document.getElementById('userBalance');
+    
+    if (userName && currentUser) {
+        userName.textContent = `👤 ${currentUser.name}`;
+    }
+    
+    if (userBalance && currentUser) {
+        // Učitaj najnovije stanje iz users
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const user = users.find(u => u.id === currentUser.id);
+        if (user) {
+            currentUser.balance = user.balance;
+            userBalance.textContent = `💰 ${user.balance.toLocaleString('sr-RS')} RSD`;
+        }
+    }
 }
 
 // ===== PRIKAZ TRENUTNOG DATUMA =====
@@ -270,6 +311,12 @@ function populateLeagueFilter() {
 
 // ===== EVENT LISTENERS =====
 function setupEventListeners() {
+    // Logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
+    }
+    
     // Navigacija sportova
     navButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -624,9 +671,58 @@ function placeTicket() {
         alert('Dodajte bar jedan meč na tiket');
         return;
     }
+    
+    // Provera stanja na računu
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const userIndex = users.findIndex(u => u.id === currentUser.id);
+    
+    if (userIndex === -1) {
+        alert('Greška: Korisnik nije pronađen');
+        return;
+    }
+    
+    if (users[userIndex].balance < stake) {
+        alert(`Nemate dovoljno sredstava! Vaše stanje: ${users[userIndex].balance} RSD`);
+        return;
+    }
 
     const totalOdds = calculateTotalOdds();
     const potentialWin = stake * totalOdds;
+    const ticketId = generateTicketId();
+
+    // Oduzmi ulog od stanja
+    users[userIndex].balance -= stake;
+    
+    // Sačuvaj tiket u istoriju
+    const ticketData = {
+        id: ticketId,
+        date: new Date().toISOString(),
+        matches: ticket.map(t => ({
+            match: `${t.match.homeTeam} vs ${t.match.awayTeam}`,
+            league: t.match.league,
+            selection: t.selection,
+            odd: t.odd
+        })),
+        stake: stake,
+        totalOdds: totalOdds,
+        potentialWin: potentialWin,
+        status: 'pending'
+    };
+    
+    users[userIndex].ticketHistory = users[userIndex].ticketHistory || [];
+    users[userIndex].ticketHistory.unshift(ticketData);
+    
+    // Ograniči istoriju na 50 tiketa
+    if (users[userIndex].ticketHistory.length > 50) {
+        users[userIndex].ticketHistory = users[userIndex].ticketHistory.slice(0, 50);
+    }
+    
+    // Sačuvaj izmene
+    localStorage.setItem('users', JSON.stringify(users));
+    currentUser.balance = users[userIndex].balance;
+    
+    // Ažuriraj prikaz stanja
+    displayUserInfo();
 
     // Prikaz success modal-a
     const ticketSummary = document.getElementById('ticketSummary');
@@ -636,7 +732,8 @@ function placeTicket() {
         <p><strong>Ulog:</strong> ${stake.toFixed(2)} RSD</p>
         <p><strong>Potencijalni dobitak:</strong> <span style="color: var(--primary-green); font-size: 1.3rem;">${potentialWin.toFixed(2)} RSD</span></p>
         <hr style="margin: 15px 0; border-color: var(--border-color);">
-        <p style="font-size: 0.9rem; color: var(--text-muted);">Tiket ID: ${generateTicketId()}</p>
+        <p style="font-size: 0.9rem; color: var(--text-muted);">Tiket ID: ${ticketId}</p>
+        <p style="margin-top: 10px;"><strong>Novo stanje:</strong> <span style="color: var(--primary-green);">${users[userIndex].balance.toFixed(2)} RSD</span></p>
     `;
 
     successModal.classList.add('show');
@@ -647,6 +744,15 @@ function placeTicket() {
     saveTicket();
     displayMatches();
     displayTicket();
+}
+
+// ===== LOGOUT =====
+function logout() {
+    if (confirm('Da li ste sigurni da želite da se odjavite?')) {
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('ticket');
+        window.location.href = 'login.html';
+    }
 }
 
 // ===== GENERISANJE TIKET ID-a =====
