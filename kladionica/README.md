@@ -214,6 +214,27 @@ Aplikacija sadrži:
 - Kvote su fiktivne i služe samo za ilustraciju
 - **VAŽNO:** U realnoj aplikaciji lozinke bi bile heshovane!
 
+## 📚 Kompletna Dokumentacija
+
+| Fajl | Opis | Kada Koristiti |
+|------|------|----------------|
+| **START-OVDE.md** | 🚀 Brzi početak i osnove | Prvi put koristiš aplikaciju |
+| **demo.html** | 🖼️ Interaktivni demo stranica | Želiš da vidiš primere |
+| **PRIMERI-KORISCENJA.md** | 📋 Scenariji i primeri podataka | Trebaš konkretne primere |
+| **RESAVANJE-PROBLEMA.md** | 🔧 Rešavanje problema i debug | Nešto ne radi |
+| **AUTENTIFIKACIJA.md** | 🔐 Sigurnost i korisnici | Pitanja o login/sigurnosti |
+| **UPUTSTVO.md** | 📖 Detaljna uputstva | Korak-po-korak vodiči |
+| **STRUKTURA-PROJEKTA.md** | 🏗️ Tehnička dokumentacija | Developer dokumentacija |
+| **README.md** | 📄 Ovaj fajl | Opšte informacije |
+
+### 🆘 Problem?
+1. **Logout ne radi?** → Pogledaj **RESAVANJE-PROBLEMA.md**
+2. **Nema mečeva?** → Pogledaj **demo.html** i **PRIMERI-KORISCENJA.md**
+3. **Kako dodati utakmicu?** → Pogledaj **UPUTSTVO.md**
+4. **Admin pristup?** → Pogledaj **AUTENTIFIKACIJA.md**
+
+---
+
 ## 🎉 Uživajte u igri!
 
 ---

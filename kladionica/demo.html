@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Pregled - Sportska Kladionica</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .demo-header {
+            text-align: center;
+            padding: 40px 20px;
+            background: var(--card-bg);
+            border-radius: 15px;
+            margin-bottom: 40px;
+            border: 2px solid var(--gold);
+        }
+
+        .demo-header h1 {
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+
+        .demo-header p {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+        }
+
+        .demo-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .demo-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+            border: none;
+            border-radius: 10px;
+            color: var(--darker-bg);
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .demo-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(0, 255, 65, 0.5);
+        }
+
+        .demo-btn.secondary {
+            background: var(--gold);
+        }
+
+        .demo-section {
+            background: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .demo-section h2 {
+            color: var(--primary-green);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .demo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .demo-card {
+            background: var(--darker-bg);
+            padding: 25px;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .demo-card:hover {
+            border-color: var(--primary-green);
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0, 255, 65, 0.2);
+        }
+
+        .demo-card h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .demo-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .demo-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .demo-card li {
+            color: var(--text-secondary);
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .demo-card li:last-child {
+            border-bottom: none;
+        }
+
+        .demo-card li strong {
+            color: var(--primary-green);
+        }
+
+        .feature-list {
+            display: grid;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .feature-item {
+            background: var(--darker-bg);
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-green);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+        }
+
+        .feature-content h4 {
+            color: var(--gold);
+            margin-bottom: 5px;
+        }
+
+        .feature-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .code-block {
+            background: var(--darker-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .code-block pre {
+            margin: 0;
+            color: var(--primary-green);
+        }
+
+        .highlight {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        .warning-box {
+            background: rgba(255, 71, 87, 0.1);
+            border-left: 4px solid var(--danger);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .warning-box h4 {
+            color: var(--danger);
+            margin-bottom: 10px;
+        }
+
+        .info-box {
+            background: rgba(0, 255, 65, 0.1);
+            border-left: 4px solid var(--primary-green);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .info-box h4 {
+            color: var(--primary-green);
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .demo-header h1 {
+                font-size: 1.8rem;
+            }
+
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">📚</span>
+                <h1>Demo Pregled</h1>
+            </div>
+        </div>
+    </header>
+
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🎮 Dobrodošli u Sportsku Kladionicu</h1>
+            <p>Kompletan sistem za online klađenje sa autentifikacijom i admin panelom</p>
+            
+            <div class="demo-actions">
+                <a href="login.html" class="demo-btn">
+                    🚀 Započni Klađenje
+                </a>
+                <a href="#primeri" class="demo-btn secondary">
+                    📖 Vidi Primere
+                </a>
+            </div>
+        </div>
+
+        <!-- DEMO NALOZI -->
+        <div class="demo-section">
+            <h2>🔑 Demo Nalozi za Testiranje</h2>
+            
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <h3>👤 Obični Korisnik</h3>
+                    <div class="code-block">
+<pre>Korisničko ime: <span class="highlight">demo</span>
+Lozinka: <span class="highlight">demo123</span>
+Stanje: <span class="highlight">10,000 RSD</span></pre>
+                    </div>
+                    <p><strong>Mogućnosti:</strong></p>
+                    <ul>
+                        <li>✅ Klađenje na utakmice</li>
+                        <li>✅ Pregled statistika</li>
+                        <li>✅ Praćenje stanja računa</li>
+                        <li>✅ Istorija tiketa</li>
+                        <li>❌ Admin panel</li>
+                    </ul>
+                </div>
+
+                <div class="demo-card">
+                    <h3>👨‍💼 Administrator</h3>
+                    <div class="code-block">
+<pre>Korisničko ime: <span class="highlight">admin</span>
+Lozinka: <span class="highlight">admin123</span>
+Pristup: <span class="highlight">Sve funkcije</span></pre>
+                    </div>
+                    <p><strong>Mogućnosti:</strong></p>
+                    <ul>
+                        <li>✅ Sve što i obični korisnik</li>
+                        <li>✅ Dodavanje utakmica</li>
+                        <li>✅ Izmena kvota i statistika</li>
+                        <li>✅ Brisanje utakmica</li>
+                        <li>✅ Admin panel</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- FUNKCIONALNOSTI -->
+        <div class="demo-section" id="primeri">
+            <h2>⚡ Ključne Funkcionalnosti</h2>
+            
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="feature-icon">🔐</div>
+                    <div class="feature-content">
+                        <h4>Sistem Autentifikacije</h4>
+                        <p>Potpuna registracija i prijava sa validacijom. Zaštita admin panela samo za administratore.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">💰</div>
+                    <div class="feature-content">
+                        <h4>Korisnički Računi</h4>
+                        <p>Svaki korisnik ima račun sa stanjem u RSD. Novi korisnici dobijaju 1,000 RSD bonus!</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">⚽</div>
+                    <div class="feature-content">
+                        <h4>Sportski Događaji</h4>
+                        <p>15 utakmica iz 3 sporta: Fudbal, Košarka i Tenis. Sa detaljnim statistikama timova.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">🎫</div>
+                    <div class="feature-content">
+                        <h4>Tiket Sistem</h4>
+                        <p>Dodavanje više mečeva, automatski proračun kvote i dobitka. Validacija stanja na računu.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">🔍</div>
+                    <div class="feature-content">
+                        <h4>Napredna Pretraga</h4>
+                        <p>Filter po sportu, ligi i datumu. Tekstualna pretraga timova i liga.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">👨‍💼</div>
+                    <div class="feature-content">
+                        <h4>Admin Panel</h4>
+                        <p>Kompletan CRUD sistem za upravljanje utakmicama, kvotama i statistikama.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KAKO KORISTITI -->
+        <div class="demo-section">
+            <h2>📋 Kako Koristiti Aplikaciju</h2>
+            
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <h3>1️⃣ Registracija</h3>
+                    <p><strong>Korak po korak:</strong></p>
+                    <ul>
+                        <li>Otvori <strong>login.html</strong></li>
+                        <li>Klikni tab "Registracija"</li>
+                        <li>Popuni formu</li>
+                        <li>Dobij 1,000 RSD bonus</li>
+                        <li>Automatska prijava</li>
+                    </ul>
+                </div>
+
+                <div class="demo-card">
+                    <h3>2️⃣ Klađenje</h3>
+                    <p><strong>Proces klađenja:</strong></p>
+                    <ul>
+                        <li>Odaberi sport (⚽🏀🎾)</li>
+                        <li>Klikni na kvotu (1, X, 2)</li>
+                        <li>Dodaj više mečeva</li>
+                        <li>Unesi ulog u RSD</li>
+                        <li>Uplati tiket</li>
+                    </ul>
+                </div>
+
+                <div class="demo-card">
+                    <h3>3️⃣ Admin Panel</h3>
+                    <p><strong>Za administratore:</strong></p>
+                    <ul>
+                        <li>Prijavi se kao admin</li>
+                        <li>Otvori admin.html</li>
+                        <li>Dodaj nove utakmice</li>
+                        <li>Izmeni kvote</li>
+                        <li>Obriši utakmice</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- PRIMERI PODATAKA -->
+        <div class="demo-section">
+            <h2>📊 Primer Podataka</h2>
+            
+            <div class="info-box">
+                <h4>💡 Predefinisani Podaci</h4>
+                <p>Aplikacija dolazi sa 15 utakmica iz različitih sportova i liga:</p>
+            </div>
+
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <h3>⚽ Fudbal (6 mečeva)</h3>
+                    <ul>
+                        <li><strong>Superliga:</strong> Zvezda vs Partizan</li>
+                        <li><strong>Premier League:</strong> Man Utd vs Liverpool</li>
+                        <li><strong>La Liga:</strong> Real Madrid vs Barcelona</li>
+                        <li><strong>Bundesliga:</strong> Bayern vs Dortmund</li>
+                        <li><strong>Serie A:</strong> Juventus vs Inter</li>
+                        <li><strong>Liga Prvaka:</strong> PSG vs Man City</li>
+                    </ul>
+                </div>
+
+                <div class="demo-card">
+                    <h3>🏀 Košarka (4 meča)</h3>
+                    <ul>
+                        <li><strong>ABA Liga:</strong> Zvezda vs Partizan</li>
+                        <li><strong>NBA:</strong> Lakers vs Celtics</li>
+                        <li><strong>Evroliga:</strong> Real vs Barcelona</li>
+                        <li><strong>NBA:</strong> Warriors vs Bucks</li>
+                    </ul>
+                </div>
+
+                <div class="demo-card">
+                    <h3>🎾 Tenis (5 mečeva)</h3>
+                    <ul>
+                        <li><strong>ATP:</strong> Đoković vs Alcaraz</li>
+                        <li><strong>ATP:</strong> Sinner vs Medvedev</li>
+                        <li><strong>WTA:</strong> Świątek vs Sabalenka</li>
+                        <li><strong>ATP:</strong> Nadal vs Tsitsipas</li>
+                        <li><strong>WTA:</strong> Gauff vs Pegula</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- STATISTIKA -->
+        <div class="demo-section">
+            <h2>📈 Primeri Statistike</h2>
+            
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <h3>⚽ Fudbal Statistika</h3>
+                    <div class="code-block">
+<pre>Crvena Zvezda:
+  Pobede: 12
+  Nerešeno: 3
+  Porazi: 2
+  Golovi: 34:12</pre>
+                    </div>
+                </div>
+
+                <div class="demo-card">
+                    <h3>🏀 Košarka Statistika</h3>
+                    <div class="code-block">
+<pre>LA Lakers:
+  Pobede: 8
+  Porazi: 4
+  Poeni: 1234:1189
+  Prosek: 102.8 ppg</pre>
+                    </div>
+                </div>
+
+                <div class="demo-card">
+                    <h3>🎾 Tenis Statistika</h3>
+                    <div class="code-block">
+<pre>Novak Đoković:
+  ATP Rang: 1
+  Titule: 5
+  Win Rate: 87%</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BEZBEDNOST -->
+        <div class="demo-section">
+            <h2>🔒 Bezbednost i Validacija</h2>
+            
+            <div class="warning-box">
+                <h4>⚠️ VAŽNO - Demo Aplikacija</h4>
+                <p>Ovo je demo aplikacija za edukativne svrhe. Lozinke se ne heš-uju i podaci se čuvaju lokalno u browser-u. U realnoj produkciji bi bilo potrebno:</p>
+                <ul style="margin-top: 10px; padding-left: 20px;">
+                    <li>Backend server (Node.js, PHP, Python)</li>
+                    <li>Prava baza podataka</li>
+                    <li>Heshovane lozinke (bcrypt)</li>
+                    <li>JWT tokeni za sesije</li>
+                    <li>HTTPS enkriptovana komunikacija</li>
+                </ul>
+            </div>
+
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="feature-icon">✅</div>
+                    <div class="feature-content">
+                        <h4>Validacija Podataka</h4>
+                        <p>Email format, minimalna dužina lozinke, jedinstveno korisničko ime.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">✅</div>
+                    <div class="feature-content">
+                        <h4>Zaštita Pristupa</h4>
+                        <p>Obavezan nalog za pristup, admin panel samo za administratore.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">✅</div>
+                    <div class="feature-content">
+                        <h4>Balance Validacija</h4>
+                        <p>Provera stanja pre uplate tiketa, ne može se kladiti više od dostupnog.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TEHNOLOGIJE -->
+        <div class="demo-section">
+            <h2>🛠️ Korišćene Tehnologije</h2>
+            
+            <div class="demo-grid">
+                <div class="demo-card">
+                    <h3>Frontend</h3>
+                    <ul>
+                        <li><strong>HTML5</strong> - Semantička struktura</li>
+                        <li><strong>CSS3</strong> - Grid, Flexbox, Animacije</li>
+                        <li><strong>JavaScript</strong> - Vanilla JS (bez framework-a)</li>
+                    </ul>
+                </div>
+
+                <div class="demo-card">
+                    <h3>Skladištenje</h3>
+                    <ul>
+                        <li><strong>LocalStorage</strong> - Korisnici</li>
+                        <li><strong>LocalStorage</strong> - Utakmice</li>
+                        <li><strong>LocalStorage</strong> - Tiketi</li>
+                        <li><strong>LocalStorage</strong> - Sesije</li>
+                    </ul>
+                </div>
+
+                <div class="demo-card">
+                    <h3>Dizajn</h3>
+                    <ul>
+                        <li><strong>Tamna tema</strong> - Profesionalan izgled</li>
+                        <li><strong>Zeleno-zlatne boje</strong> - Sportski stil</li>
+                        <li><strong>Responsive</strong> - Mobile-first</li>
+                        <li><strong>Animacije</strong> - Smooth prelazi</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- POČETAK -->
+        <div class="demo-section">
+            <h2>🚀 Počni Odmah!</h2>
+            
+            <div style="text-align: center; padding: 40px 0;">
+                <p style="font-size: 1.3rem; color: var(--text-secondary); margin-bottom: 30px;">
+                    Sve je spremno! Prijavite se i počnite da se kladite.
+                </p>
+                
+                <div class="demo-actions">
+                    <a href="login.html" class="demo-btn">
+                        🎮 Idi na Prijavu
+                    </a>
+                    <a href="README.md" class="demo-btn secondary">
+                        📖 Dokumentacija
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('📚 Demo stranica - Pregled aplikacije');
+        console.log('🔑 Demo nalozi:');
+        console.log('   Korisnik: demo / demo123');
+        console.log('   Admin: admin / admin123');
+    </script>
+</body>
+</html>
+

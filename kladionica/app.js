@@ -755,6 +755,9 @@ function logout() {
     }
 }
 
+// Učini logout dostupnim globalno
+window.logout = logout;
+
 // ===== GENERISANJE TIKET ID-a =====
 function generateTicketId() {
     const timestamp = Date.now();

@@ -212,9 +212,17 @@ location.reload();
 Sve je spremno za korišćenje. Otvorite **`login.html`** i počnite da se kladite!
 
 ### Potrebna Pomoć?
+- Pogledajte **demo.html** za primere i pregled
 - Pogledajte **UPUTSTVO.md** za detaljne korake
 - Pogledajte **AUTENTIFIKACIJA.md** za sigurnosne detalje
 - Pitajte developera 😊
+
+### 🖼️ Pogledaj Demo Stranicu
+Otvorite **`demo.html`** za:
+- ✅ Pregled svih funkcionalnosti
+- ✅ Primere podataka i statistika
+- ✅ Korak-po-korak uputstva
+- ✅ Demo naloge i testiranje
 
 ---
 

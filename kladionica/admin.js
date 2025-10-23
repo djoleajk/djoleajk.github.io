@@ -74,6 +74,9 @@ function logout() {
     }
 }
 
+// Učini logout dostupnim globalno
+window.logout = logout;
+
 // ===== PRIKAZ/SAKRIVANJE STATISTIKE POLJA =====
 function updateStatsFields() {
     const sport = sportSelect.value;
