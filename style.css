@@ -261,6 +261,28 @@ body {
     padding: 5rem 2rem;
 }
 
+/* Project Types Cards */
+#contact .border.rounded {
+    transition: all 0.3s ease;
+    border-color: #e9ecef !important;
+    background: white;
+}
+
+#contact .border.rounded:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color) !important;
+}
+
+#contact .border.rounded i {
+    transition: all 0.3s ease;
+}
+
+#contact .border.rounded:hover i {
+    transform: scale(1.1);
+    color: #0dcaf0 !important;
+}
+
 .contact-form {
     max-width: 600px;
     margin: 0 auto;
@@ -327,12 +349,131 @@ button[type="submit"]:hover {
     background: #0056b3;
 }
 
-/* Footer */
-footer {
-    text-align: center;
-    padding: 2rem;
-    background: #333;
-    color: white;
+/* Footer Modern Styles */
+.footer-modern {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.footer-modern::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(13, 110, 253, 0.5), transparent);
+}
+
+.footer-modern h5 {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: #fff;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+.footer-modern h5::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 40px;
+    height: 2px;
+    background: var(--primary-color);
+}
+
+/* Footer Links */
+.footer-links li a {
+    opacity: 0.75;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.footer-links li a:hover {
+    opacity: 1;
+    color: #0dcaf0 !important;
+    padding-left: 5px;
+}
+
+.footer-links li a i {
+    font-size: 0.7rem;
+}
+
+/* Contact Info Links */
+.contact-info .footer-link {
+    opacity: 0.75;
+    transition: all 0.3s ease;
+    word-break: break-word;
+}
+
+.contact-info .footer-link:hover {
+    opacity: 1;
+    color: #0dcaf0 !important;
+}
+
+/* Social Icons */
+.social-icon {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.social-icon:hover {
+    background: var(--primary-color);
+    color: #fff;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.4);
+}
+
+/* Tech List */
+.tech-list i {
+    transition: all 0.3s ease;
+}
+
+.tech-list .d-flex:hover i {
+    transform: scale(1.1);
+    color: #0dcaf0 !important;
+}
+
+.tech-list span {
+    opacity: 0.75;
+    transition: opacity 0.3s ease;
+}
+
+.tech-list .d-flex:hover span {
+    opacity: 1;
+}
+
+/* Footer Responsive */
+@media (max-width: 991px) {
+    .footer-modern .col-md-6:nth-child(odd) {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .footer-modern h5 {
+        font-size: 1.2rem;
+    }
+    
+    .footer-modern .row > div {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 2rem;
+    }
+    
+    .footer-modern .row > div:last-child {
+        border-bottom: none;
+    }
 }
 
 /* Hero sekcija */
