@@ -1,1 +1,143 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sportska Kladionica</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="logo">
+                <span class="logo-icon">⚽</span>
+                <h1>Sportska Kladionica</h1>
+            </div>
+            <div class="header-info">
+                <span id="currentDate"></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="container">
+            <button class="nav-btn active" data-sport="all">
+                <span>🏆</span> Svi sportovi
+            </button>
+            <button class="nav-btn" data-sport="fudbal">
+                <span>⚽</span> Fudbal
+            </button>
+            <button class="nav-btn" data-sport="kosarka">
+                <span>🏀</span> Košarka
+            </button>
+            <button class="nav-btn" data-sport="tenis">
+                <span>🎾</span> Tenis
+            </button>
+        </div>
+    </nav>
+
+    <!-- Filter Section -->
+    <section class="filter-section">
+        <div class="container">
+            <div class="filter-group">
+                <input type="text" id="searchInput" placeholder="🔍 Pretraži timove ili lige...">
+                <select id="leagueFilter">
+                    <option value="all">Sve lige</option>
+                </select>
+                <select id="dateFilter">
+                    <option value="all">Svi datumi</option>
+                    <option value="today">Danas</option>
+                    <option value="tomorrow">Sutra</option>
+                    <option value="week">Ove nedelje</option>
+                </select>
+                <button id="clearFilters" class="clear-btn">Očisti filtere</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Matches Section -->
+            <section class="matches-section">
+                <h2 class="section-title">
+                    <span class="title-icon">📋</span>
+                    Aktuelni događaji
+                </h2>
+                <div id="matchesList" class="matches-list">
+                    <!-- Matches will be loaded here by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Ticket Section -->
+            <aside class="ticket-section">
+                <div class="ticket-container">
+                    <div class="ticket-header">
+                        <h2>
+                            <span>🧾</span> Tvoj Tiket
+                        </h2>
+                        <button id="clearTicket" class="clear-ticket-btn">Očisti</button>
+                    </div>
+                    
+                    <div id="ticketMatches" class="ticket-matches">
+                        <div class="empty-ticket">
+                            <p>📝 Dodaj mečeve na tiket klikom na kvote</p>
+                        </div>
+                    </div>
+
+                    <div class="ticket-calculation">
+                        <div class="calc-row">
+                            <span>Broj mečeva:</span>
+                            <span id="matchCount">0</span>
+                        </div>
+                        <div class="calc-row">
+                            <span>Ukupna kvota:</span>
+                            <span id="totalOdds" class="highlight">1.00</span>
+                        </div>
+                        <div class="calc-row stake-input-row">
+                            <label for="stakeAmount">Ulog (RSD):</label>
+                            <input type="number" id="stakeAmount" min="10" step="10" placeholder="100">
+                        </div>
+                        <div class="calc-row total-win">
+                            <span>Potencijalni dobitak:</span>
+                            <span id="potentialWin" class="win-amount">0.00 RSD</span>
+                        </div>
+                    </div>
+
+                    <button id="placeTicket" class="place-ticket-btn" disabled>
+                        💰 Uplati tiket
+                    </button>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Match Details Modal -->
+    <div id="matchModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div id="modalBody">
+                <!-- Match details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal success-modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <div class="success-content">
+                <div class="success-icon">✅</div>
+                <h2>Tiket uspešno uplaćen!</h2>
+                <div id="ticketSummary"></div>
+                <button class="close-success-btn">Zatvori</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
 
