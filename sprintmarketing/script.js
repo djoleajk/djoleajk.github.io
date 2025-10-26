@@ -300,55 +300,9 @@ if (typingText) {
 }
 
 // ============================================
-// Form Submission Handler
+// Contact Form Removed
 // ============================================
-
-const contactForm = document.getElementById('contact-form');
-const formMessage = document.getElementById('form-message');
-
-contactForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    // Get form data
-    const formData = new FormData(contactForm);
-    const data = Object.fromEntries(formData);
-    
-    // Show loading state
-    const submitButton = contactForm.querySelector('.btn-submit');
-    const originalText = submitButton.innerHTML;
-    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Šalje se...</span>';
-    submitButton.disabled = true;
-    
-    // Simulate form submission (replace with actual backend endpoint)
-    try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // Log form data (in production, send to backend)
-        console.log('Form submitted:', data);
-        
-        // Show success message
-        formMessage.textContent = 'Hvala! Vaša poruka je uspešno poslata. Kontaktiraćemo vas uskoro.';
-        formMessage.className = 'form-message success';
-        
-        // Reset form
-        contactForm.reset();
-        
-        // Hide success message after 5 seconds
-        setTimeout(() => {
-            formMessage.style.display = 'none';
-        }, 5000);
-        
-    } catch (error) {
-        // Show error message
-        formMessage.textContent = 'Došlo je do greške. Molimo pokušajte ponovo.';
-        formMessage.className = 'form-message error';
-    } finally {
-        // Restore button state
-        submitButton.innerHTML = originalText;
-        submitButton.disabled = false;
-    }
-});
+// Contact form has been removed. Users can use phone and email links directly.
 
 // ============================================
 // Scroll to Top Button
@@ -530,27 +484,9 @@ floatingCards.forEach((card, index) => {
 });
 
 // ============================================
-// Form Input Animations
+// Form Input Animations - Removed
 // ============================================
-
-const formInputs = document.querySelectorAll('.form-group input, .form-group textarea, .form-group select');
-
-formInputs.forEach(input => {
-    input.addEventListener('focus', () => {
-        input.parentElement.classList.add('focused');
-    });
-    
-    input.addEventListener('blur', () => {
-        if (!input.value) {
-            input.parentElement.classList.remove('focused');
-        }
-    });
-    
-    // Check if input has value on page load
-    if (input.value) {
-        input.parentElement.classList.add('focused');
-    }
-});
+// Form inputs removed - no longer needed
 
 // ============================================
 // Add Loading Animation
@@ -745,11 +681,6 @@ document.querySelectorAll('.btn').forEach(btn => {
     btn.addEventListener('click', () => {
         trackEvent('Button', 'Click', btn.textContent.trim());
     });
-});
-
-// Track form submission
-contactForm.addEventListener('submit', () => {
-    trackEvent('Form', 'Submit', 'Contact Form');
 });
 
 // Track social media clicks
