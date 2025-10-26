@@ -9,11 +9,6 @@ let deletedTasks = [];
 let currentLanguage = localStorage.getItem('language') || 'sr';
 let isDarkMode = localStorage.getItem('darkMode') === 'true';
 
-// Pomodoro timer state
-let timerInterval = null;
-let timerSeconds = 25 * 60;
-let isTimerRunning = false;
-
 // ==================== TRANSLATIONS ====================
 const translations = {
     sr: {
@@ -123,93 +118,76 @@ const translations = {
 // ==================== DOM ELEMENTS ====================
 const elements = {
     // Header
-    appTitle: document.getElementById('appTitle'),
-    langToggle: document.getElementById('langToggle'),
-    darkModeToggle: document.getElementById('darkModeToggle'),
+    appTitle: document.getElementById('app-title'),
+    langToggle: document.getElementById('lang-toggle'),
+    themeToggle: document.getElementById('theme-toggle'),
     
     // Progress & Stats
-    progressBar: document.getElementById('progressBar'),
-    progressText: document.getElementById('progressText'),
-    totalTasks: document.getElementById('totalTasks'),
-    completedTasks: document.getElementById('completedTasks'),
-    activeTasks: document.getElementById('activeTasks'),
-    streak: document.getElementById('streak'),
-    
-    // Timer
-    timerDisplay: document.getElementById('timerDisplay'),
-    startTimer: document.getElementById('startTimer'),
-    pauseTimer: document.getElementById('pauseTimer'),
-    resetTimer: document.getElementById('resetTimer'),
-    timerMode: document.getElementById('timerMode'),
+    progressBar: document.getElementById('progress-bar'),
+    totalTasks: document.getElementById('total-tasks'),
+    completedTasks: document.getElementById('completed-tasks'),
+    activeTasks: document.getElementById('active-tasks'),
+    streakValue: document.getElementById('streak-value'),
     
     // Search & Filters
-    searchInput: document.getElementById('searchInput'),
-    filterAll: document.getElementById('filterAll'),
-    filterActive: document.getElementById('filterActive'),
-    filterCompleted: document.getElementById('filterCompleted'),
-    categoryFilter: document.getElementById('categoryFilter'),
-    sortSelect: document.getElementById('sortSelect'),
+    searchInput: document.getElementById('search-input'),
+    categoryFilter: document.getElementById('category-filter'),
+    sortSelect: document.getElementById('sort-select'),
     
     // Task Input
-    taskInput: document.getElementById('taskInput'),
-    taskNote: document.getElementById('taskNote'),
-    toggleNoteBtn: document.getElementById('toggleNoteBtn'),
-    prioritySelect: document.getElementById('prioritySelect'),
-    categorySelect: document.getElementById('categorySelect'),
-    dueDateInput: document.getElementById('dueDateInput'),
-    addTaskBtn: document.getElementById('addTaskBtn'),
+    taskInput: document.getElementById('task-input'),
+    noteInput: document.getElementById('note-input'),
+    noteSection: document.getElementById('note-section'),
+    toggleNoteBtn: document.getElementById('toggle-note-btn'),
+    prioritySelect: document.getElementById('priority-select'),
+    categorySelect: document.getElementById('category-select'),
+    dueDateInput: document.getElementById('due-date-input'),
+    addBtn: document.getElementById('add-btn'),
     
     // Bulk Actions
-    markAllComplete: document.getElementById('markAllComplete'),
-    deleteCompleted: document.getElementById('deleteCompleted'),
-    deleteAll: document.getElementById('deleteAll'),
-    exportTasks: document.getElementById('exportTasks'),
-    importTasks: document.getElementById('importTasks'),
-    importFile: document.getElementById('importFile'),
+    markAllBtn: document.getElementById('mark-all-btn'),
+    deleteCompletedBtn: document.getElementById('delete-completed-btn'),
+    deleteAllBtn: document.getElementById('delete-all-btn'),
+    exportBtn: document.getElementById('export-btn'),
+    importBtn: document.getElementById('import-btn'),
+    importFile: document.getElementById('import-file'),
     
     // Task List
-    taskList: document.getElementById('taskList'),
-    tasksContainer: document.getElementById('tasksContainer'),
+    taskList: document.getElementById('task-list'),
     
     // Modals
-    editModal: document.getElementById('editModal'),
-    editTaskInput: document.getElementById('editTaskInput'),
-    editTaskNote: document.getElementById('editTaskNote'),
-    editPriority: document.getElementById('editPriority'),
-    editCategory: document.getElementById('editCategory'),
-    editDueDate: document.getElementById('editDueDate'),
-    saveEditBtn: document.getElementById('saveEditBtn'),
-    cancelEditBtn: document.getElementById('cancelEditBtn'),
+    editModal: document.getElementById('edit-modal'),
+    editTaskInput: document.getElementById('edit-task-input'),
+    editNoteInput: document.getElementById('edit-note-input'),
+    editPrioritySelect: document.getElementById('edit-priority-select'),
+    editCategorySelect: document.getElementById('edit-category-select'),
+    editDueDateInput: document.getElementById('edit-due-date-input'),
+    saveEditBtn: document.getElementById('save-edit-btn'),
+    cancelEditBtn: document.getElementById('cancel-edit-btn'),
     
-    statsModal: document.getElementById('statsModal'),
-    showStatsBtn: document.getElementById('showStatsBtn'),
-    closeStatsBtn: document.getElementById('closeStatsBtn'),
+    statsModal: document.getElementById('stats-modal'),
+    showStatsBtn: document.getElementById('show-stats-btn'),
+    closeStatsBtn: document.getElementById('close-stats-btn'),
     
-    subtasksModal: document.getElementById('subtasksModal'),
-    subtasksList: document.getElementById('subtasksList'),
-    subtaskInput: document.getElementById('subtaskInput'),
-    addSubtaskBtn: document.getElementById('addSubtaskBtn'),
-    closeSubtasksBtn: document.getElementById('closeSubtasksBtn'),
+    subtasksModal: document.getElementById('subtasks-modal'),
+    subtaskList: document.getElementById('subtask-list'),
+    subtaskInput: document.getElementById('subtask-input'),
+    addSubtaskBtn: document.getElementById('add-subtask-btn'),
+    closeSubtasksBtn: document.getElementById('close-subtasks-btn'),
     
     // Settings Modal
-    settingsBtn: document.getElementById('settingsBtn'),
-    settingsModal: document.getElementById('settingsModal'),
-    darkModeCheckbox: document.getElementById('darkModeCheckbox'),
-    languageSelect: document.getElementById('languageSelect'),
-    pomodoroWork: document.getElementById('pomodoroWork'),
-    pomodoroShortBreak: document.getElementById('pomodoroShortBreak'),
-    pomodoroLongBreak: document.getElementById('pomodoroLongBreak'),
-    notificationsCheckbox: document.getElementById('notificationsCheckbox'),
-    soundCheckbox: document.getElementById('soundCheckbox'),
-    clearAllDataBtn: document.getElementById('clearAllDataBtn'),
-    dataSize: document.getElementById('dataSize'),
-    saveSettingsBtn: document.getElementById('saveSettingsBtn'),
-    closeSettingsBtn: document.getElementById('closeSettingsBtn'),
+    settingsBtn: document.getElementById('settings-btn'),
+    settingsModal: document.getElementById('settings-modal'),
+    notificationsToggle: document.getElementById('notifications-toggle'),
+    soundToggle: document.getElementById('sound-toggle'),
+    autoArchiveToggle: document.getElementById('auto-archive-toggle'),
+    saveSettingsBtn: document.getElementById('save-settings-btn'),
+    closeSettingsBtn: document.getElementById('close-settings-btn'),
     
     // Toast
     toast: document.getElementById('toast'),
-    toastMessage: document.getElementById('toastMessage'),
-    undoBtn: document.getElementById('undoBtn')
+    toastMessage: document.getElementById('toast-message'),
+    undoBtn: document.getElementById('undo-btn')
 };
 
 // ==================== INITIALIZATION ====================
@@ -244,83 +222,98 @@ function saveTasks() {
 // ==================== EVENT LISTENERS ====================
 function setupEventListeners() {
     // Language & Theme
-    elements.langToggle.addEventListener('click', toggleLanguage);
-    elements.darkModeToggle.addEventListener('click', toggleDarkMode);
-    
-    // Timer
-    elements.startTimer.addEventListener('click', startTimer);
-    elements.pauseTimer.addEventListener('click', pauseTimer);
-    elements.resetTimer.addEventListener('click', resetTimer);
-    elements.timerMode.addEventListener('change', changeTimerMode);
+    if (elements.langToggle) elements.langToggle.addEventListener('click', toggleLanguage);
+    if (elements.themeToggle) elements.themeToggle.addEventListener('click', toggleDarkMode);
     
     // Search & Filters
-    elements.searchInput.addEventListener('input', handleSearch);
-    elements.filterAll.addEventListener('click', () => setFilter('all'));
-    elements.filterActive.addEventListener('click', () => setFilter('active'));
-    elements.filterCompleted.addEventListener('click', () => setFilter('completed'));
-    elements.categoryFilter.addEventListener('change', handleCategoryFilter);
-    elements.sortSelect.addEventListener('change', handleSort);
+    if (elements.searchInput) elements.searchInput.addEventListener('input', handleSearch);
+    
+    // Filter buttons - potrebno pronaci dugmice sa data-filter atributima
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const filter = e.target.dataset.filter;
+            if (filter) setFilter(filter);
+        });
+    });
+    
+    if (elements.categoryFilter) elements.categoryFilter.addEventListener('change', handleCategoryFilter);
+    if (elements.sortSelect) elements.sortSelect.addEventListener('change', handleSort);
     
     // Add Task
-    elements.addTaskBtn.addEventListener('click', addTask);
-    elements.taskInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') addTask();
-    });
-    elements.toggleNoteBtn.addEventListener('click', toggleNoteField);
+    if (elements.addBtn) elements.addBtn.addEventListener('click', addTask);
+    if (elements.taskInput) {
+        elements.taskInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTask();
+        });
+    }
+    if (elements.toggleNoteBtn) elements.toggleNoteBtn.addEventListener('click', toggleNoteField);
     
     // Bulk Actions
-    elements.markAllComplete.addEventListener('click', markAllComplete);
-    elements.deleteCompleted.addEventListener('click', deleteCompleted);
-    elements.deleteAll.addEventListener('click', deleteAllTasks);
-    elements.exportTasks.addEventListener('click', exportTasks);
-    elements.importTasks.addEventListener('click', () => elements.importFile.click());
-    elements.importFile.addEventListener('change', importTasks);
+    if (elements.markAllBtn) elements.markAllBtn.addEventListener('click', markAllComplete);
+    if (elements.deleteCompletedBtn) elements.deleteCompletedBtn.addEventListener('click', deleteCompleted);
+    if (elements.deleteAllBtn) elements.deleteAllBtn.addEventListener('click', deleteAllTasks);
+    if (elements.exportBtn) elements.exportBtn.addEventListener('click', exportTasks);
+    if (elements.importBtn) elements.importBtn.addEventListener('click', () => elements.importFile.click());
+    if (elements.importFile) elements.importFile.addEventListener('change', importTasks);
     
     // Edit Modal
-    elements.saveEditBtn.addEventListener('click', saveEdit);
-    elements.cancelEditBtn.addEventListener('click', closeEditModal);
-    elements.editModal.addEventListener('click', (e) => {
-        if (e.target === elements.editModal) closeEditModal();
-    });
-    elements.editTaskInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') saveEdit();
-    });
+    if (elements.saveEditBtn) elements.saveEditBtn.addEventListener('click', saveEdit);
+    if (elements.cancelEditBtn) elements.cancelEditBtn.addEventListener('click', closeEditModal);
+    if (elements.editModal) {
+        elements.editModal.addEventListener('click', (e) => {
+            if (e.target === elements.editModal) closeEditModal();
+        });
+    }
+    if (elements.editTaskInput) {
+        elements.editTaskInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') saveEdit();
+        });
+    }
     
     // Stats Modal
-    elements.showStatsBtn.addEventListener('click', showStats);
-    elements.closeStatsBtn.addEventListener('click', closeStatsModal);
-    elements.statsModal.addEventListener('click', (e) => {
-        if (e.target === elements.statsModal) closeStatsModal();
-    });
+    if (elements.showStatsBtn) elements.showStatsBtn.addEventListener('click', showStats);
+    if (elements.closeStatsBtn) elements.closeStatsBtn.addEventListener('click', closeStatsModal);
+    if (elements.statsModal) {
+        elements.statsModal.addEventListener('click', (e) => {
+            if (e.target === elements.statsModal) closeStatsModal();
+        });
+    }
     
     // Subtasks Modal
-    elements.addSubtaskBtn.addEventListener('click', addSubtask);
-    elements.closeSubtasksBtn.addEventListener('click', closeSubtasksModal);
-    elements.subtasksModal.addEventListener('click', (e) => {
-        if (e.target === elements.subtasksModal) closeSubtasksModal();
-    });
-    elements.subtaskInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') addSubtask();
-    });
+    if (elements.addSubtaskBtn) elements.addSubtaskBtn.addEventListener('click', addSubtask);
+    if (elements.closeSubtasksBtn) elements.closeSubtasksBtn.addEventListener('click', closeSubtasksModal);
+    if (elements.subtasksModal) {
+        elements.subtasksModal.addEventListener('click', (e) => {
+            if (e.target === elements.subtasksModal) closeSubtasksModal();
+        });
+    }
+    if (elements.subtaskInput) {
+        elements.subtaskInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addSubtask();
+        });
+    }
     
     // Settings Modal
-    elements.settingsBtn.addEventListener('click', openSettingsModal);
-    elements.saveSettingsBtn.addEventListener('click', saveSettings);
-    elements.closeSettingsBtn.addEventListener('click', closeSettingsModal);
-    elements.settingsModal.addEventListener('click', (e) => {
-        if (e.target === elements.settingsModal) closeSettingsModal();
-    });
-    elements.clearAllDataBtn.addEventListener('click', clearAllData);
+    if (elements.settingsBtn) elements.settingsBtn.addEventListener('click', openSettingsModal);
+    if (elements.saveSettingsBtn) elements.saveSettingsBtn.addEventListener('click', saveSettings);
+    if (elements.closeSettingsBtn) elements.closeSettingsBtn.addEventListener('click', closeSettingsModal);
+    if (elements.settingsModal) {
+        elements.settingsModal.addEventListener('click', (e) => {
+            if (e.target === elements.settingsModal) closeSettingsModal();
+        });
+    }
     
     // Toast
-    elements.undoBtn.addEventListener('click', undoDelete);
+    if (elements.undoBtn) elements.undoBtn.addEventListener('click', undoDelete);
     
     // Keyboard Shortcuts
     document.addEventListener('keydown', handleKeyboardShortcuts);
     
     // Drag and Drop
-    elements.taskList.addEventListener('dragover', handleDragOver);
-    elements.taskList.addEventListener('drop', handleDrop);
+    if (elements.taskList) {
+        elements.taskList.addEventListener('dragover', handleDragOver);
+        elements.taskList.addEventListener('drop', handleDrop);
+    }
 }
 
 // ==================== LANGUAGE ====================
@@ -370,59 +363,11 @@ function toggleDarkMode() {
 function applyDarkMode() {
     if (isDarkMode) {
         document.body.classList.add('dark-mode');
-        elements.darkModeToggle.textContent = '☀️';
+        if (elements.themeToggle) elements.themeToggle.textContent = '☀️';
     } else {
         document.body.classList.remove('dark-mode');
-        elements.darkModeToggle.textContent = '🌙';
+        if (elements.themeToggle) elements.themeToggle.textContent = '🌙';
     }
-}
-
-// ==================== POMODORO TIMER ====================
-function startTimer() {
-    if (isTimerRunning) return;
-    
-    isTimerRunning = true;
-    timerInterval = setInterval(() => {
-        timerSeconds--;
-        updateTimerDisplay();
-        
-        if (timerSeconds <= 0) {
-            pauseTimer();
-            showNotification('⏰ Timer završen!', 'Vreme je za pauzu!');
-            playNotificationSound();
-        }
-    }, 1000);
-}
-
-function pauseTimer() {
-    isTimerRunning = false;
-    if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-    }
-}
-
-function resetTimer() {
-    pauseTimer();
-    const minutes = parseInt(elements.timerMode.value);
-    timerSeconds = minutes * 60;
-    updateTimerDisplay();
-}
-
-function changeTimerMode() {
-    resetTimer();
-}
-
-function updateTimerDisplay() {
-    const minutes = Math.floor(timerSeconds / 60);
-    const seconds = timerSeconds % 60;
-    elements.timerDisplay.textContent = 
-        `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-}
-
-function playNotificationSound() {
-    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBTGH0fPTgjMGHm7A7+OZURE');
-    audio.play().catch(() => {});
 }
 
 // ==================== ADD TASK ====================
@@ -437,7 +382,7 @@ function addTask() {
     const newTask = {
         id: Date.now(),
         text: text,
-        note: elements.taskNote.value.trim(),
+        note: elements.noteInput ? elements.noteInput.value.trim() : '',
         completed: false,
         priority: elements.prioritySelect.value,
         category: elements.categorySelect.value,
@@ -448,19 +393,23 @@ function addTask() {
     
     tasks.unshift(newTask);
     saveTasks();
+    renderTasks();
+    updateStats();
     
     // Clear inputs
     elements.taskInput.value = '';
-    elements.taskNote.value = '';
-    elements.taskNote.style.display = 'none';
-    elements.dueDateInput.value = '';
+    if (elements.noteInput) elements.noteInput.value = '';
+    if (elements.noteSection) elements.noteSection.style.display = 'none';
+    if (elements.dueDateInput) elements.dueDateInput.value = '';
     elements.taskInput.focus();
 }
 
 function toggleNoteField() {
-    const isVisible = elements.taskNote.style.display !== 'none';
-    elements.taskNote.style.display = isVisible ? 'none' : 'block';
-    if (!isVisible) elements.taskNote.focus();
+    if (elements.noteSection) {
+        const isVisible = elements.noteSection.style.display !== 'none';
+        elements.noteSection.style.display = isVisible ? 'none' : 'block';
+        if (!isVisible && elements.noteInput) elements.noteInput.focus();
+    }
 }
 
 // ==================== RENDER TASKS ====================
@@ -691,10 +640,10 @@ function openEditModal(id) {
     
     currentEditId = id;
     elements.editTaskInput.value = task.text;
-    elements.editTaskNote.value = task.note || '';
-    elements.editPriority.value = task.priority;
-    elements.editCategory.value = task.category;
-    elements.editDueDate.value = task.dueDate || '';
+    if (elements.editNoteInput) elements.editNoteInput.value = task.note || '';
+    if (elements.editPrioritySelect) elements.editPrioritySelect.value = task.priority;
+    if (elements.editCategorySelect) elements.editCategorySelect.value = task.category;
+    if (elements.editDueDateInput) elements.editDueDateInput.value = task.dueDate || '';
     
     elements.editModal.classList.add('show');
     elements.editTaskInput.focus();
@@ -711,11 +660,13 @@ function saveEdit() {
     const taskIndex = tasks.findIndex(t => t.id === currentEditId);
     if (taskIndex !== -1) {
         tasks[taskIndex].text = text;
-        tasks[taskIndex].note = elements.editTaskNote.value.trim();
-        tasks[taskIndex].priority = elements.editPriority.value;
-        tasks[taskIndex].category = elements.editCategory.value;
-        tasks[taskIndex].dueDate = elements.editDueDate.value;
+        tasks[taskIndex].note = elements.editNoteInput ? elements.editNoteInput.value.trim() : '';
+        tasks[taskIndex].priority = elements.editPrioritySelect.value;
+        tasks[taskIndex].category = elements.editCategorySelect.value;
+        tasks[taskIndex].dueDate = elements.editDueDateInput.value;
         saveTasks();
+        renderTasks();
+        updateStats();
     }
     
     closeEditModal();
@@ -740,7 +691,8 @@ function openSubtasksModal(id) {
 }
 
 function renderSubtasks(subtasks) {
-    elements.subtasksList.innerHTML = '';
+    if (!elements.subtaskList) return;
+    elements.subtaskList.innerHTML = '';
     
     subtasks.forEach((subtask, index) => {
         const div = document.createElement('div');
@@ -764,7 +716,7 @@ function renderSubtasks(subtasks) {
         div.appendChild(checkbox);
         div.appendChild(text);
         div.appendChild(deleteBtn);
-        elements.subtasksList.appendChild(div);
+        if (elements.subtaskList) elements.subtaskList.appendChild(div);
     });
 }
 
@@ -927,10 +879,10 @@ function updateStats() {
     const active = total - completed;
     const streak = calculateStreak();
     
-    elements.totalTasks.textContent = total;
-    elements.completedTasks.textContent = completed;
-    elements.activeTasks.textContent = active;
-    elements.streak.textContent = streak;
+    if (elements.totalTasks) elements.totalTasks.textContent = total;
+    if (elements.completedTasks) elements.completedTasks.textContent = completed;
+    if (elements.activeTasks) elements.activeTasks.textContent = active;
+    if (elements.streakValue) elements.streakValue.textContent = streak + ' 🔥';
 }
 
 function updateProgressBar() {
@@ -938,8 +890,7 @@ function updateProgressBar() {
     const completed = tasks.filter(t => t.completed).length;
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
     
-    elements.progressBar.style.width = percentage + '%';
-    elements.progressText.textContent = percentage + '%';
+    if (elements.progressBar) elements.progressBar.style.width = percentage + '%';
 }
 
 function calculateStreak() {
@@ -980,10 +931,15 @@ function showStats() {
     const daysSinceFirst = Math.max(1, Math.ceil((new Date() - firstTaskDate) / (1000 * 60 * 60 * 24)));
     const avgPerDay = (total / daysSinceFirst).toFixed(1);
     
-    document.getElementById('totalCreated').textContent = total;
-    document.getElementById('totalCompleted').textContent = completed;
-    document.getElementById('completionRate').textContent = completionRate + '%';
-    document.getElementById('avgPerDay').textContent = avgPerDay;
+    const totalCreatedEl = document.getElementById('total-created');
+    const totalCompletedEl = document.getElementById('total-completed-stat');
+    const completionRateEl = document.getElementById('completion-rate');
+    const avgPerDayEl = document.getElementById('avg-per-day');
+    
+    if (totalCreatedEl) totalCreatedEl.textContent = total;
+    if (totalCompletedEl) totalCompletedEl.textContent = completed;
+    if (completionRateEl) completionRateEl.textContent = completionRate + '%';
+    if (avgPerDayEl) avgPerDayEl.textContent = avgPerDay;
     
     elements.statsModal.classList.add('show');
     
@@ -992,7 +948,9 @@ function showStats() {
 }
 
 function drawSimpleChart() {
-    const canvas = document.getElementById('statsChart');
+    const canvas = document.getElementById('completion-chart');
+    if (!canvas) return;
+    
     const ctx = canvas.getContext('2d');
     
     canvas.width = canvas.offsetWidth;
@@ -1128,30 +1086,16 @@ function handleKeyboardShortcuts(e) {
 
 // ==================== SETTINGS MODAL ====================
 function openSettingsModal() {
-    // Load current settings
-    elements.darkModeCheckbox.checked = isDarkMode;
-    elements.languageSelect.value = currentLanguage;
-    
-    // Load Pomodoro settings from localStorage or defaults
-    const pomodoroSettings = JSON.parse(localStorage.getItem('pomodoroSettings')) || {
-        work: 25,
-        shortBreak: 5,
-        longBreak: 15
-    };
-    elements.pomodoroWork.value = pomodoroSettings.work;
-    elements.pomodoroShortBreak.value = pomodoroSettings.shortBreak;
-    elements.pomodoroLongBreak.value = pomodoroSettings.longBreak;
-    
     // Load notification settings
     const notificationSettings = JSON.parse(localStorage.getItem('notificationSettings')) || {
         enabled: true,
-        sound: true
+        sound: true,
+        autoArchive: false
     };
-    elements.notificationsCheckbox.checked = notificationSettings.enabled;
-    elements.soundCheckbox.checked = notificationSettings.sound;
     
-    // Calculate data size
-    calculateDataSize();
+    if (elements.notificationsToggle) elements.notificationsToggle.checked = notificationSettings.enabled;
+    if (elements.soundToggle) elements.soundToggle.checked = notificationSettings.sound;
+    if (elements.autoArchiveToggle) elements.autoArchiveToggle.checked = notificationSettings.autoArchive;
     
     elements.settingsModal.classList.add('show');
 }
@@ -1161,45 +1105,11 @@ function closeSettingsModal() {
 }
 
 function saveSettings() {
-    // Save dark mode
-    const newDarkMode = elements.darkModeCheckbox.checked;
-    if (newDarkMode !== isDarkMode) {
-        toggleDarkMode();
-    }
-    
-    // Save language
-    const newLanguage = elements.languageSelect.value;
-    if (newLanguage !== currentLanguage) {
-        currentLanguage = newLanguage;
-        localStorage.setItem('language', currentLanguage);
-        applyLanguage();
-        renderTasks();
-    }
-    
-    // Save Pomodoro settings
-    const pomodoroSettings = {
-        work: parseInt(elements.pomodoroWork.value) || 25,
-        shortBreak: parseInt(elements.pomodoroShortBreak.value) || 5,
-        longBreak: parseInt(elements.pomodoroLongBreak.value) || 15
-    };
-    localStorage.setItem('pomodoroSettings', JSON.stringify(pomodoroSettings));
-    
-    // Update timer mode options
-    const timerModeSelect = elements.timerMode;
-    timerModeSelect.options[0].value = pomodoroSettings.work;
-    timerModeSelect.options[0].text = `Pomodoro (${pomodoroSettings.work} min)`;
-    timerModeSelect.options[1].value = pomodoroSettings.shortBreak;
-    timerModeSelect.options[1].text = `Kratka pauza (${pomodoroSettings.shortBreak} min)`;
-    timerModeSelect.options[2].value = pomodoroSettings.longBreak;
-    timerModeSelect.options[2].text = `Duga pauza (${pomodoroSettings.longBreak} min)`;
-    
-    // Reset timer with new settings
-    resetTimer();
-    
     // Save notification settings
     const notificationSettings = {
-        enabled: elements.notificationsCheckbox.checked,
-        sound: elements.soundCheckbox.checked
+        enabled: elements.notificationsToggle ? elements.notificationsToggle.checked : true,
+        sound: elements.soundToggle ? elements.soundToggle.checked : true,
+        autoArchive: elements.autoArchiveToggle ? elements.autoArchiveToggle.checked : false
     };
     localStorage.setItem('notificationSettings', JSON.stringify(notificationSettings));
     
@@ -1259,8 +1169,7 @@ function calculateDataSize() {
     }
     
     // Convert to KB
-    const sizeInKB = (totalSize / 1024).toFixed(2);
-    elements.dataSize.textContent = sizeInKB + ' KB';
+    return (totalSize / 1024).toFixed(2);
 }
 
 // ==================== HELPERS ====================
