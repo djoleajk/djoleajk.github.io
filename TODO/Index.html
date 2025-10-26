@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Napredna Todo lista sa mnogim funkcionalnostima">
+    <meta name="theme-color" content="#667eea">
+    <title>📝 Todo Lista Pro</title>
+    <link rel="stylesheet" href="Style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-top">
+                <h1>📝 <span id="app-title">Todo Lista Pro</span></h1>
+                <div class="header-controls">
+                    <button class="icon-btn" id="settings-btn" title="Podešavanja">⚙️</button>
+                    <button class="icon-btn" id="theme-toggle" title="Promeni temu">🌙</button>
+                    <button class="icon-btn" id="lang-toggle" title="Promeni jezik">🌐</button>
+                </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="stats">
+                <div class="stat-item">
+                    <span class="stat-label" id="total-label">Ukupno:</span>
+                    <span class="stat-value" id="total-tasks">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label" id="completed-label">Završeno:</span>
+                    <span class="stat-value" id="completed-tasks">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label" id="active-label">Aktivno:</span>
+                    <span class="stat-value" id="active-tasks">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label" id="streak-label">Streak:</span>
+                    <span class="stat-value" id="streak-value">0 🔥</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Search and Filters -->
+        <div class="search-section">
+            <input type="text" id="search-input" placeholder="🔍 Pretraži zadatke...">
+        </div>
+
+        <div class="controls">
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">Svi</button>
+                <button class="filter-btn" data-filter="active">Aktivni</button>
+                <button class="filter-btn" data-filter="completed">Završeni</button>
+            </div>
+            
+            <div class="control-group">
+                <select id="category-filter" class="select-control">
+                    <option value="all">Sve kategorije</option>
+                    <option value="work">💼 Posao</option>
+                    <option value="personal">👤 Lično</option>
+                    <option value="shopping">🛒 Kupovina</option>
+                    <option value="health">💪 Zdravlje</option>
+                    <option value="other">📌 Ostalo</option>
+                </select>
+                
+                <select id="sort-select" class="select-control">
+                    <option value="date-desc">Najnovije prvo</option>
+                    <option value="date-asc">Najstarije prvo</option>
+                    <option value="alpha-asc">A-Z</option>
+                    <option value="alpha-desc">Z-A</option>
+                    <option value="priority">Po prioritetu</option>
+                    <option value="due-date">Po roku</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Task Input -->
+        <div class="input-section">
+            <div class="task-input-group">
+                <input type="text" id="task-input" placeholder="Unesite novi zadatak...">
+                <button id="toggle-note-btn" class="icon-btn" title="Dodaj napomenu">📝</button>
+                <button id="add-btn">➕ <span id="add-btn-text">Dodaj</span></button>
+            </div>
+            
+            <div id="note-section" class="note-section" style="display: none;">
+                <textarea id="note-input" placeholder="Napomena (opciono)..." rows="2"></textarea>
+            </div>
+            
+            <div class="task-options">
+                <div class="option-group">
+                    <label for="priority-select">Prioritet:</label>
+                    <select id="priority-select">
+                        <option value="low">🟢 Niska</option>
+                        <option value="medium" selected>🟡 Srednja</option>
+                        <option value="high">🔴 Visoka</option>
+                    </select>
+                </div>
+                
+                <div class="option-group">
+                    <label for="category-select">Kategorija:</label>
+                    <select id="category-select">
+                        <option value="work">💼 Posao</option>
+                        <option value="personal">👤 Lično</option>
+                        <option value="shopping">🛒 Kupovina</option>
+                        <option value="health">💪 Zdravlje</option>
+                        <option value="other">📌 Ostalo</option>
+                    </select>
+                </div>
+                
+                <div class="option-group">
+                    <label for="due-date-input">Rok:</label>
+                    <input type="date" id="due-date-input">
+                </div>
+            </div>
+        </div>
+
+        <!-- Task List -->
+        <ul id="task-list" class="task-list">
+            <!-- Tasks will be dynamically added here -->
+        </ul>
+
+        <!-- Bulk Actions -->
+        <div class="bulk-actions">
+            <button id="mark-all-btn" class="bulk-btn">✅ <span id="mark-all-text">Označi sve</span></button>
+            <button id="delete-completed-btn" class="bulk-btn">🗑️ <span id="delete-completed-text">Obriši završene</span></button>
+            <button id="delete-all-btn" class="bulk-btn danger">❌ <span id="delete-all-text">Obriši sve</span></button>
+        </div>
+
+        <!-- Export/Import and Stats -->
+        <div class="file-actions">
+            <button id="export-btn" class="file-btn">💾 <span id="export-text">Izvezi</span></button>
+            <button id="import-btn" class="file-btn">📥 <span id="import-text">Uvezi</span></button>
+            <input type="file" id="import-file" accept=".json" style="display: none;">
+            <button id="show-stats-btn" class="file-btn stats-btn">📊 <span id="show-stats-text">Prikaži statistiku</span></button>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="edit-modal-title">Izmeni Zadatak</h2>
+            <div class="modal-body">
+                <input type="text" id="edit-task-input" placeholder="Naziv zadatka">
+                <textarea id="edit-note-input" placeholder="Napomena (opciono)..." rows="3"></textarea>
+                
+                <div class="edit-options">
+                    <div class="option-group">
+                        <label for="edit-priority-select">Prioritet:</label>
+                        <select id="edit-priority-select">
+                            <option value="low">🟢 Niska</option>
+                            <option value="medium">🟡 Srednja</option>
+                            <option value="high">🔴 Visoka</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="edit-category-select">Kategorija:</label>
+                        <select id="edit-category-select">
+                            <option value="work">💼 Posao</option>
+                            <option value="personal">👤 Lično</option>
+                            <option value="shopping">🛒 Kupovina</option>
+                            <option value="health">💪 Zdravlje</option>
+                            <option value="other">📌 Ostalo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="edit-due-date-input">Rok:</label>
+                        <input type="date" id="edit-due-date-input">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-edit-btn" class="modal-btn primary"><span id="save-btn-text">Sačuvaj</span></button>
+                <button id="cancel-edit-btn" class="modal-btn"><span id="cancel-btn-text">Otkaži</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Modal -->
+    <div id="stats-modal" class="modal">
+        <div class="modal-content stats-modal-content">
+            <h2 id="stats-modal-title">Statistika i Analytics</h2>
+            <div class="modal-body">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="total-created">0</div>
+                            <div class="stat-label" id="total-created-label">Ukupno kreirano</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="total-completed-stat">0</div>
+                            <div class="stat-label" id="total-completed-label">Ukupno završeno</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="completion-rate">0%</div>
+                            <div class="stat-label" id="completion-rate-label">Stopa završavanja</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📅</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="avg-per-day">0</div>
+                            <div class="stat-label" id="avg-per-day-label">Prosek dnevno</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3>Završeni zadaci (7 dana)</h3>
+                    <canvas id="completion-chart"></canvas>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="close-stats-btn" class="modal-btn"><span id="close-stats-btn-text">Zatvori</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subtasks Modal -->
+    <div id="subtasks-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="subtasks-modal-title">Podzadaci</h2>
+            <div class="modal-body">
+                <div class="subtask-input-group">
+                    <input type="text" id="subtask-input" placeholder="Dodaj podzadatak...">
+                    <button id="add-subtask-btn" class="icon-btn">➕</button>
+                </div>
+                <ul id="subtask-list" class="subtask-list">
+                    <!-- Subtasks will be dynamically added here -->
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button id="close-subtasks-btn" class="modal-btn"><span id="close-subtasks-btn-text">Zatvori</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="settings-modal-title">Podešavanja</h2>
+            <div class="modal-body">
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="notifications-toggle">
+                        Omogući notifikacije
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="sound-toggle">
+                        Omogući zvuk
+                    </label>
+                </div>
+                <div class="setting-item">
+                    <label>
+                        <input type="checkbox" id="auto-archive-toggle">
+                        Auto-arhiviranje završenih
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="save-settings-btn" class="modal-btn primary"><span id="save-settings-btn-text">Sačuvaj</span></button>
+                <button id="close-settings-btn" class="modal-btn"><span id="close-settings-btn-text">Zatvori</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span id="toast-message"></span>
+        <button id="undo-btn" style="display: none;">Vrati</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
