@@ -170,86 +170,106 @@ window.addEventListener('load', checkCounterVisibility);
 const canvas = document.getElementById('particles-canvas');
 const ctx = canvas.getContext('2d');
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+// Check if device is mobile or has reduced motion preference
+const isMobile = window.innerWidth <= 768;
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-class Particle {
-    constructor() {
-        this.reset();
-        this.y = Math.random() * canvas.height;
-        this.opacity = Math.random() * 0.5 + 0.2;
-    }
-    
-    reset() {
-        this.x = Math.random() * canvas.width;
-        this.y = Math.random() * canvas.height;
-        this.speed = Math.random() * 0.5 + 0.2;
-        this.size = Math.random() * 2 + 1;
-        this.opacity = Math.random() * 0.5 + 0.2;
-    }
-    
-    update() {
-        this.y -= this.speed;
-        
-        if (this.y < 0) {
-            this.y = canvas.height;
-            this.x = Math.random() * canvas.width;
-        }
-    }
-    
-    draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 122, 0, ${this.opacity})`;
-        ctx.fill();
-    }
-}
-
-const particles = [];
-const particleCount = 100;
-
-for (let i = 0; i < particleCount; i++) {
-    particles.push(new Particle());
-}
-
-function animateParticles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    particles.forEach(particle => {
-        particle.update();
-        particle.draw();
-    });
-    
-    // Connect nearby particles with lines
-    for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance < 100) {
-                ctx.beginPath();
-                ctx.strokeStyle = `rgba(255, 122, 0, ${0.1 * (1 - distance / 100)})`;
-                ctx.lineWidth = 0.5;
-                ctx.moveTo(particles[i].x, particles[i].y);
-                ctx.lineTo(particles[j].x, particles[j].y);
-                ctx.stroke();
-            }
-        }
-    }
-    
-    requestAnimationFrame(animateParticles);
-}
-
-animateParticles();
-
-// Resize canvas on window resize
-window.addEventListener('resize', () => {
+// Only run particles on desktop and if motion is not reduced
+if (!isMobile && !prefersReducedMotion) {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    
-    particles.forEach(particle => particle.reset());
-});
+
+    class Particle {
+        constructor() {
+            this.reset();
+            this.y = Math.random() * canvas.height;
+            this.opacity = Math.random() * 0.5 + 0.2;
+        }
+        
+        reset() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.speed = Math.random() * 0.5 + 0.2;
+            this.size = Math.random() * 2 + 1;
+            this.opacity = Math.random() * 0.5 + 0.2;
+        }
+        
+        update() {
+            this.y -= this.speed;
+            
+            if (this.y < 0) {
+                this.y = canvas.height;
+                this.x = Math.random() * canvas.width;
+            }
+        }
+        
+        draw() {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 122, 0, ${this.opacity})`;
+            ctx.fill();
+        }
+    }
+
+    const particles = [];
+    const particleCount = window.innerWidth > 1200 ? 100 : 50;
+
+    for (let i = 0; i < particleCount; i++) {
+        particles.push(new Particle());
+    }
+
+    function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        particles.forEach(particle => {
+            particle.update();
+            particle.draw();
+        });
+        
+        // Connect nearby particles with lines (only on larger screens)
+        if (window.innerWidth > 1024) {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 100) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(255, 122, 0, ${0.1 * (1 - distance / 100)})`;
+                        ctx.lineWidth = 0.5;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+        
+        requestAnimationFrame(animateParticles);
+    }
+
+    animateParticles();
+
+    // Resize canvas on window resize (debounced)
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            if (window.innerWidth > 768) {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+                particles.forEach(particle => particle.reset());
+            } else {
+                // Hide particles on mobile after resize
+                canvas.style.display = 'none';
+            }
+        }, 250);
+    });
+} else {
+    // Hide canvas on mobile
+    canvas.style.display = 'none';
+}
 
 // ============================================
 // Scroll Animations (AOS - Animate On Scroll)
@@ -326,145 +346,157 @@ scrollTopBtn.addEventListener('click', () => {
 });
 
 // ============================================
-// Parallax Effect on Hero Section
+// Parallax Effect on Hero Section (Desktop Only)
 // ============================================
 
 const heroSection = document.querySelector('.hero');
 const heroContent = document.querySelector('.hero-content');
 const heroVisual = document.querySelector('.hero-visual');
 
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const parallaxSpeed = 0.5;
-    
-    if (heroContent && scrolled < window.innerHeight) {
-        heroContent.style.transform = `translateY(${scrolled * parallaxSpeed}px)`;
-        heroContent.style.opacity = 1 - (scrolled / 700);
-    }
-    
-    if (heroVisual && scrolled < window.innerHeight) {
-        heroVisual.style.transform = `translateY(${scrolled * parallaxSpeed * 0.8}px)`;
-    }
-});
+// Only add parallax on desktop
+if (window.innerWidth > 768 && !prefersReducedMotion) {
+    window.addEventListener('scroll', () => {
+        const scrolled = window.pageYOffset;
+        const parallaxSpeed = 0.5;
+        
+        if (heroContent && scrolled < window.innerHeight) {
+            heroContent.style.transform = `translateY(${scrolled * parallaxSpeed}px)`;
+            heroContent.style.opacity = 1 - (scrolled / 700);
+        }
+        
+        if (heroVisual && scrolled < window.innerHeight) {
+            heroVisual.style.transform = `translateY(${scrolled * parallaxSpeed * 0.8}px)`;
+        }
+    });
+}
 
 // ============================================
-// Service Card Tilt Effect
+// Service Card Tilt Effect (Desktop Only)
 // ============================================
 
 const serviceCards = document.querySelectorAll('.service-card');
 
-serviceCards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+// Only add tilt effect on desktop (not touch devices)
+if (window.innerWidth > 768 && !('ontouchstart' in window)) {
+    serviceCards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = (y - centerY) / 20;
+            const rotateY = (centerX - x) / 20;
+            
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+        });
         
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateX = (y - centerY) / 20;
-        const rotateY = (centerX - x) / 20;
-        
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+        });
     });
-    
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = '';
-    });
-});
+}
 
 // ============================================
-// Portfolio Card Hover Effect
+// Portfolio Card Hover Effect (Desktop Only)
 // ============================================
 
 const portfolioCards = document.querySelectorAll('.portfolio-card');
 
-portfolioCards.forEach(card => {
-    card.addEventListener('mouseenter', () => {
-        portfolioCards.forEach(otherCard => {
-            if (otherCard !== card) {
-                otherCard.style.opacity = '0.6';
-                otherCard.style.transform = 'scale(0.97)';
-            }
+// Only add hover and tilt effects on desktop
+if (window.innerWidth > 768 && !('ontouchstart' in window)) {
+    portfolioCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            portfolioCards.forEach(otherCard => {
+                if (otherCard !== card) {
+                    otherCard.style.opacity = '0.6';
+                    otherCard.style.transform = 'scale(0.97)';
+                }
+            });
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            portfolioCards.forEach(otherCard => {
+                otherCard.style.opacity = '1';
+                otherCard.style.transform = 'scale(1)';
+            });
+        });
+        
+        // Add 3D tilt effect to portfolio cards
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            
+            const rotateX = (y - centerY) / 30;
+            const rotateY = (centerX - x) / 30;
+            
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
         });
     });
-    
-    card.addEventListener('mouseleave', () => {
-        portfolioCards.forEach(otherCard => {
-            otherCard.style.opacity = '1';
-            otherCard.style.transform = 'scale(1)';
-        });
-    });
-    
-    // Add 3D tilt effect to portfolio cards
-    card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        
-        const rotateX = (y - centerY) / 30;
-        const rotateY = (centerX - x) / 30;
-        
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
-    });
-    
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = '';
-    });
-});
-
-// ============================================
-// Add Glow Effect to Mouse Cursor
-// ============================================
-
-const glowEffect = document.createElement('div');
-glowEffect.className = 'cursor-glow';
-glowEffect.style.cssText = `
-    position: fixed;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 122, 0, 0.6) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate(-50%, -50%);
-    transition: opacity 0.3s ease;
-    opacity: 0;
-`;
-document.body.appendChild(glowEffect);
-
-let mouseX = 0;
-let mouseY = 0;
-let glowX = 0;
-let glowY = 0;
-
-document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    glowEffect.style.opacity = '1';
-});
-
-document.addEventListener('mouseleave', () => {
-    glowEffect.style.opacity = '0';
-});
-
-function animateGlow() {
-    const dx = mouseX - glowX;
-    const dy = mouseY - glowY;
-    
-    glowX += dx * 0.15;
-    glowY += dy * 0.15;
-    
-    glowEffect.style.left = glowX + 'px';
-    glowEffect.style.top = glowY + 'px';
-    
-    requestAnimationFrame(animateGlow);
 }
 
-animateGlow();
+// ============================================
+// Add Glow Effect to Mouse Cursor (Desktop Only)
+// ============================================
+
+// Only add cursor glow on desktop devices
+if (window.innerWidth > 768 && !('ontouchstart' in window)) {
+    const glowEffect = document.createElement('div');
+    glowEffect.className = 'cursor-glow';
+    glowEffect.style.cssText = `
+        position: fixed;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255, 122, 0, 0.6) 0%, transparent 70%);
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        transition: opacity 0.3s ease;
+        opacity: 0;
+    `;
+    document.body.appendChild(glowEffect);
+
+    let mouseX = 0;
+    let mouseY = 0;
+    let glowX = 0;
+    let glowY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        glowEffect.style.opacity = '1';
+    });
+
+    document.addEventListener('mouseleave', () => {
+        glowEffect.style.opacity = '0';
+    });
+
+    function animateGlow() {
+        const dx = mouseX - glowX;
+        const dy = mouseY - glowY;
+        
+        glowX += dx * 0.15;
+        glowY += dy * 0.15;
+        
+        glowEffect.style.left = glowX + 'px';
+        glowEffect.style.top = glowY + 'px';
+        
+        requestAnimationFrame(animateGlow);
+    }
+
+    animateGlow();
+}
 
 // ============================================
 // Floating Cards Animation Enhancement
@@ -472,16 +504,19 @@ animateGlow();
 
 const floatingCards = document.querySelectorAll('.floating-card');
 
-floatingCards.forEach((card, index) => {
-    // Add mouse parallax effect
-    document.addEventListener('mousemove', (e) => {
-        const x = (e.clientX / window.innerWidth - 0.5) * 20;
-        const y = (e.clientY / window.innerHeight - 0.5) * 20;
-        
-        const multiplier = (index + 1) * 0.5;
-        card.style.transform = `translate(${x * multiplier}px, ${y * multiplier}px)`;
+// Only add parallax effect on desktop devices
+if (window.innerWidth > 768 && !prefersReducedMotion) {
+    floatingCards.forEach((card, index) => {
+        // Add mouse parallax effect
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 20;
+            const y = (e.clientY / window.innerHeight - 0.5) * 20;
+            
+            const multiplier = (index + 1) * 0.5;
+            card.style.transform = `translate(${x * multiplier}px, ${y * multiplier}px)`;
+        });
     });
-});
+}
 
 // ============================================
 // Form Input Animations - Removed
