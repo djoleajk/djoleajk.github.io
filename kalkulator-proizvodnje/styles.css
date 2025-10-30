@@ -816,6 +816,115 @@ input[type="number"]:focus {
 }
 
 /* ============================================
+   NORMATIVI UI
+   ============================================ */
+.normativi-section {
+    background: #ffffff;
+    border: 3px solid #e0e0e0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto; /* omogućava horizontalni skrol ako je tabela šira */
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 900px;
+}
+
+.normativi-title {
+    color: #333;
+    font-weight: 700;
+    margin-bottom: 12px;
+    text-align: center;
+}
+
+.normativi-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+    justify-content: center;
+}
+
+.normativi-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fafafa;
+    table-layout: auto;
+    min-width: 760px; /* spreči preveliko skupljanje kolona */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.normativi-table th,
+.normativi-table td {
+    border: 1px solid #dcdcdc;
+    padding: 10px;
+    text-align: center;
+    white-space: normal; /* dozvoli prelamanje naslova kolona */
+}
+
+.normativi-table th {
+    background: #f2f2f2;
+    font-weight: 700;
+}
+
+.normativi-add-wrapper {
+    margin-top: 12px;
+}
+
+.normativi-add-form {
+    margin-top: 10px;
+    padding: 12px;
+    background: #f8f9fa;
+    border: 2px dashed #e0e0e0;
+    border-radius: 10px;
+}
+
+.normativi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.normativi-add-form label {
+    font-weight: 600;
+    color: #555;
+}
+
+.normativi-add-form input {
+    width: 100%;
+    margin-top: 6px;
+    padding: 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+}
+
+.normativi-note {
+    text-align: center;
+    color: #444;
+    font-weight: 600;
+    margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+    .normativi-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .normativi-table {
+        min-width: 600px;
+    }
+
+    .normativi-table th,
+    .normativi-table td {
+        padding: 6px;
+        font-size: 0.9em;
+    }
+}
+
+/* ============================================
    QUICK ACTIONS - Istorija i Notifikacije
    ============================================ */
 
