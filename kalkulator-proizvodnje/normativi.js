@@ -150,19 +150,7 @@ function initNormativiUI() {
     if (!item) return;
     renderNormativiTable(tableHost, item);
 
-    // Autofill known inputs depending on page
-    const ctx = detectContext();
-    if (ctx === 'kovanje') {
-      setIfExists('timePerPiece', item.taktKovanja_s);
-      setIfExists('numberOfPieces', item.kovanje_ком ?? item.kovanje_kom);
-    } else if (ctx === 'suzavanje') {
-      setIfExists('timePerPiece', item.taktSuzavanja_s);
-      setIfExists('numberOfPieces', item.suzavanje_ком ?? item.suzavanje_kom);
-    }
-    if (ctx === 'peskarenje') {
-      setIfExists('timePerCycle', item.taktPeskarenja_s);
-      setIfExists('numberOfMines', item.peskarenje_ком ?? item.peskarenje_kom);
-    }
+    // Po zahtevu: ne auto-popunjavati polja u input-section; ostaju samo placeholder primeri
 
     localStorage.setItem('normativ_selected_artikal', item.artikal);
   }
