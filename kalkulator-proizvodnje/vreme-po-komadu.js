@@ -72,11 +72,6 @@ function calculate() {
 
     document.getElementById('results').classList.remove('hidden');
 
-    // Prijatn zvučni feedback za uspešnu kalkulaciju
-    if (typeof audioNotificationManager !== 'undefined') {
-        audioNotificationManager.playSuccessSound();
-    }
-
     // Sačuvaj u istoriju
     if (typeof historyManager !== 'undefined') {
         const totalDurationStr = formatDuration(totalTimeInSeconds);

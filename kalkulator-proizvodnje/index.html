@@ -36,17 +36,17 @@
             <div id="currentDate" class="date-display"></div>
         </div>
 
-        <!-- Istorija i notifikacije dugmići -->
+        <!-- Istorija -->
         <div class="quick-actions">
             <a href="history.html" class="action-btn history-btn" title="Преглед историје калкулација">
                 <span class="action-icon">📊</span>
                 <span class="action-text">Историја</span>
                 <span id="historyCount" class="badge">0</span>
             </a>
-            <button id="notificationToggle" class="action-btn notification-btn" title="Омогући/онемогући нотификације">
-                <span class="action-icon">🔔</span>
-                <span class="action-text">Нотификације</span>
-            </button>
+            <a href="vreme-po-komadu.html" class="action-btn action-btn-special" title="Израчунај време за један комад">
+                <span class="action-icon">⏱️</span>
+                <span class="action-text">Време по Комаду</span>
+            </a>
         </div>
 
         <div class="menu-grid">
@@ -85,12 +85,6 @@
                 <div class="menu-title">Преса "БЕМ"</div>
                 <div class="menu-description">Калкулација за БЕМ пресу</div>
             </a>
-
-            <a href="vreme-po-komadu.html" class="menu-card special">
-                <div class="menu-icon">⏱️</div>
-                <div class="menu-title">Време по Комаду</div>
-                <div class="menu-description">Израчунај време за један комад</div>
-            </a>
         </div>
 
         <div class="weather-widget-container">
@@ -105,7 +99,6 @@
     <script src="time-sync.js"></script>
     <script src="weather.js"></script>
     <script src="history-manager.js"></script>
-    <script src="notifications.js"></script>
     <script>
         // Pokreni sat sa prikazom datuma
         atomicClock.startClock('currentTime', { 
@@ -122,22 +115,6 @@
                 countElement.style.display = history.length > 0 ? 'inline-block' : 'none';
             }
         }
-
-        // Toggle notifikacija
-        document.getElementById('notificationToggle').addEventListener('click', async () => {
-            if (notificationManager.areNotificationsEnabled()) {
-                // Već omogućeno, prikaži poruku
-                alert('Нотификације су већ омогућене! ✓\n\nПримићете обавештења када се калкулација заврши.');
-            } else {
-                // Traži dozvolu
-                const granted = await notificationManager.requestPermission();
-                if (granted) {
-                    alert('Нотификације омогућене! ✓');
-                } else {
-                    alert('Нотификације нису дозвољене.\n\nУколико желите да их омогућите, идите у подешавања прегледача и дозволите нотификације за ову страницу.');
-                }
-            }
-        });
 
         // Inicijalno ažuriranje
         updateHistoryCount();

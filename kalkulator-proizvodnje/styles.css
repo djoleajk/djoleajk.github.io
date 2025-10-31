@@ -960,6 +960,20 @@ input[type="number"]:focus {
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
+.action-btn-special {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.action-btn-special:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
 .action-icon {
     font-size: 1.3em;
 }
