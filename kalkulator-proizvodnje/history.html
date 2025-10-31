@@ -160,22 +160,30 @@
                             </div>
                         </div>
                         <div class="history-item-body">
+                            ${calc.timePerPiece !== undefined && calc.timePerPiece !== null ? `
                             <div class="history-detail">
                                 <span class="detail-label">Време по комаду:</span>
-                                <span class="detail-value">${calc.timePerPiece} сек</span>
+                                <span class="detail-value">${calc.timePerPiece} ${typeof calc.timePerPiece === 'number' ? 'сек' : ''}</span>
                             </div>
+                            ` : ''}
+                            ${calc.numberOfPieces !== undefined && calc.numberOfPieces !== null ? `
                             <div class="history-detail">
                                 <span class="detail-label">Број комада:</span>
                                 <span class="detail-value">${calc.numberOfPieces} ком</span>
                             </div>
+                            ` : ''}
+                            ${duration ? `
                             <div class="history-detail">
                                 <span class="detail-label">Укупно трајање:</span>
                                 <span class="detail-value highlight">${duration}</span>
                             </div>
+                            ` : ''}
+                            ${calc.startTime && calc.endTime ? `
                             <div class="history-detail">
                                 <span class="detail-label">Време:</span>
                                 <span class="detail-value">${calc.startTime} → ${calc.endTime}</span>
                             </div>
+                            ` : ''}
                             ${calc.note ? `
                             <div class="history-note">
                                 <span class="note-icon">📝</span>
@@ -197,12 +205,25 @@
         function updateStatistics() {
             const stats = historyManager.getStatistics();
             
-            document.getElementById('totalCalcs').textContent = stats.totalCalculations;
-            document.getElementById('totalPieces').textContent = stats.totalPieces.toLocaleString('sr-RS');
+            document.getElementById('totalCalcs').textContent = stats.totalCalculations || 0;
+            document.getElementById('totalPieces').textContent = (stats.totalPieces || 0).toLocaleString('sr-RS');
             
-            const hours = Math.floor(stats.totalTime / 3600);
-            const minutes = Math.floor((stats.totalTime % 3600) / 60);
-            document.getElementById('totalTime').textContent = `${hours}h ${minutes}m`;
+            // Validacija totalTime
+            const totalTimeSeconds = stats.totalTime || 0;
+            if (isNaN(totalTimeSeconds) || totalTimeSeconds < 0) {
+                document.getElementById('totalTime').textContent = '0h';
+                return;
+            }
+            
+            const hours = Math.floor(totalTimeSeconds / 3600);
+            const minutes = Math.floor((totalTimeSeconds % 3600) / 60);
+            
+            // Ako su hours i minutes validni brojevi
+            if (!isNaN(hours) && !isNaN(minutes)) {
+                document.getElementById('totalTime').textContent = `${hours}h ${minutes}m`;
+            } else {
+                document.getElementById('totalTime').textContent = '0h';
+            }
         }
 
         // Dobij ikonu operacije

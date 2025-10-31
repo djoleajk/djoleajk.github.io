@@ -1,7 +1,12 @@
 function formatDuration(seconds) {
+    // Validacija - ako nije broj, vrati prazan string
+    if (isNaN(seconds) || seconds === null || seconds === undefined) {
+        return '';
+    }
+    
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = seconds % 60;
+    const secs = Math.floor(seconds % 60);
 
     // Gramatika za sate
     let hourText = '';
@@ -23,6 +28,11 @@ function formatDuration(seconds) {
 }
 
 function formatTimePerPiece(seconds) {
+    // Validacija - ako nije broj, vrati prazan string
+    if (isNaN(seconds) || seconds === null || seconds === undefined) {
+        return '';
+    }
+    
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     const secs = Math.round((seconds % 60) * 100) / 100; // Zaokruzivanje na 2 decimale za sekunde
@@ -43,16 +53,21 @@ function hourText(hours) {
 }
 
 function calculate() {
-    const numberOfPieces = parseInt(document.getElementById('numberOfPieces').value);
-    const totalHours = parseInt(document.getElementById('totalHours').value) || 0;
-    const totalMinutes = parseInt(document.getElementById('totalMinutes').value) || 0;
-    const totalSeconds = parseInt(document.getElementById('totalSeconds').value) || 0;
+    const numberOfPiecesInput = document.getElementById('numberOfPieces').value;
+    const totalHoursInput = document.getElementById('totalHours').value;
+    const totalMinutesInput = document.getElementById('totalMinutes').value;
+    const totalSecondsInput = document.getElementById('totalSeconds').value;
 
     // Validacija unosa
-    if (!numberOfPieces || numberOfPieces <= 0) {
+    const numberOfPieces = parseInt(numberOfPiecesInput);
+    if (!numberOfPieces || numberOfPieces <= 0 || isNaN(numberOfPieces)) {
         alert('Молимо унесите валидан број комада!');
         return;
     }
+
+    const totalHours = parseInt(totalHoursInput) || 0;
+    const totalMinutes = parseInt(totalMinutesInput) || 0;
+    const totalSeconds = parseInt(totalSecondsInput) || 0;
 
     if (totalHours === 0 && totalMinutes === 0 && totalSeconds === 0) {
         alert('Молимо унесите валидно време (најмање минуте или секунде)!');
@@ -62,8 +77,20 @@ function calculate() {
     // Pretvori sve u sekunde
     const totalTimeInSeconds = (totalHours * 3600) + (totalMinutes * 60) + totalSeconds;
 
+    // Validacija rezultata
+    if (isNaN(totalTimeInSeconds) || totalTimeInSeconds <= 0) {
+        alert('Грешка при израчунавању времена! Молимо проверите унете вредности.');
+        return;
+    }
+
     // Izračunaj vreme po komadu
     const timePerPieceInSeconds = totalTimeInSeconds / numberOfPieces;
+    
+    // Validacija rezultata
+    if (isNaN(timePerPieceInSeconds) || timePerPieceInSeconds <= 0) {
+        alert('Грешка при израчунавању времена по комаду!');
+        return;
+    }
 
     // Prikaz rezultata
     document.getElementById('timePerPiece').textContent = formatTimePerPiece(timePerPieceInSeconds);
@@ -74,12 +101,12 @@ function calculate() {
 
     // Sačuvaj u istoriju
     if (typeof historyManager !== 'undefined') {
-        const totalDurationStr = formatDuration(totalTimeInSeconds);
         historyManager.addCalculation({
             operation: 'Време по Комаду',
             numberOfPieces: numberOfPieces,
-            totalDuration: totalDurationStr,
+            totalDuration: totalTimeInSeconds, // Pošalji broj sekundi, ne formatiran string
             timePerPiece: Math.round(timePerPieceInSeconds * 100) / 100
+            // Ne šaljemo startTime i endTime jer nisu relevantni za ovu operaciju
         });
     }
 }

@@ -109,8 +109,36 @@ class HistoryManager {
     }
 
     /**
-     * Vraća statistiku
+     * Konvertuje totalDuration u broj sekundi
+     * Ako je već broj, vraća ga. Ako je string, pokušava da parsuje.
      */
+    parseDurationToSeconds(duration) {
+        // Ako je već broj i validan
+        if (typeof duration === 'number' && !isNaN(duration)) {
+            return duration;
+        }
+        
+        // Ako je undefined, null ili prazan string
+        if (!duration || duration === null || duration === undefined) {
+            return 0;
+        }
+        
+        // Ako je string koji sadrži formatiran tekst, ne možemo ga parsovati, vrati 0
+        if (typeof duration === 'string') {
+            // Ako već sadrži formatiran tekst (npr. "2 сата 19мин 0сек"), ne možemo parsovati
+            if (duration.includes('мин') || duration.includes('сат') || duration.includes('сек') || 
+                duration.includes('h') || duration.includes('min') || duration.includes('s')) {
+                return 0; // Ne možemo parsovati formatirani string, vrati 0
+            }
+            // Ako je broj kao string, pretvori u broj
+            const parsed = parseFloat(duration);
+            return isNaN(parsed) ? 0 : parsed;
+        }
+        
+        // Ako ništa ne odgovara, vrati 0
+        return 0;
+    }
+
     getStatistics() {
         const history = this.getHistory();
         
@@ -131,8 +159,13 @@ class HistoryManager {
         };
 
         history.forEach(calc => {
-            stats.totalPieces += calc.numberOfPieces;
-            stats.totalTime += calc.totalDuration;
+            // Validacija numberOfPieces
+            const pieces = parseInt(calc.numberOfPieces) || 0;
+            stats.totalPieces += pieces;
+            
+            // Konvertuj totalDuration u broj sekundi
+            const durationInSeconds = this.parseDurationToSeconds(calc.totalDuration);
+            stats.totalTime += durationInSeconds;
 
             if (!stats.byOperation[calc.operation]) {
                 stats.byOperation[calc.operation] = {
@@ -143,8 +176,8 @@ class HistoryManager {
             }
 
             stats.byOperation[calc.operation].count++;
-            stats.byOperation[calc.operation].pieces += calc.numberOfPieces;
-            stats.byOperation[calc.operation].time += calc.totalDuration;
+            stats.byOperation[calc.operation].pieces += pieces;
+            stats.byOperation[calc.operation].time += durationInSeconds;
         });
 
         return stats;
@@ -216,9 +249,24 @@ class HistoryManager {
      * Formatira trajanje u čitljiv format
      */
     formatDuration(seconds) {
+        // Ako je string, pokušaj da ga pretvoriš u broj
+        if (typeof seconds === 'string') {
+            // Ako već sadrži formatiran tekst (npr. "2 сата 19мин 0сек"), vrati ga
+            if (seconds.includes('мин') || seconds.includes('сат') || seconds.includes('сек')) {
+                return seconds;
+            }
+            // Ako je broj kao string, pretvori u broj
+            seconds = parseFloat(seconds);
+        }
+        
+        // Validacija - ako nije broj, vrati prazan string
+        if (isNaN(seconds) || seconds === null || seconds === undefined) {
+            return '';
+        }
+        
         const hours = Math.floor(seconds / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
+        const secs = Math.floor(seconds % 60);
 
         if (hours > 0) {
             return `${hours}h ${minutes}min ${secs}s`;

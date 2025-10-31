@@ -80,11 +80,6 @@ function calculate() {
 
     document.getElementById('results').classList.remove('hidden');
 
-    // Prijatn zvučni feedback za uspešnu kalkulaciju
-    if (typeof audioNotificationManager !== 'undefined') {
-        audioNotificationManager.playSuccessSound();
-    }
-
     // Sačuvaj u istoriju
     if (typeof historyManager !== 'undefined') {
         historyManager.addCalculation({
@@ -130,25 +125,6 @@ function calculate() {
         }
     }
 
-    // Zakazi zvučne notifikacije
-    if (typeof audioNotificationManager !== 'undefined') {
-        const now = atomicClock.getCurrentTime();
-        const delayMs = endTime.getTime() - now.getTime();
-        
-        if (delayMs > 0) {
-            // Zvučni signal za završetak
-            setTimeout(() => {
-                audioNotificationManager.playCompletionSound();
-            }, delayMs);
-
-            // Zvučni signal za polovinu vremena (ako je proces duži od 1 minuta)
-            if (delayMs > 60000) {
-                setTimeout(() => {
-                    audioNotificationManager.playMidpointSound();
-                }, delayMs / 2);
-            }
-        }
-    }
 }
 
 document.getElementById('calculateBtn').addEventListener('click', calculate);
