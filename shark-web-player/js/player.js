@@ -8,6 +8,13 @@ document.addEventListener('DOMContentLoaded', function() {
      
     const audioPlayer = new Audio();
     
+    // Poboljšanja: Shuffle i Repeat modovi
+    let shuffleMode = false;
+    let repeatMode = false;
+    let originalPlaylistOrder = [];
+    
+    // Poboljšanja: Error handling - definisaćemo funkcije kasnije
+    
     
     const volumeSlider = document.getElementById('volume');
     const volumeIcon = document.querySelector('.volume-icon');
@@ -53,6 +60,48 @@ document.addEventListener('DOMContentLoaded', function() {
     let tracks = [];
     let currentTrackIndex = 0;
 
+    // Poboljšanja: localStorage funkcije
+    function savePlaylist() {
+        try {
+            // Sačuvaj samo streamove (audio fajlovi se ne mogu sačuvati u localStorage)
+            const playlistData = tracks.filter(track => track.isStream).map(track => ({
+                name: track.name,
+                url: track.url,
+                isStream: true
+            }));
+            localStorage.setItem('sharkPlayerPlaylist', JSON.stringify(playlistData));
+            localStorage.setItem('sharkPlayerCurrentIndex', currentTrackIndex.toString());
+        } catch (e) {
+            console.warn('Could not save playlist:', e);
+        }
+    }
+
+    function loadPlaylist() {
+        try {
+            const saved = localStorage.getItem('sharkPlayerPlaylist');
+            if (saved) {
+                const playlistData = JSON.parse(saved);
+                // Učitaj samo streamove (audio fajlovi se ne mogu sačuvati u localStorage)
+                tracks = playlistData.filter(track => track.isStream).map(track => ({
+                    name: track.name,
+                    url: track.url,
+                    isStream: true
+                }));
+                const savedIndex = localStorage.getItem('sharkPlayerCurrentIndex');
+                if (savedIndex && tracks.length > 0) {
+                    currentTrackIndex = Math.min(parseInt(savedIndex, 10) || 0, tracks.length - 1);
+                }
+                if (tracks.length > 0) {
+                    refreshPlaylist();
+                    return true;
+                }
+            }
+        } catch (e) {
+            console.warn('Could not load playlist:', e);
+        }
+        return false;
+    }
+
      
     const defaultStations = [
         { name: "AS FM", url: "https://asfmonair-masterasfm.radioca.st/stream" },
@@ -77,15 +126,36 @@ document.addEventListener('DOMContentLoaded', function() {
         { name: "RED", url: "https://stream.redradio.rs/sid=1" }
     ];
 
-     
-    function loadDefaultStations() {
-        defaultStations.forEach(station => {
-            addStreamToPlaylist(station.name, station.url);
+    // Poboljšanja: Funkcija za dodavanje bez čuvanja (koristi se za početno učitavanje)
+    function addStreamToPlaylistInitial(name, url) {
+        const stream = {
+            name: name,
+            url: url,
+            isStream: true
+        };
+        tracks.push(stream);
+        
+        const streamElement = document.createElement('div');
+        streamElement.className = 'playlist-item';
+        streamElement.innerHTML = `
+            <span class="stream-icon">📻</span>
+            <span>${name}</span>
+        `;
+        makeItemSelectable(streamElement);
+        streamElement.addEventListener('dblclick', () => {
+            currentTrackIndex = tracks.length - 1;
+            playTrack(currentTrackIndex);
         });
+        playlist.appendChild(streamElement);
     }
 
-    
-    loadDefaultStations();
+    // Poboljšanja: Učitaj playlistu iz localStorage ili učitaj default stanice
+    if (!loadPlaylist()) {
+        defaultStations.forEach(station => {
+            addStreamToPlaylistInitial(station.name, station.url);
+        });
+        savePlaylist();
+    }
 
      
     playPauseBtn.addEventListener('click', () => {
@@ -103,15 +173,37 @@ document.addEventListener('DOMContentLoaded', function() {
 
      
     prevBtn.addEventListener('click', () => {
-        if (currentTrackIndex > 0) {
+        if (tracks.length === 0) return;
+        
+        if (shuffleMode && tracks.length > 1) {
+            let prevIndex;
+            do {
+                prevIndex = Math.floor(Math.random() * tracks.length);
+            } while (prevIndex === currentTrackIndex && tracks.length > 1);
+            currentTrackIndex = prevIndex;
+        } else if (currentTrackIndex > 0) {
             currentTrackIndex--;
-            playTrack(currentTrackIndex);
+        } else if (repeatMode) {
+            currentTrackIndex = tracks.length - 1;
+        } else {
+            return;
         }
+        playTrack(currentTrackIndex);
     });
 
      
     nextBtn.addEventListener('click', () => {
-        currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+        if (tracks.length === 0) return;
+        
+        if (shuffleMode && tracks.length > 1) {
+            let nextIndex;
+            do {
+                nextIndex = Math.floor(Math.random() * tracks.length);
+            } while (nextIndex === currentTrackIndex && tracks.length > 1);
+            currentTrackIndex = nextIndex;
+        } else {
+            currentTrackIndex = (currentTrackIndex + 1) % tracks.length;
+        }
         playTrack(currentTrackIndex);
     });
 
@@ -126,6 +218,8 @@ document.addEventListener('DOMContentLoaded', function() {
          
         const trackInfo = document.querySelector('.track-info');
         trackInfo.textContent = 'No track playing';
+        timer.textContent = '--:--:--';
+        progress.style.width = '0%';
     });
 
      
@@ -288,6 +382,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     case 'delete':
                         tracks.splice(index, 1);
                         element.remove();
+                        savePlaylist(); // Poboljšanje: Sačuvaj playlistu
+                        if (currentTrackIndex >= tracks.length) {
+                            currentTrackIndex = Math.max(0, tracks.length - 1);
+                        }
+                        showToast('Obrisano iz playliste', 'info');
                         break;
                 }
                 contextMenu.remove();
@@ -309,6 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         tracks.push(stream);
+        savePlaylist(); // Poboljšanje: Sačuvaj playlistu
         
         const streamElement = document.createElement('div');
         streamElement.className = 'playlist-item';
@@ -323,16 +423,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         playlist.appendChild(streamElement);
+        showToast(`Dodato: ${name}`, 'success');
     }
 
     
     function addTrackToPlaylist(file) {
         const track = {
             name: file.name,
-            url: URL.createObjectURL(file)
+            url: URL.createObjectURL(file),
+            isStream: false,
+            fileObject: file // Čuvamo referencu za localStorage
         };
         
         tracks.push(track);
+        savePlaylist(); // Poboljšanje: Sačuvaj playlistu
         
         const trackElement = document.createElement('div');
         trackElement.className = 'playlist-item';
@@ -341,13 +445,10 @@ document.addEventListener('DOMContentLoaded', function() {
         trackElement.addEventListener('dblclick', () => {
             currentTrackIndex = tracks.length - 1;
             playTrack(currentTrackIndex);
-            if (currentTrackIndex === tracks.length - 1) {
-                currentTrackIndex = 0;
-                playTrack(currentTrackIndex);
-            }
         });
         
         playlist.appendChild(trackElement);
+        showToast(`Dodato: ${file.name}`, 'success');
     }
 
     
@@ -363,10 +464,17 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (track.isStream) {
             document.querySelector('.bitrate').textContent = 'LIVE';
+        } else {
+            document.querySelector('.bitrate').textContent = '128 kbps';
         }
         
-        audioPlayer.addEventListener('timeupdate', updateProgress);
-        audioPlayer.play();
+        // Ukloni postojeći event listener i dodaj novi
+        audioPlayer.removeEventListener('timeupdate', updateProgress);
+        audioPlayer.addEventListener('timeupdate', () => updateProgress({ target: audioPlayer }));
+        audioPlayer.play().catch(err => {
+            console.error('Play error:', err);
+            showToast('Neuspešna reprodukcija. Proverite dozvole.', 'error');
+        });
         playPauseBtn.textContent = '⏸';
         
         
@@ -410,6 +518,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (index !== -1) {
                     tracks.splice(index - 1, 1); // Adjust for playlist header
                     selected.remove();
+                    savePlaylist(); // Poboljšanje: Sačuvaj playlistu
+                    if (currentTrackIndex >= tracks.length) {
+                        currentTrackIndex = Math.max(0, tracks.length - 1);
+                    }
+                    showToast('Obrisano iz playliste', 'info');
                 }
                 deleteWarning.remove();
             });
@@ -442,7 +555,8 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="sort-option" data-sort="az">A-Z ↓</div>
             <div class="sort-option" data-sort="za">Z-A ↑</div>
             <div class="sort-option" data-sort="recent">Najnovije prvo</div>
-            <div class="sort-option" data-sort="shuffle">Izmešaj</div>
+            <div class="sort-option ${shuffleMode ? 'active-mode' : ''}" data-sort="shuffle">${shuffleMode ? '✓ ' : ''}Izmešaj</div>
+            <div class="sort-option ${repeatMode ? 'active-mode' : ''}" data-sort="repeat">${repeatMode ? '✓ ' : ''}Ponavljaj</div>
         `;
 
         const buttonRect = sortBtn.getBoundingClientRect();
@@ -469,15 +583,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     sortedTracks.reverse();
                     break;
                 case 'shuffle':
-                    for (let i = sortedTracks.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [sortedTracks[i], sortedTracks[j]] = [sortedTracks[j], sortedTracks[i]];
+                    shuffleMode = !shuffleMode;
+                    if (shuffleMode) {
+                        showToast('Shuffle mode: ON', 'success');
+                    } else {
+                        showToast('Shuffle mode: OFF', 'info');
                     }
-                    break;
+                    sortMenu.remove();
+                    return; // Ne sortiraj, samo promeni mod
+                case 'repeat':
+                    repeatMode = !repeatMode;
+                    if (repeatMode) {
+                        showToast('Repeat mode: ON', 'success');
+                    } else {
+                        showToast('Repeat mode: OFF', 'info');
+                    }
+                    sortMenu.remove();
+                    return; // Ne sortiraj, samo promeni mod
             }
 
             
             tracks = sortedTracks;
+            savePlaylist(); // Poboljšanje: Sačuvaj sortiranu playlistu
             
             
             refreshPlaylist();
@@ -554,6 +681,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     🔹 Razvijena kao doprinos digitalnoj dostupnosti i zajednici
                 </p>
                 <p>Shark Web Player je deo šire inicijative za razvoj korisnih, javno dostupnih digitalnih alata.</p>
+                <div style="margin: 15px 0; padding: 10px; background: rgba(255,255,255,0.05); border-radius: 5px;">
+                    <strong style="color: #0af;">Keyboard Shortcuts:</strong><br>
+                    Space - Play/Pause<br>
+                    ← → - Previous/Next<br>
+                    ↑ ↓ - Volume +/-<br>
+                    Esc - Close dialogs
+                </div>
                 <button class="close-info">Zatvori</button>
             </div>
         `;
@@ -572,15 +706,66 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     
+    // Poboljšanja: Interaktivni progress bar
+    progressBar.addEventListener('click', (e) => {
+        const audio = getCurrentAudio();
+        if (!audio || !audio.duration || audio.duration === Infinity || isNaN(audio.duration)) return;
+        
+        const rect = progressBar.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const percent = clickX / rect.width;
+        audio.currentTime = percent * audio.duration;
+        updateProgress({ target: audio });
+    });
+
+    progressBar.addEventListener('mousemove', (e) => {
+        progressBar.style.cursor = 'pointer';
+    });
+    
     function updateProgress(e) {
         const audio = e.target;
-        const percent = (audio.currentTime / audio.duration) * 100;
-        progress.style.width = percent + '%';
+        const currentTrack = tracks[currentTrackIndex];
         
-        
-        const time = formatTime(audio.currentTime);
-        timer.textContent = time;
+        // Za streamove prikaži samo trenutno vreme ili LIVE
+        if (currentTrack && currentTrack.isStream) {
+            if (!audio.duration || audio.duration === Infinity || isNaN(audio.duration)) {
+                timer.textContent = 'LIVE';
+                return;
+            }
+            const time = formatTime(audio.currentTime);
+            timer.textContent = time;
+        } else {
+            // Za audio fajlove prikaži trenutno / ukupno vreme
+            if (!audio.duration || audio.duration === Infinity || isNaN(audio.duration)) {
+                progress.style.width = '0%';
+                timer.textContent = '00:00:00';
+                return;
+            }
+            const percent = (audio.currentTime / audio.duration) * 100;
+            progress.style.width = percent + '%';
+            
+            const time = formatTime(audio.currentTime);
+            const duration = formatTime(audio.duration);
+            timer.textContent = `${time} / ${duration}`;
+        }
     }
+    
+    // Poboljšanja: Autoplay sledećeg
+    audioPlayer.addEventListener('ended', () => {
+        if (repeatMode && tracks.length > 0) {
+            playTrack(currentTrackIndex);
+        } else if (shuffleMode && tracks.length > 1) {
+            let nextIndex;
+            do {
+                nextIndex = Math.floor(Math.random() * tracks.length);
+            } while (nextIndex === currentTrackIndex && tracks.length > 1);
+            currentTrackIndex = nextIndex;
+            playTrack(currentTrackIndex);
+        } else if (currentTrackIndex < tracks.length - 1) {
+            currentTrackIndex++;
+            playTrack(currentTrackIndex);
+        }
+    });
 
     function formatTime(seconds) {
         const hrs = Math.floor(seconds / 3600);
@@ -617,4 +802,95 @@ document.addEventListener('DOMContentLoaded', function() {
             playlist.appendChild(trackElement);
         });
     }
+
+    // Poboljšanja: Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        // Ignoriši ako je fokus na input polju
+        if (e.target.tagName === 'INPUT') return;
+        
+        switch(e.code) {
+            case 'Space':
+                e.preventDefault();
+                playPauseBtn.click();
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                prevBtn.click();
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                nextBtn.click();
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                volumeSlider.value = Math.min(100, parseInt(volumeSlider.value) + 10);
+                volumeSlider.dispatchEvent(new Event('input'));
+                break;
+            case 'ArrowDown':
+                e.preventDefault();
+                volumeSlider.value = Math.max(0, parseInt(volumeSlider.value) - 10);
+                volumeSlider.dispatchEvent(new Event('input'));
+                break;
+            case 'KeyS':
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    sortBtn.click();
+                }
+                break;
+            case 'Escape':
+                // Zatvori sve modale
+                document.querySelectorAll('.stream-dialog, .info-modal, .delete-warning, .track-details, .sort-menu, .add-options').forEach(el => {
+                    if (el.style.display !== 'none') el.remove();
+                });
+                break;
+        }
+    });
+
+    // Poboljšanja: Toast notifikacije
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    function hideToast() {
+        const toasts = document.querySelectorAll('.toast');
+        toasts.forEach(toast => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        });
+    }
+
+    // Poboljšanja: Error handling
+    audioPlayer.addEventListener('error', (e) => {
+        showToast('Greška pri reprodukciji. Proverite URL ili fajl.', 'error');
+        console.error('Audio error:', e);
+    });
+    
+    audioPlayer.addEventListener('loadstart', () => {
+        // Toast će biti prikazan samo ako treba
+    });
+    
+    audioPlayer.addEventListener('canplay', () => {
+        // Audio je spreman za reprodukciju
+    });
+
+    // Poboljšanja: Čuvanje trenutne pozicije
+    audioPlayer.addEventListener('play', () => {
+        savePlaylist();
+    });
+
+    audioPlayer.addEventListener('pause', () => {
+        savePlaylist();
+    });
 });

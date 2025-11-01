@@ -613,6 +613,106 @@ body {
     color: #0af;
 }
 
+/* Poboljšanja: Toast notifikacije */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: linear-gradient(to bottom, #0c1824, #1a2834);
+    border: 1px solid #234;
+    border-radius: 8px;
+    padding: 12px 20px;
+    color: #fff;
+    font-size: 14px;
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    min-width: 200px;
+    text-align: center;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast-success {
+    border-color: #4caf50;
+    background: linear-gradient(to bottom, #1a4c1f, #0c2810);
+}
+
+.toast-error {
+    border-color: #f44336;
+    background: linear-gradient(to bottom, #4c1a1a, #28100c);
+}
+
+.toast-info {
+    border-color: #2196f3;
+    background: linear-gradient(to bottom, #1a1f4c, #0c1028);
+}
+
+/* Poboljšanja: Active mode indikatori */
+.sort-option.active-mode {
+    background: #234;
+    color: #0af;
+    font-weight: bold;
+}
+
+.sort-option.active-mode:hover {
+    background: #345;
+}
+
+/* Poboljšanja: Progress bar hover efekat */
+.progress-bar:hover {
+    background: #234;
+}
+
+.progress-bar:hover .progress {
+    background: #0bf;
+}
+
+/* Poboljšanja: Bolji scrollbar za playlistu */
+.playlist {
+    scrollbar-width: thin;
+    scrollbar-color: #345 #123;
+}
+
+.playlist::-webkit-scrollbar {
+    width: 8px;
+}
+
+.playlist::-webkit-scrollbar-track {
+    background: #123;
+    border-radius: 4px;
+}
+
+.playlist::-webkit-scrollbar-thumb {
+    background: #345;
+    border-radius: 4px;
+}
+
+.playlist::-webkit-scrollbar-thumb:hover {
+    background: #456;
+}
+
+/* Poboljšanja: Animacije za button hover */
+.ctrl-btn, .footer-btn {
+    transition: all 0.2s ease;
+}
+
+.ctrl-btn:hover, .footer-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Poboljšanja: Poboljšan timer prikaz */
+.timer {
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    color: #0af;
+}
+
 /* Mobile Specific Styles */
 @media screen and (max-width: 768px) {
     .player-container {
@@ -629,5 +729,15 @@ body {
     .volume-control {
         width: 100%;
         margin-top: 10px;
+    }
+
+    .toast {
+        min-width: 90%;
+        left: 5%;
+        transform: translateX(0) translateY(100px);
+    }
+
+    .toast.show {
+        transform: translateX(0) translateY(0);
     }
 }
