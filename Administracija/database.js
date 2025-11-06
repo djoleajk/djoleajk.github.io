@@ -448,18 +448,18 @@ async function initDefaultData() {
     });
     console.log('Admin korisnik kreiran/ažuriran');
 
-    // Kreiraj ili ažuriraj user korisnika
+    // Kreiraj ili ažuriraj urednik korisnika
     // Koristimo updateKorisnik (put) koji će kreirati ili ažurirati
-    console.log('Kreiranje/ažuriranje user korisnika...');
+    console.log('Kreiranje/ažuriranje urednik korisnika...');
     await updateKorisnik({
         id: 2,
         username: 'user',
         password: userPassword,
-        ime: 'Korisnik',
+        ime: 'Urednik',
         email: 'user@preduzece.rs',
-        uloga: 'user'
+        uloga: 'urednik'
     });
-    console.log('User korisnik kreiran/ažuriran');
+    console.log('Urednik korisnik kreiran/ažuriran');
     
     console.log('Default podaci inicijalizovani');
 }

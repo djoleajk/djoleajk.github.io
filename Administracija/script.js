@@ -303,6 +303,23 @@ async function loadAllData() {
         ostale = await getAllOstale();
         korisnici = await getAllKorisnici(); // Učitaj korisnike za sve
         
+        // Automatsko ažuriranje statusa odmora - označi kao "Završen" ako je prošao datum završetka
+        const danas = new Date();
+        danas.setHours(0, 0, 0, 0);
+        
+        for (const odmor of odmori) {
+            if (odmor.status === 'Odobren' || odmor.status === 'U toku' || odmor.status === 'Planiran') {
+                const zavrsetakDate = new Date(odmor.zavrsetak + 'T00:00:00');
+                if (zavrsetakDate < danas) {
+                    // Automatski označi kao završen ako je prošao datum završetka
+                    await updateOdmor({ ...odmor, status: 'Završen' });
+                }
+            }
+        }
+        
+        // Ponovo učitaj odmore nakon ažuriranja
+        odmori = await getAllOdmori();
+        
         // Učitaj opcione podatke ako postoje store-ovi
         try {
             poruke = await getAllPoruke();
@@ -330,6 +347,15 @@ async function loadAllData() {
 
 // Renderovanje tabela
 async function renderRadnici() {
+    // PRIVATNOST: Samo administrator vidi sve radnike
+    if (!isAdmin()) {
+        const tbody = document.getElementById('radnici-tbody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px; color: #999;">Nemate dozvolu za pregled radnika</td></tr>';
+        }
+        return;
+    }
+    
     const tbody = document.getElementById('radnici-tbody');
     tbody.innerHTML = '';
     
@@ -364,7 +390,7 @@ async function renderRadnici() {
         return `
             <tr>
                 <td>${radnik.id}</td>
-                <td>${radnik.ime}</td>
+                <td><a href="#" class="clickable-name" onclick="showKorisnikProfilByRadnikId(${radnik.id}); return false;" style="color: #667eea; text-decoration: none; cursor: pointer; font-weight: 500;">${radnik.ime}</a></td>
                 <td>${radnik.jmbg}</td>
                 <td>${radnik.telefon}</td>
                 <td>${radnik.email}</td>
@@ -380,6 +406,15 @@ async function renderRadnici() {
 }
 
 async function renderPlate() {
+    // PRIVATNOST: Samo administrator vidi sve plate
+    if (!isAdmin()) {
+        const tbody = document.getElementById('plate-tbody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 30px; color: #999;">Nemate dozvolu za pregled plata</td></tr>';
+        }
+        return;
+    }
+    
     const tbody = document.getElementById('plate-tbody');
     tbody.innerHTML = '';
     
@@ -391,6 +426,14 @@ async function renderPlate() {
     
     plate.forEach(plata => {
         const radnik = radnici.find(r => r.id === plata.radnikId);
+        // Pronađi korisničko ime radnika ako radnik ima nalog
+        let radnikKorisnickoIme = radnik ? radnik.ime : 'Nepoznat';
+        if (radnik) {
+            const radnikKorisnik = korisnici.find(k => k.radnikId === radnik.id);
+            if (radnikKorisnik) {
+                radnikKorisnickoIme = radnikKorisnik.username;
+            }
+        }
         const osnovna = parseFloat(plata.osnovna) || 0;
         const bonusi = parseFloat(plata.bonusi) || 0;
         const prekovremeni = parseFloat(plata.prekovremeni) || 0;
@@ -425,7 +468,7 @@ async function renderPlate() {
         row.onclick = () => showPlataDetalj(plata);
         row.innerHTML = `
             <td>${plata.id}</td>
-            <td>${radnik ? radnik.ime : 'Nepoznat'}</td>
+            <td><a href="#" class="clickable-name" onclick="event.stopPropagation(); showKorisnikProfilByRadnikId(${plata.radnikId}); return false;" style="color: #667eea; text-decoration: none; cursor: pointer; font-weight: 500;">${radnikKorisnickoIme}</a></td>
             <td>${mesecNaziv}</td>
             <td>${plata.godina}</td>
             <td>${formatCurrency(osnovna)}</td>
@@ -439,6 +482,15 @@ async function renderPlate() {
 }
 
 async function renderOdmori() {
+    // PRIVATNOST: Samo administrator vidi sve odmore
+    if (!isAdmin()) {
+        const tbody = document.getElementById('odmori-tbody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px; color: #999;">Nemate dozvolu za pregled godišnjih odmora</td></tr>';
+        }
+        return;
+    }
+    
     const tbody = document.getElementById('odmori-tbody');
     tbody.innerHTML = '';
     
@@ -450,6 +502,14 @@ async function renderOdmori() {
     
     odmori.forEach(odmor => {
         const radnik = radnici.find(r => r.id === odmor.radnikId);
+        // Pronađi korisničko ime radnika ako radnik ima nalog
+        let radnikKorisnickoIme = radnik ? radnik.ime : 'Nepoznat';
+        if (radnik) {
+            const radnikKorisnik = korisnici.find(k => k.radnikId === radnik.id);
+            if (radnikKorisnik) {
+                radnikKorisnickoIme = radnikKorisnik.username;
+            }
+        }
         const brojDana = calculateDays(odmor.pocetak, odmor.zavrsetak);
         const statusClass = `status-${odmor.status.toLowerCase().replace(' ', '-')}`;
         const actionsCell = isAdmin() ? `
@@ -464,7 +524,7 @@ async function renderOdmori() {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${odmor.id}</td>
-            <td>${radnik ? radnik.ime : 'Nepoznat'}</td>
+            <td><a href="#" class="clickable-name" onclick="showKorisnikProfilByRadnikId(${odmor.radnikId}); return false;" style="color: #667eea; text-decoration: none; cursor: pointer; font-weight: 500;">${radnikKorisnickoIme}</a></td>
             <td>${formatDate(odmor.pocetak)}</td>
             <td>${formatDate(odmor.zavrsetak)}</td>
             <td>${brojDana}</td>
@@ -476,6 +536,15 @@ async function renderOdmori() {
 }
 
 async function renderOstale() {
+    // PRIVATNOST: Samo administrator vidi sve evidencije
+    if (!isAdmin()) {
+        const tbody = document.getElementById('ostale-tbody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 30px; color: #999;">Nemate dozvolu za pregled evidencija</td></tr>';
+        }
+        return;
+    }
+    
     const tbody = document.getElementById('ostale-tbody');
     tbody.innerHTML = '';
     
@@ -487,6 +556,14 @@ async function renderOstale() {
     
     ostale.forEach(evidencija => {
         const radnik = radnici.find(r => r.id === evidencija.radnikId);
+        // Pronađi korisničko ime radnika ako radnik ima nalog
+        let radnikKorisnickoIme = radnik ? radnik.ime : 'Nepoznat';
+        if (radnik) {
+            const radnikKorisnik = korisnici.find(k => k.radnikId === radnik.id);
+            if (radnikKorisnik) {
+                radnikKorisnickoIme = radnikKorisnik.username;
+            }
+        }
         const actionsCell = isAdmin() ? `
             <td>
                 <div class="action-buttons">
@@ -500,7 +577,7 @@ async function renderOstale() {
         row.innerHTML = `
             <td>${evidencija.id}</td>
             <td>${evidencija.tip}</td>
-            <td>${radnik ? radnik.ime : 'Nepoznat'}</td>
+            <td><a href="#" class="clickable-name" onclick="showKorisnikProfilByRadnikId(${evidencija.radnikId}); return false;" style="color: #667eea; text-decoration: none; cursor: pointer; font-weight: 500;">${radnikKorisnickoIme}</a></td>
             <td>${formatDate(evidencija.datum)}</td>
             <td>${evidencija.opis}</td>
             ${actionsCell}
@@ -510,6 +587,15 @@ async function renderOstale() {
 }
 
 async function renderKorisnici() {
+    // PRIVATNOST: Samo administrator vidi sve korisnike
+    if (!isAdmin()) {
+        const tbody = document.getElementById('korisnici-tbody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px; color: #999;">Nemate dozvolu za pregled korisnika</td></tr>';
+        }
+        return;
+    }
+    
     const tbody = document.getElementById('korisnici-tbody');
     tbody.innerHTML = '';
     
@@ -520,18 +606,24 @@ async function renderKorisnici() {
     
     korisnici.forEach(korisnik => {
         const radnik = korisnik.radnikId ? radnici.find(r => r.id === korisnik.radnikId) : null;
-        const radnikIme = radnik ? radnik.ime : '-';
-        let roleText = 'Korisnik';
+        // Pronađi korisničko ime radnika ako radnik ima nalog
+        let radnikKorisnickoIme = '-';
+        if (radnik) {
+            const radnikKorisnik = korisnici.find(k => k.radnikId === radnik.id);
+            radnikKorisnickoIme = radnikKorisnik ? radnikKorisnik.username : radnik.ime;
+        }
+        let roleText = 'Urednik';
         if (korisnik.uloga === 'admin') roleText = 'Administrator';
         else if (korisnik.uloga === 'radnik') roleText = 'Radnik';
+        else if (korisnik.uloga === 'urednik') roleText = 'Urednik';
         
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${korisnik.id}</td>
             <td>${korisnik.username}</td>
-            <td>${korisnik.ime}</td>
+            <td><a href="#" class="clickable-name" onclick="showKorisnikProfil(${korisnik.id}); return false;" style="color: #667eea; text-decoration: none; cursor: pointer; font-weight: 500;">${korisnik.ime}</a></td>
             <td><span class="role-badge role-${korisnik.uloga}">${roleText}</span></td>
-            <td>${radnikIme}</td>
+            <td>${radnikKorisnickoIme}</td>
             <td>${korisnik.email}</td>
             <td>
                 <div class="action-buttons">
@@ -569,6 +661,14 @@ function openModal(type) {
         // Popuni select liste sa radnicima gde je potrebno
         if (type === 'plate' || type === 'odmori' || type === 'ostale') {
             populateRadnikSelect(`select#${type}-radnik`);
+            // Inicijalizuj proveru naloga za slanje dokumenta
+            if (type === 'plate') {
+                checkRadnikAccountAndShowSendOption('plate-radnik', 'plate-send-document-group');
+            } else if (type === 'odmori') {
+                checkRadnikAccountAndShowSendOption('odmori-radnik', 'odmori-send-document-group');
+            } else if (type === 'ostale') {
+                checkRadnikAccountAndShowSendOption('ostale-radnik', 'ostale-send-document-group');
+            }
         }
         
         if (type === 'poruke') {
@@ -740,8 +840,10 @@ async function editPlata(id) {
     document.getElementById('plate-doprinosi').value = plata.doprinosi || 0;
     document.getElementById('plate-dugovanja').value = plata.dugovanja || 0;
     document.getElementById('plate-ostali-odbitci').value = plata.ostaliOdbitci || 0;
+    document.getElementById('plate-send-document').checked = false; // Reset checkbox
     
     populateRadnikSelect('select#plate-radnik');
+    await checkRadnikAccountAndShowSendOption('plate-radnik', 'plate-send-document-group');
     openModal('plate');
 }
 
@@ -770,8 +872,10 @@ async function editOdmor(id) {
     document.getElementById('odmori-pocetak').value = odmor.pocetak;
     document.getElementById('odmori-zavrsetak').value = odmor.zavrsetak;
     document.getElementById('odmori-status').value = odmor.status;
+    document.getElementById('odmori-send-document').checked = false; // Reset checkbox
     
     populateRadnikSelect('select#odmori-radnik');
+    await checkRadnikAccountAndShowSendOption('odmori-radnik', 'odmori-send-document-group');
     openModal('odmori');
 }
 
@@ -819,8 +923,10 @@ async function editOstala(id) {
     document.getElementById('ostale-radnik').value = evidencija.radnikId;
     document.getElementById('ostale-datum').value = evidencija.datum;
     document.getElementById('ostale-opis').value = evidencija.opis;
+    document.getElementById('ostale-send-document').checked = false; // Reset checkbox
     
     populateRadnikSelect('select#ostale-radnik');
+    await checkRadnikAccountAndShowSendOption('ostale-radnik', 'ostale-send-document-group');
     openModal('ostale');
 }
 
@@ -839,6 +945,16 @@ async function deleteOstalaHandler(id) {
 
 // Korisnici CRUD
 async function editKorisnik(id) {
+    // PRIVATNOST: Samo administrator može da menja korisnike
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za izmenu korisnika');
+        } else {
+            alert('Nemate dozvolu za izmenu korisnika');
+        }
+        return;
+    }
+    
     const korisnik = await getKorisnikById(id);
     if (!korisnik) return;
     
@@ -867,6 +983,16 @@ async function editKorisnik(id) {
 }
 
 async function deleteKorisnikHandler(id) {
+    // PRIVATNOST: Samo administrator može da briše korisnike
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za brisanje korisnika');
+        } else {
+            alert('Nemate dozvolu za brisanje korisnika');
+        }
+        return;
+    }
+    
     if (currentUser.id === id) {
         alert('Ne možete obrisati sopstveni nalog');
         return;
@@ -885,6 +1011,16 @@ async function deleteKorisnikHandler(id) {
 // Form submit handlers
 document.getElementById('form-radnici').addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    // PRIVATNOST: Samo administrator može da dodaje/izmenjuje radnike
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za dodavanje/izmenu radnika');
+        } else {
+            alert('Nemate dozvolu za dodavanje/izmenu radnika');
+        }
+        return;
+    }
     
     try {
         const id = document.getElementById('radnici-id').value;
@@ -940,6 +1076,16 @@ document.getElementById('form-radnici').addEventListener('submit', async (e) => 
 document.getElementById('form-plate').addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    // PRIVATNOST: Samo administrator može da dodaje/izmenjuje plate
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za dodavanje/izmenu plata');
+        } else {
+            alert('Nemate dozvolu za dodavanje/izmenu plata');
+        }
+        return;
+    }
+    
     try {
         const id = document.getElementById('plate-id').value;
         const data = {
@@ -969,6 +1115,12 @@ document.getElementById('form-plate').addEventListener('submit', async (e) => {
             await addPlata(data);
         }
         
+        // Proveri da li treba poslati dokument korisniku
+        const sendDocument = document.getElementById('plate-send-document').checked;
+        if (sendDocument) {
+            await sendDocumentToUser(data.radnikId, 'plata', data);
+        }
+        
         await loadAllData();
         closeModal('plate');
     } catch (error) {
@@ -978,6 +1130,16 @@ document.getElementById('form-plate').addEventListener('submit', async (e) => {
 
 document.getElementById('form-odmori').addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    // PRIVATNOST: Samo administrator može da dodaje/izmenjuje odmore
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za dodavanje/izmenu godišnjih odmora');
+        } else {
+            alert('Nemate dozvolu za dodavanje/izmenu godišnjih odmora');
+        }
+        return;
+    }
     
     const button = e.target.querySelector('button[type="submit"]');
     
@@ -1011,10 +1173,47 @@ document.getElementById('form-odmori').addEventListener('submit', async (e) => {
             status: document.getElementById('odmori-status').value
         };
         
+        // Validacija: Proveri da li radnik ima dovoljno dana odmora ako se odobriva/završava odmor
+        if (data.status === 'Odobren' || data.status === 'Završen' || data.status === 'U toku') {
+            const radnikOdmori = odmori.filter(o => o.radnikId === data.radnikId && o.id !== data.id);
+            const danas = new Date();
+            danas.setHours(0, 0, 0, 0);
+            
+            const iskorisceniOdmori = radnikOdmori.filter(o => {
+                if (o.status === 'Završen') return true;
+                if (o.status === 'U toku') return true;
+                if (o.status === 'Odobren' || o.status === 'Planiran') {
+                    const zavrsetakDate = new Date(o.zavrsetak + 'T00:00:00');
+                    return zavrsetakDate <= danas;
+                }
+                return false;
+            });
+            
+            const iskorisceno = iskorisceniOdmori.reduce((sum, o) => sum + calculateDays(o.pocetak, o.zavrsetak), 0);
+            const brojDanaNovogOdmora = calculateDays(data.pocetak, data.zavrsetak);
+            const ukupno = 20;
+            const preostalo = ukupno - iskorisceno;
+            
+            if (brojDanaNovogOdmora > preostalo) {
+                if (typeof toast !== 'undefined') {
+                    toast.error(`Radnik ima samo ${preostalo} dana preostalog odmora, a zahteva se ${brojDanaNovogOdmora} dana!`);
+                } else {
+                    alert(`Radnik ima samo ${preostalo} dana preostalog odmora, a zahteva se ${brojDanaNovogOdmora} dana!`);
+                }
+                return;
+            }
+        }
+        
         if (id) {
             await updateOdmor(data);
         } else {
             await addOdmor(data);
+        }
+        
+        // Proveri da li treba poslati dokument korisniku
+        const sendDocument = document.getElementById('odmori-send-document').checked;
+        if (sendDocument) {
+            await sendDocumentToUser(data.radnikId, 'odmor', data);
         }
         
         await loadAllData();
@@ -1042,6 +1241,16 @@ document.getElementById('form-odmori').addEventListener('submit', async (e) => {
 document.getElementById('form-ostale').addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    // PRIVATNOST: Samo administrator može da dodaje/izmenjuje evidencije
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za dodavanje/izmenu evidencija');
+        } else {
+            alert('Nemate dozvolu za dodavanje/izmenu evidencija');
+        }
+        return;
+    }
+    
     try {
         const id = document.getElementById('ostale-id').value;
         const data = {
@@ -1058,6 +1267,12 @@ document.getElementById('form-ostale').addEventListener('submit', async (e) => {
             await addOstala(data);
         }
         
+        // Proveri da li treba poslati dokument korisniku
+        const sendDocument = document.getElementById('ostale-send-document').checked;
+        if (sendDocument) {
+            await sendDocumentToUser(data.radnikId, 'evidencija', data);
+        }
+        
         await loadAllData();
         closeModal('ostale');
     } catch (error) {
@@ -1067,6 +1282,16 @@ document.getElementById('form-ostale').addEventListener('submit', async (e) => {
 
 document.getElementById('form-korisnici').addEventListener('submit', async (e) => {
     e.preventDefault();
+    
+    // PRIVATNOST: Samo administrator može da dodaje/izmenjuje korisnike
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za dodavanje/izmenu korisnika');
+        } else {
+            alert('Nemate dozvolu za dodavanje/izmenu korisnika');
+        }
+        return;
+    }
     
     const button = e.target.querySelector('button[type="submit"]');
     
@@ -1203,6 +1428,28 @@ function calculateDays(startDate, endDate) {
 
 // Funkcija za prikaz detaljne plate
 async function showPlataDetalj(plata) {
+    // PRIVATNOST: Samo administrator ili vlasnik plate može da vidi detalje
+    if (!isAdmin()) {
+        // Proveri da li je radnik vlasnik plate
+        if (isRadnik() && currentUser.radnikId !== plata.radnikId) {
+            if (typeof toast !== 'undefined') {
+                toast.warning('Nemate dozvolu za pregled ove plate');
+            } else {
+                alert('Nemate dozvolu za pregled ove plate');
+            }
+            return;
+        }
+        // Ako nije ni admin ni radnik-vlasnik, zabrani pristup
+        if (!isRadnik() || currentUser.radnikId !== plata.radnikId) {
+            if (typeof toast !== 'undefined') {
+                toast.warning('Nemate dozvolu za pregled plata');
+            } else {
+                alert('Nemate dozvolu za pregled plata');
+            }
+            return;
+        }
+    }
+    
     const radnik = radnici.find(r => r.id === plata.radnikId);
     const mesecNaziv = getMonthName(plata.mesec);
     
@@ -1345,6 +1592,15 @@ function renderAll() {
 
 // Renderovanje pregleda godišnjih odmora po radniku
 async function renderOdmoriPregled() {
+    // PRIVATNOST: Samo administrator vidi pregled odmora svih radnika
+    if (!isAdmin()) {
+        const tbody = document.getElementById('odmori-pregled-tbody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px; color: #999;">Nemate dozvolu za pregled odmora</td></tr>';
+        }
+        return;
+    }
+    
     const tbody = document.getElementById('odmori-pregled-tbody');
     if (!tbody) return;
     
@@ -1357,8 +1613,31 @@ async function renderOdmoriPregled() {
     
     radnici.forEach(radnik => {
         const radnikOdmori = odmori.filter(o => o.radnikId === radnik.id);
-        const zavrseniOdmori = radnikOdmori.filter(o => o.status === 'Završen');
-        const iskorisceno = zavrseniOdmori.reduce((sum, o) => sum + calculateDays(o.pocetak, o.zavrsetak), 0);
+        // Pronađi korisničko ime radnika ako radnik ima nalog
+        let radnikKorisnickoIme = radnik.ime;
+        const radnikKorisnik = korisnici.find(k => k.radnikId === radnik.id);
+        if (radnikKorisnik) {
+            radnikKorisnickoIme = radnikKorisnik.username;
+        }
+        
+        // Računaj sve odmore koji su odobreni i iskorišćeni (Završen, U toku, ili Odobren ako je prošao datum završetka)
+        const danas = new Date();
+        danas.setHours(0, 0, 0, 0);
+        
+        const iskorisceniOdmori = radnikOdmori.filter(o => {
+            // Uvek računaj završene odmore
+            if (o.status === 'Završen') return true;
+            // Računaj odmore koji su u toku
+            if (o.status === 'U toku') return true;
+            // Računaj odobrene odmore čiji je datum završetka prošao
+            if (o.status === 'Odobren' || o.status === 'Planiran') {
+                const zavrsetakDate = new Date(o.zavrsetak + 'T00:00:00');
+                return zavrsetakDate <= danas;
+            }
+            return false;
+        });
+        
+        const iskorisceno = iskorisceniOdmori.reduce((sum, o) => sum + calculateDays(o.pocetak, o.zavrsetak), 0);
         const ukupno = 20; // Standardno 20 dana godišnjeg odmora
         const preostalo = ukupno - iskorisceno;
         const procenat = ukupno > 0 ? Math.round((iskorisceno / ukupno) * 100) : 0;
@@ -1367,7 +1646,7 @@ async function renderOdmoriPregled() {
         const procenatClass = procenat >= 80 ? 'high-usage' : procenat >= 50 ? 'medium-usage' : 'low-usage';
         
         row.innerHTML = `
-            <td>${radnik.ime}</td>
+            <td>${radnikKorisnickoIme}</td>
             <td><strong>${ukupno}</strong></td>
             <td>${iskorisceno}</td>
             <td><strong class="${preostalo < 5 ? 'warning' : ''}">${preostalo}</strong></td>
@@ -1442,8 +1721,24 @@ async function renderRadnikData() {
     odmoriTbody.innerHTML = '';
     
     // Izračunaj statistiku godišnjih odmora
-    const zavrseniOdmori = radnikOdmori.filter(o => o.status === 'Završen');
-    const iskorisceno = zavrseniOdmori.reduce((sum, o) => sum + calculateDays(o.pocetak, o.zavrsetak), 0);
+    // Računaj sve odmore koji su odobreni i iskorišćeni (Završen, U toku, ili Odobren ako je prošao datum završetka)
+    const danas = new Date();
+    danas.setHours(0, 0, 0, 0);
+    
+    const iskorisceniOdmori = radnikOdmori.filter(o => {
+        // Uvek računaj završene odmore
+        if (o.status === 'Završen') return true;
+        // Računaj odmore koji su u toku
+        if (o.status === 'U toku') return true;
+        // Računaj odobrene odmore čiji je datum završetka prošao
+        if (o.status === 'Odobren' || o.status === 'Planiran') {
+            const zavrsetakDate = new Date(o.zavrsetak + 'T00:00:00');
+            return zavrsetakDate <= danas;
+        }
+        return false;
+    });
+    
+    const iskorisceno = iskorisceniOdmori.reduce((sum, o) => sum + calculateDays(o.pocetak, o.zavrsetak), 0);
     const ukupno = 20; // Standardno 20 dana godišnjeg odmora
     const preostalo = ukupno - iskorisceno;
     
@@ -1498,6 +1793,16 @@ async function renderRadnikData() {
 
 // Kreiranje naloga za radnika
 async function createAccountForRadnik(radnikId) {
+    // PRIVATNOST: Samo administrator može da kreira naloge za radnike
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za kreiranje naloga');
+        } else {
+            alert('Nemate dozvolu za kreiranje naloga');
+        }
+        return;
+    }
+    
     const radnik = await getRadnikById(radnikId);
     if (!radnik) return;
     
@@ -1537,6 +1842,15 @@ function toggleCreateAccountFields() {
 
 // Renderovanje poruka (Admin)
 async function renderPoruke() {
+    // PRIVATNOST: Samo administrator vidi sve poruke
+    if (!isAdmin()) {
+        const tbody = document.getElementById('poruke-tbody');
+        if (tbody) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px; color: #999;">Nemate dozvolu za pregled poruka</td></tr>';
+        }
+        return;
+    }
+    
     const tbody = document.getElementById('poruke-tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
@@ -1548,14 +1862,23 @@ async function renderPoruke() {
     
     poruke.forEach(poruka => {
         const radnik = poruka.radnikId ? radnici.find(r => r.id === poruka.radnikId) : null;
-        const radnikIme = poruka.radnikId === 'svi' || !poruka.radnikId ? 'Svi radnici' : (radnik ? radnik.ime : 'Nepoznat');
+        // Pronađi korisničko ime radnika ako radnik ima nalog
+        let radnikKorisnickoIme = 'Svi radnici';
+        if (poruka.radnikId && poruka.radnikId !== 'svi') {
+            if (radnik) {
+                const radnikKorisnik = korisnici.find(k => k.radnikId === radnik.id);
+                radnikKorisnickoIme = radnikKorisnik ? radnikKorisnik.username : radnik.ime;
+            } else {
+                radnikKorisnickoIme = 'Nepoznat';
+            }
+        }
         const procitaoText = poruka.procitao ? 'Pročitano' : 'Nepročitano';
         const procitaoClass = poruka.procitao ? 'status-procitao' : 'status-neprocitao';
         
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${poruka.id}</td>
-            <td>${radnikIme}</td>
+            <td>${radnikKorisnickoIme}</td>
             <td>${formatDate(poruka.datum)}</td>
             <td>${poruka.naslov}</td>
             <td>${poruka.poruka.substring(0, 50)}${poruka.poruka.length > 50 ? '...' : ''}</td>
@@ -1572,6 +1895,19 @@ async function renderPoruke() {
 
 // Renderovanje zahteva (Admin)
 async function renderZahtevi() {
+    // PRIVATNOST: Samo administrator vidi sve zahteve
+    if (!isAdmin()) {
+        const tbodyOdmor = document.getElementById('zahtevi-odmor-tbody');
+        const tbodyAdmin = document.getElementById('zahtevi-admin-tbody');
+        if (tbodyOdmor) {
+            tbodyOdmor.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 30px; color: #999;">Nemate dozvolu za pregled zahteva</td></tr>';
+        }
+        if (tbodyAdmin) {
+            tbodyAdmin.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px; color: #999;">Nemate dozvolu za pregled zahteva</td></tr>';
+        }
+        return;
+    }
+    
     const tbodyOdmor = document.getElementById('zahtevi-odmor-tbody');
     const tbodyAdmin = document.getElementById('zahtevi-admin-tbody');
     
@@ -1582,13 +1918,19 @@ async function renderZahtevi() {
         } else {
             zahteviOdmor.forEach(zahtev => {
                 const radnik = radnici.find(r => r.id === zahtev.radnikId);
+                // Pronađi korisničko ime radnika ako radnik ima nalog
+                let radnikKorisnickoIme = 'Nepoznat';
+                if (radnik) {
+                    const radnikKorisnik = korisnici.find(k => k.radnikId === radnik.id);
+                    radnikKorisnickoIme = radnikKorisnik ? radnikKorisnik.username : radnik.ime;
+                }
                 const statusClass = `status-${zahtev.status.toLowerCase().replace(' ', '-')}`;
                 const brojDana = calculateDays(zahtev.pocetak, zahtev.zavrsetak);
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${zahtev.id}</td>
-                    <td>${radnik ? radnik.ime : 'Nepoznat'}</td>
+                    <td>${radnikKorisnickoIme}</td>
                     <td>${formatDate(zahtev.datum)}</td>
                     <td>${formatDate(zahtev.pocetak)}</td>
                     <td>${formatDate(zahtev.zavrsetak)}</td>
@@ -1614,14 +1956,19 @@ async function renderZahtevi() {
             tbodyAdmin.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 30px; color: #999;">Nema administrativnih zahteva</td></tr>';
         } else {
             zahteviAdmin.forEach(zahtev => {
-                // Prikaži radnika ili korisnika u zavisnosti od tipa zahteva
-                let imeKorisnika = 'Nepoznat';
+                // Prikaži korisničko ime radnika ili korisnika u zavisnosti od tipa zahteva
+                let korisnickoIme = 'Nepoznat';
                 if (zahtev.radnikId) {
                     const radnik = radnici.find(r => r.id === zahtev.radnikId);
-                    imeKorisnika = radnik ? radnik.ime : 'Nepoznat radnik';
+                    if (radnik) {
+                        const radnikKorisnik = korisnici.find(k => k.radnikId === radnik.id);
+                        korisnickoIme = radnikKorisnik ? radnikKorisnik.username : radnik.ime;
+                    } else {
+                        korisnickoIme = 'Nepoznat radnik';
+                    }
                 } else if (zahtev.userId) {
                     const korisnik = korisnici.find(k => k.id === zahtev.userId);
-                    imeKorisnika = korisnik ? korisnik.ime : 'Nepoznat korisnik';
+                    korisnickoIme = korisnik ? korisnik.username : 'Nepoznat korisnik';
                 }
                 
                 const statusClass = `status-${zahtev.status.toLowerCase().replace(' ', '-')}`;
@@ -1629,7 +1976,7 @@ async function renderZahtevi() {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${zahtev.id}</td>
-                    <td>${imeKorisnika}</td>
+                    <td>${korisnickoIme}</td>
                     <td>${zahtev.tip}</td>
                     <td>${formatDate(zahtev.datum)}</td>
                     <td>${zahtev.opis.substring(0, 50)}${zahtev.opis.length > 50 ? '...' : ''}</td>
@@ -1724,10 +2071,49 @@ async function renderRadnikZahtevi() {
 
 // Funkcije za upravljanje zahtevima
 async function odobriZahtevOdmor(id) {
+    // PRIVATNOST: Samo administrator može da odobrava zahteve
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za odobravanje zahteva');
+        } else {
+            alert('Nemate dozvolu za odobravanje zahteva');
+        }
+        return;
+    }
+    
     const zahtev = await getZahtevOdmorById(id);
     if (!zahtev) return;
     
     try {
+        // Validacija: Proveri da li radnik ima dovoljno dana odmora
+        const radnikOdmori = odmori.filter(o => o.radnikId === zahtev.radnikId);
+        const danas = new Date();
+        danas.setHours(0, 0, 0, 0);
+        
+        const iskorisceniOdmori = radnikOdmori.filter(o => {
+            if (o.status === 'Završen') return true;
+            if (o.status === 'U toku') return true;
+            if (o.status === 'Odobren' || o.status === 'Planiran') {
+                const zavrsetakDate = new Date(o.zavrsetak + 'T00:00:00');
+                return zavrsetakDate <= danas;
+            }
+            return false;
+        });
+        
+        const iskorisceno = iskorisceniOdmori.reduce((sum, o) => sum + calculateDays(o.pocetak, o.zavrsetak), 0);
+        const brojDanaZahteva = calculateDays(zahtev.pocetak, zahtev.zavrsetak);
+        const ukupno = 20;
+        const preostalo = ukupno - iskorisceno;
+        
+        if (brojDanaZahteva > preostalo) {
+            if (typeof toast !== 'undefined') {
+                toast.error(`Radnik ima samo ${preostalo} dana preostalog odmora, a zahteva se ${brojDanaZahteva} dana!`);
+            } else {
+                alert(`Radnik ima samo ${preostalo} dana preostalog odmora, a zahteva se ${brojDanaZahteva} dana!`);
+            }
+            return;
+        }
+        
         await updateZahtevOdmor({ ...zahtev, status: 'Odobren' });
         // Kreiraj odmor ako je odobren
         await addOdmor({
@@ -1745,6 +2131,16 @@ async function odobriZahtevOdmor(id) {
 }
 
 async function odbijZahtevOdmor(id) {
+    // PRIVATNOST: Samo administrator može da odbija zahteve
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za odbijanje zahteva');
+        } else {
+            alert('Nemate dozvolu za odbijanje zahteva');
+        }
+        return;
+    }
+    
     const zahtev = await getZahtevOdmorById(id);
     if (!zahtev) return;
     
@@ -1758,6 +2154,16 @@ async function odbijZahtevOdmor(id) {
 }
 
 async function odobriZahtevAdmin(id) {
+    // PRIVATNOST: Samo administrator može da odobrava zahteve
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za odobravanje zahteva');
+        } else {
+            alert('Nemate dozvolu za odobravanje zahteva');
+        }
+        return;
+    }
+    
     const zahtev = await getZahtevAdminById(id);
     if (!zahtev) return;
     
@@ -1771,6 +2177,16 @@ async function odobriZahtevAdmin(id) {
 }
 
 async function odbijZahtevAdmin(id) {
+    // PRIVATNOST: Samo administrator može da odbija zahteve
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za odbijanje zahteva');
+        } else {
+            alert('Nemate dozvolu za odbijanje zahteva');
+        }
+        return;
+    }
+    
     const zahtev = await getZahtevAdminById(id);
     if (!zahtev) return;
     
@@ -1831,6 +2247,16 @@ async function deletePorukaHandler(id) {
 document.getElementById('form-poruke').addEventListener('submit', async (e) => {
     e.preventDefault();
     
+    // PRIVATNOST: Samo administrator može da šalje poruke
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za slanje poruka');
+        } else {
+            alert('Nemate dozvolu za slanje poruka');
+        }
+        return;
+    }
+    
     const button = e.target.querySelector('button[type="submit"]');
     
     try {
@@ -1869,7 +2295,7 @@ document.getElementById('form-poruke').addEventListener('submit', async (e) => {
             }
             
             // Pošalji svim običnim korisnicima
-            const obicniKorisnici = korisnici.filter(k => k.uloga === 'user');
+            const obicniKorisnici = korisnici.filter(k => k.uloga === 'urednik');
             for (const korisnik of obicniKorisnici) {
                 await addPoruka({
                     userId: korisnik.id,
@@ -2103,7 +2529,7 @@ async function renderUserData() {
     document.getElementById('user-profil-ime').textContent = currentUser.ime;
     document.getElementById('user-profil-username').textContent = currentUser.username || 'N/A';
     document.getElementById('user-profil-email').textContent = currentUser.email || 'N/A';
-    document.getElementById('user-profil-uloga').textContent = 'Korisnik';
+    document.getElementById('user-profil-uloga').textContent = 'Urednik';
 }
 
 // Renderovanje user poruka
@@ -2165,6 +2591,190 @@ async function renderUserZahtevi() {
         `;
         tbody.appendChild(row);
     });
+}
+
+// Funkcije za prikaz profila korisnika
+async function showKorisnikProfil(korisnikId) {
+    // PRIVATNOST: Samo administrator može da vidi profile korisnika
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za pregled profila korisnika');
+        } else {
+            alert('Nemate dozvolu za pregled profila korisnika');
+        }
+        return;
+    }
+    
+    const korisnik = await getKorisnikById(korisnikId);
+    if (!korisnik) {
+        alert('Korisnik nije pronađen');
+        return;
+    }
+    
+    // Popuni osnovne informacije o korisniku
+    document.getElementById('profil-korisnik-ime').textContent = korisnik.ime || 'N/A';
+    document.getElementById('profil-korisnik-username').textContent = korisnik.username || 'N/A';
+    document.getElementById('profil-korisnik-email').textContent = korisnik.email || 'N/A';
+    
+    let roleText = 'Urednik';
+    if (korisnik.uloga === 'admin') roleText = 'Administrator';
+    else if (korisnik.uloga === 'radnik') roleText = 'Radnik';
+    else if (korisnik.uloga === 'urednik') roleText = 'Urednik';
+    document.getElementById('profil-korisnik-uloga').textContent = roleText;
+    
+    // Ako je korisnik povezan sa radnikom, prikaži dodatne informacije
+    if (korisnik.radnikId) {
+        const radnik = await getRadnikById(korisnik.radnikId);
+        if (radnik) {
+            document.getElementById('profil-korisnik-radnik-row').style.display = 'flex';
+            document.getElementById('profil-korisnik-radnik').textContent = radnik.ime;
+            
+            document.getElementById('profil-radnik-detalji').style.display = 'block';
+            document.getElementById('profil-radnik-jmbg').textContent = radnik.jmbg || 'N/A';
+            document.getElementById('profil-radnik-telefon').textContent = radnik.telefon || 'N/A';
+            document.getElementById('profil-radnik-pozicija').textContent = radnik.pozicija || 'N/A';
+            document.getElementById('profil-radnik-datum').textContent = formatDate(radnik.datum) || 'N/A';
+        } else {
+            document.getElementById('profil-korisnik-radnik-row').style.display = 'none';
+            document.getElementById('profil-radnik-detalji').style.display = 'none';
+        }
+    } else {
+        document.getElementById('profil-korisnik-radnik-row').style.display = 'none';
+        document.getElementById('profil-radnik-detalji').style.display = 'none';
+    }
+    
+    openModal('korisnik-profil');
+}
+
+async function showKorisnikProfilByRadnikId(radnikId) {
+    // PRIVATNOST: Samo administrator može da vidi profile korisnika
+    if (!isAdmin()) {
+        if (typeof toast !== 'undefined') {
+            toast.warning('Nemate dozvolu za pregled profila korisnika');
+        } else {
+            alert('Nemate dozvolu za pregled profila korisnika');
+        }
+        return;
+    }
+    
+    // Pronađi korisnika povezanog sa ovim radnikom
+    const korisnik = await getKorisnikByRadnikId(radnikId);
+    if (korisnik) {
+        await showKorisnikProfil(korisnik.id);
+    } else {
+        // Ako radnik nema nalog, prikaži samo informacije o radniku
+        const radnik = await getRadnikById(radnikId);
+        if (!radnik) {
+            alert('Radnik nije pronađen');
+            return;
+        }
+        
+        document.getElementById('profil-korisnik-ime').textContent = radnik.ime || 'N/A';
+        document.getElementById('profil-korisnik-username').textContent = 'Nema naloga';
+        document.getElementById('profil-korisnik-email').textContent = radnik.email || 'N/A';
+        document.getElementById('profil-korisnik-uloga').textContent = 'Radnik (bez naloga)';
+        document.getElementById('profil-korisnik-radnik-row').style.display = 'none';
+        
+        document.getElementById('profil-radnik-detalji').style.display = 'block';
+        document.getElementById('profil-radnik-jmbg').textContent = radnik.jmbg || 'N/A';
+        document.getElementById('profil-radnik-telefon').textContent = radnik.telefon || 'N/A';
+        document.getElementById('profil-radnik-pozicija').textContent = radnik.pozicija || 'N/A';
+        document.getElementById('profil-radnik-datum').textContent = formatDate(radnik.datum) || 'N/A';
+        
+        openModal('korisnik-profil');
+    }
+}
+
+// Funkcija za proveru da li radnik ima nalog i prikaz checkbox-a za slanje dokumenta
+async function checkRadnikAccountAndShowSendOption(radnikSelectId, sendDocumentGroupId) {
+    const radnikSelect = document.getElementById(radnikSelectId);
+    const sendDocumentGroup = document.getElementById(sendDocumentGroupId);
+    
+    if (!radnikSelect || !sendDocumentGroup) return;
+    
+    const checkAccount = async () => {
+        const radnikId = radnikSelect.value;
+        if (radnikId) {
+            const korisnik = await getKorisnikByRadnikId(parseInt(radnikId));
+            if (korisnik) {
+                sendDocumentGroup.style.display = 'block';
+            } else {
+                sendDocumentGroup.style.display = 'none';
+                const checkbox = sendDocumentGroup.querySelector('input[type="checkbox"]');
+                if (checkbox) checkbox.checked = false;
+            }
+        } else {
+            sendDocumentGroup.style.display = 'none';
+            const checkbox = sendDocumentGroup.querySelector('input[type="checkbox"]');
+            if (checkbox) checkbox.checked = false;
+        }
+    };
+    
+    radnikSelect.addEventListener('change', checkAccount);
+    await checkAccount(); // Proveri i na inicijalizaciji
+}
+
+// Funkcija za slanje dokumenta korisniku
+async function sendDocumentToUser(radnikId, documentType, documentData) {
+    const korisnik = await getKorisnikByRadnikId(radnikId);
+    if (!korisnik) {
+        console.warn('Radnik nema nalog, dokument se ne može poslati');
+        return;
+    }
+    
+    let naslov = '';
+    let poruka = '';
+    
+    if (documentType === 'plata') {
+        const mesecNaziv = getMonthName(documentData.mesec);
+        naslov = `Platna lista - ${mesecNaziv} ${documentData.godina}`;
+        const osnovna = parseFloat(documentData.osnovna) || 0;
+        const bonusi = parseFloat(documentData.bonusi) || 0;
+        const prekovremeni = parseFloat(documentData.prekovremeni) || 0;
+        const nocni = parseFloat(documentData.nocni) || 0;
+        const praznicki = parseFloat(documentData.praznicki) || 0;
+        const regres = parseFloat(documentData.regres) || 0;
+        const staz = parseFloat(documentData.staz) || 0;
+        const ukupnoDobitci = osnovna + bonusi + prekovremeni + nocni + praznicki + regres + staz;
+        
+        const pio = parseFloat(documentData.pio) || 0;
+        const zo = parseFloat(documentData.zo) || 0;
+        const nezaposlenost = parseFloat(documentData.nezaposlenost) || 0;
+        const porez = parseFloat(documentData.porez) || 0;
+        const doprinosi = parseFloat(documentData.doprinosi) || 0;
+        const dugovanja = parseFloat(documentData.dugovanja) || 0;
+        const ostaliOdbitci = parseFloat(documentData.ostaliOdbitci) || 0;
+        const ukupnoOdbitci = pio + zo + nezaposlenost + porez + doprinosi + dugovanja + ostaliOdbitci;
+        const ukupno = ukupnoDobitci - ukupnoOdbitci;
+        
+        poruka = `Vaša platna lista za ${mesecNaziv} ${documentData.godina}:\n\n` +
+                 `Dobitci: ${formatCurrency(ukupnoDobitci)}\n` +
+                 `Odbitci: ${formatCurrency(ukupnoOdbitci)}\n` +
+                 `Ukupno: ${formatCurrency(ukupno)}`;
+    } else if (documentType === 'odmor') {
+        naslov = `Godišnji odmor - ${formatDate(documentData.pocetak)} do ${formatDate(documentData.zavrsetak)}`;
+        const brojDana = calculateDays(documentData.pocetak, documentData.zavrsetak);
+        poruka = `Informacije o vašem godišnjem odmoru:\n\n` +
+                 `Period: ${formatDate(documentData.pocetak)} - ${formatDate(documentData.zavrsetak)}\n` +
+                 `Broj dana: ${brojDana}\n` +
+                 `Status: ${documentData.status}`;
+    } else if (documentType === 'evidencija') {
+        naslov = `Evidencija - ${documentData.tip}`;
+        poruka = `Informacije o evidenciji:\n\n` +
+                 `Tip: ${documentData.tip}\n` +
+                 `Datum: ${formatDate(documentData.datum)}\n` +
+                 `Opis: ${documentData.opis}`;
+    }
+    
+    if (naslov && poruka) {
+        await addPoruka({
+            radnikId: radnikId,
+            naslov: naslov,
+            poruka: poruka,
+            datum: new Date().toISOString().split('T')[0],
+            procitao: false
+        });
+    }
 }
 
 // Inicijalizacija aplikacije kada se stranica učita

@@ -89,7 +89,7 @@ header {
     border: 2px solid white;
 }
 
-.role-user {
+.role-urednik {
     background: rgba(255, 255, 255, 0.2);
     color: white;
 }
@@ -943,7 +943,7 @@ td {
     color: white;
 }
 
-.role-badge.role-user {
+.role-badge.role-urednik {
     background: #6c757d;
     color: white;
 }
@@ -2006,4 +2006,39 @@ body.dark-mode .mobile-menu-item {
 body.dark-mode .mobile-menu-item:hover {
     background: rgba(255, 255, 255, 0.1);
 }
+
+/* Stilovi za klikabilna imena */
+.clickable-name {
+    color: #667eea !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    border-bottom: 1px solid transparent !important;
+}
+
+.clickable-name:hover {
+    color: #764ba2 !important;
+    border-bottom-color: #764ba2 !important;
+    text-decoration: none !important;
+}
+
+.clickable-name:active {
+    color: #5568d3 !important;
+}
+
+/* Dark mode za klikabilna imena */
+body.dark-mode .clickable-name {
+    color: #8b9aff !important;
+}
+
+body.dark-mode .clickable-name:hover {
+    color: #a78bfa !important;
+    border-bottom-color: #a78bfa !important;
+}
+
+body.dark-mode .clickable-name:active {
+    color: #7c8aff !important;
+}
+
 

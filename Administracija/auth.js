@@ -18,7 +18,7 @@ function isRadnik() {
 
 // Provera da li je korisnik user (običan korisnik)
 function isUser() {
-    return currentUser && currentUser.uloga === 'user';
+    return currentUser && currentUser.uloga === 'urednik';
 }
 
 // Prijava korisnika
@@ -187,10 +187,10 @@ function updateUIForRole() {
         const mobileSidebarUserName = document.getElementById('mobile-sidebar-user-name');
         const mobileSidebarRoleBadge = document.getElementById('mobile-sidebar-user-role');
         
-        let roleText = 'Korisnik';
+        let roleText = 'Urednik';
         if (currentUser.uloga === 'admin') roleText = 'Administrator';
         else if (currentUser.uloga === 'radnik') roleText = 'Radnik';
-        else if (currentUser.uloga === 'user') roleText = 'Korisnik';
+        else if (currentUser.uloga === 'urednik') roleText = 'Urednik';
         
         // Ažuriraj desktop
         if (desktopUserName) desktopUserName.textContent = currentUser.ime;

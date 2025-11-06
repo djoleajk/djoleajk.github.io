@@ -26,7 +26,7 @@
                 <div class="login-info">
                     <p><strong>Demo nalozi:</strong></p>
                     <p>Admin: <code>admin</code> / <code>admin123</code></p>
-                    <p>Korisnik: <code>user</code> / <code>user123</code></p>
+                    <p>Urednik: <code>user</code> / <code>user123</code></p>
                 </div>
             </form>
         </div>
@@ -324,7 +324,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Radnik</th>
+                            <th>Korisničko Ime</th>
                             <th>Mesec</th>
                             <th>Godina</th>
                             <th>Osnovna Plata</th>
@@ -351,7 +351,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Radnik</th>
+                            <th>Korisničko Ime</th>
                             <th>Datum Početka</th>
                             <th>Datum Završetka</th>
                             <th>Broj Dana</th>
@@ -374,7 +374,7 @@
                 <table id="odmori-pregled-table">
                     <thead>
                         <tr>
-                            <th>Radnik</th>
+                            <th>Korisničko Ime</th>
                             <th>Ukupno Dana</th>
                             <th>Iskorišćeno</th>
                             <th>Preostalo</th>
@@ -399,7 +399,7 @@
                         <tr>
                             <th>ID</th>
                             <th>Tip Evidencije</th>
-                            <th>Radnik</th>
+                            <th>Korisničko Ime</th>
                             <th>Datum</th>
                             <th>Opis</th>
                             <th class="admin-only" style="display: none;">Akcije</th>
@@ -425,7 +425,7 @@
                             <th>Korisničko Ime</th>
                             <th>Ime i Prezime</th>
                             <th>Uloga</th>
-                            <th>Radnik</th>
+                            <th>Korisničko Ime Radnika</th>
                             <th>Email</th>
                             <th>Akcije</th>
                         </tr>
@@ -594,7 +594,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Radnik</th>
+                            <th>Korisničko Ime</th>
                             <th>Datum</th>
                             <th>Naslov</th>
                             <th>Poruka</th>
@@ -619,7 +619,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Radnik</th>
+                            <th>Korisničko Ime</th>
                             <th>Datum Zahteva</th>
                             <th>Početak</th>
                             <th>Završetak</th>
@@ -636,7 +636,7 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Radnik</th>
+                            <th>Korisničko Ime</th>
                             <th>Tip</th>
                             <th>Datum</th>
                             <th>Opis</th>
@@ -871,6 +871,13 @@
                     <label>Ostali Odbitci:</label>
                     <input type="number" id="plate-ostali-odbitci" name="ostaliOdbitci" step="0.01" min="0" value="0">
                 </div>
+                <div class="form-group" id="plate-send-document-group" style="display: none;">
+                    <label>
+                        <input type="checkbox" id="plate-send-document" name="sendDocument">
+                        Pošalji dokument korisniku
+                    </label>
+                    <small style="color: #666; display: block; margin-top: 5px;">Dokument će biti poslat korisniku kao poruka nakon čuvanja</small>
+                </div>
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Sačuvaj</button>
                     <button type="button" class="btn btn-secondary" onclick="closeModal('plate')">Otkaži</button>
@@ -924,6 +931,13 @@
                         <option value="Otkazan">Otkazan</option>
                     </select>
                 </div>
+                <div class="form-group" id="odmori-send-document-group" style="display: none;">
+                    <label>
+                        <input type="checkbox" id="odmori-send-document" name="sendDocument">
+                        Pošalji dokument korisniku
+                    </label>
+                    <small style="color: #666; display: block; margin-top: 5px;">Dokument će biti poslat korisniku kao poruka nakon čuvanja</small>
+                </div>
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Sačuvaj</button>
                     <button type="button" class="btn btn-secondary" onclick="closeModal('odmori')">Otkaži</button>
@@ -965,6 +979,13 @@
                     <label>Opis:</label>
                     <textarea id="ostale-opis" name="opis" rows="4" required></textarea>
                 </div>
+                <div class="form-group" id="ostale-send-document-group" style="display: none;">
+                    <label>
+                        <input type="checkbox" id="ostale-send-document" name="sendDocument">
+                        Pošalji dokument korisniku
+                    </label>
+                    <small style="color: #666; display: block; margin-top: 5px;">Dokument će biti poslat korisniku kao poruka nakon čuvanja</small>
+                </div>
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">Sačuvaj</button>
                     <button type="button" class="btn btn-secondary" onclick="closeModal('ostale')">Otkaži</button>
@@ -1000,7 +1021,7 @@
                 <div class="form-group">
                     <label>Uloga:</label>
                     <select id="korisnici-uloga" name="uloga" required>
-                        <option value="user">Korisnik</option>
+                        <option value="urednik">Urednik</option>
                         <option value="admin">Administrator</option>
                         <option value="radnik">Radnik</option>
                     </select>
@@ -1016,6 +1037,69 @@
                     <button type="button" class="btn btn-secondary" onclick="closeModal('korisnici')">Otkaži</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Modal za Prikaz Profila Korisnika -->
+    <div id="modal-korisnik-profil" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="closeModal('korisnik-profil')">&times;</span>
+            <h2>Profil Korisnika</h2>
+            <div id="korisnik-profil-content">
+                <div class="profile-container">
+                    <div class="profile-card">
+                        <div class="profile-info">
+                            <div class="info-row">
+                                <span class="info-label">Ime i Prezime:</span>
+                                <span class="info-value" id="profil-korisnik-ime"></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Korisničko Ime:</span>
+                                <span class="info-value" id="profil-korisnik-username"></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Email:</span>
+                                <span class="info-value" id="profil-korisnik-email"></span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Uloga:</span>
+                                <span class="info-value" id="profil-korisnik-uloga"></span>
+                            </div>
+                            <div class="info-row" id="profil-korisnik-radnik-row" style="display: none;">
+                                <span class="info-label">Povezan sa Radnikom:</span>
+                                <span class="info-value" id="profil-korisnik-radnik"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Dodatne informacije o radniku ako je povezan -->
+                    <div id="profil-radnik-detalji" style="display: none;">
+                        <div class="profile-card" style="margin-top: 20px;">
+                            <h3 style="margin-bottom: 15px;">Informacije o Radniku</h3>
+                            <div class="profile-info">
+                                <div class="info-row">
+                                    <span class="info-label">JMBG:</span>
+                                    <span class="info-value" id="profil-radnik-jmbg"></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Telefon:</span>
+                                    <span class="info-value" id="profil-radnik-telefon"></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Pozicija:</span>
+                                    <span class="info-value" id="profil-radnik-pozicija"></span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Datum Zaposlenja:</span>
+                                    <span class="info-value" id="profil-radnik-datum"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('korisnik-profil')">Zatvori</button>
+            </div>
         </div>
     </div>
 
