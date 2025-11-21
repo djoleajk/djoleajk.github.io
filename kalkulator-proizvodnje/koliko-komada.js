@@ -46,6 +46,7 @@ function calculate() {
     const timePerPiece = parseInt(document.getElementById('timePerPiece').value);
     const startTimeInput = document.getElementById('startTimeInput').value;
     const endTimeInput = document.getElementById('endTimeInput').value;
+    const operationType = document.querySelector('input[name="operationType"]:checked').value;
 
     if (!timePerPiece || timePerPiece <= 0) {
         alert('Молимо унесите валидно време по комаду!');
@@ -78,8 +79,14 @@ function calculate() {
         return;
     }
 
-    // Izračunaj broj komada
-    const numberOfPieces = Math.floor(availableSeconds / timePerPiece);
+    // Izračunaj broj komada - za peskarenje se rade 2 komada odjednom
+    let numberOfPieces;
+    if (operationType === 'peskarenje') {
+        const numberOfCycles = Math.floor(availableSeconds / timePerPiece);
+        numberOfPieces = numberOfCycles * 2; // 2 komada po ciklusu
+    } else {
+        numberOfPieces = Math.floor(availableSeconds / timePerPiece);
+    }
 
     if (numberOfPieces <= 0) {
         alert('Нема довољно времена за производњу ниједног комада!');
@@ -90,18 +97,24 @@ function calculate() {
     const endTimeStr = formatTime(endTime);
     const availableTimeStr = formatDuration(availableSeconds);
 
+    // Pripremi naziv operacije za prikaz
+    let operationName = '';
+    if (operationType === 'kovanje') operationName = 'Ковање';
+    else if (operationType === 'peskarenje') operationName = 'Пескарење';
+    else if (operationType === 'suzavanje') operationName = 'Затварање/Сузавање';
+
     document.getElementById('startTime').textContent = startTimeStr;
     document.getElementById('endTime').textContent = endTimeStr;
     document.getElementById('availableTime').textContent = availableTimeStr;
     document.getElementById('numberOfPieces').textContent = numberOfPieces + ' ком';
-    document.getElementById('timePerPieceDisplay').textContent = timePerPiece + ' сек';
+    document.getElementById('timePerPieceDisplay').textContent = timePerPiece + ' сек' + (operationType === 'peskarenje' ? ' (2 ком.)' : '');
 
     document.getElementById('results').classList.remove('hidden');
 
     // Sačuvaj u istoriju
     if (typeof historyManager !== 'undefined') {
         historyManager.addCalculation({
-            operation: 'Колико Комада',
+            operation: 'Колико Комада - ' + operationName,
             timePerPiece: timePerPiece,
             numberOfPieces: numberOfPieces,
             startTime: startTimeStr,
@@ -129,5 +142,15 @@ document.getElementById('endTimeInput').addEventListener('keypress', function(e)
     if (e.key === 'Enter') {
         calculate();
     }
+});
+
+// Event listener za promenu tipa operacije - ažurira normative
+document.querySelectorAll('input[name="operationType"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        // Trigger refresh normativa ako postoji funkcija
+        if (typeof window.refreshNormativiForContext === 'function') {
+            window.refreshNormativiForContext(this.value);
+        }
+    });
 });
 

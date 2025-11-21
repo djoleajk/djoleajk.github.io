@@ -29,6 +29,24 @@
 
         <div class="input-section">
             <div class="input-group">
+                <label><strong>Тип операције:</strong></label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="operationType" value="kovanje" checked>
+                        <span>Ковање</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="operationType" value="peskarenje">
+                        <span>Пескарење (2 ком.)</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="operationType" value="suzavanje">
+                        <span>Затварање/Сузавање</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="input-group">
                 <label for="timePerPiece">Време по комаду (секунде):</label>
                 <input type="number" id="timePerPiece" min="1" placeholder="нпр. 24">
             </div>

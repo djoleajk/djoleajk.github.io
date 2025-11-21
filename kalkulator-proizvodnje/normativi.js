@@ -47,15 +47,30 @@ function setIfExists(id, value) {
 
 function detectContext() {
   const path = (location && location.pathname) ? location.pathname : '';
+  
+  // Za koliko-komada.html, proveri odabrani tip operacije
+  if (/koliko-komada\.html$/i.test(path)) {
+    const selectedOperation = document.querySelector('input[name="operationType"]:checked');
+    if (selectedOperation) {
+      return selectedOperation.value; // 'kovanje', 'peskarenje', ili 'suzavanje'
+    }
+    return 'kovanje'; // Default
+  }
+  
   // Prvo proveri URL putanju za specificne stranice
   if (/peskarenje\.html$/i.test(path)) return 'peskarenje';
-  if (/ubadanje\.html$/i.test(path) || /italijanka\.html$/i.test(path) || /bem\.html$/i.test(path) || /robot\.html$/i.test(path) || /zatvaranje-mine\.html$/i.test(path) || /koliko-komada\.html$/i.test(path)) return 'kovanje';
-  if (/vreme-po-komadu\.html$/i.test(path)) return 'suzavanje';
+  if (/ubadanje\.html$/i.test(path) || /italijanka\.html$/i.test(path) || /bem\.html$/i.test(path)) return 'kovanje';
+  if (/robot\.html$/i.test(path) || /zatvaranje-mine\.html$/i.test(path)) return 'suzavanje';
+  if (/vreme-po-komadu\.html$/i.test(path)) return 'reverse-calc';
   
   // Fallback na proveru elemenata
   if (document.getElementById('timePerCycle') && document.getElementById('numberOfMines')) return 'peskarenje';
-  if (document.getElementById('timePerPiece') && document.getElementById('startTimeInput')) return 'kovanje';
-  if (document.getElementById('totalHours') && document.getElementById('totalMinutes')) return 'suzavanje';
+  if (document.getElementById('timePerPiece') && document.getElementById('startTimeInput') && !document.getElementById('endTimeInput')) {
+    // Proveri da li je ubadanje, italijanka ili bem
+    if (/ubadanje\.html$/i.test(path) || /italijanka\.html$/i.test(path) || /bem\.html$/i.test(path)) return 'kovanje';
+    return 'suzavanje';
+  }
+  if (document.getElementById('totalHours') && document.getElementById('totalMinutes')) return 'reverse-calc';
   
   return 'generic';
 }
@@ -109,6 +124,15 @@ function renderNormativiTable(container, item) {
           <td>${taktText}</td>
           <td>${suzavanjeText}</td>`;
     minWidth = 'min-width: 420px;';
+  } else if (ctx === 'reverse-calc') {
+    // Za vreme-po-komadu.html - ne prikazujemo normative jer nije potrebno
+    headerCols = `
+          <th>Артикал</th>
+          <th>Калибар</th>`;
+    rowCols = `
+          <td><strong>${item.artikal}</strong></td>
+          <td>${item.kalibar}</td>`;
+    minWidth = 'min-width: 280px;';
   } else {
     headerCols = `
           <th>Артикал</th>
@@ -185,6 +209,8 @@ function initNormativiUI() {
         setIfExists('timePerPiece', item.taktKovanja_s);
       } else if (ctx === 'suzavanje' && item.taktSuzavanja_s !== null) {
         setIfExists('timePerPiece', item.taktSuzavanja_s);
+      } else if (ctx === 'reverse-calc') {
+        // Za vreme-po-komadu.html ne postavljamo automatski vrednosti
       }
     }
 
@@ -196,6 +222,23 @@ function initNormativiUI() {
   applySelection(select.value, true); // Automatski popuni pri inicijalizaciji
 
   select.addEventListener('change', () => applySelection(select.value, true)); // Automatski popuni pri promeni
+
+  // Eksportuj funkciju za refresh normativa (za koliko-komada.html)
+  window.refreshNormativiForContext = function(newContext) {
+    const currentArtikal = select.value;
+    const item = getAllNormativi().find(n => n.artikal === currentArtikal);
+    if (item) {
+      renderNormativiTable(tableHost, item);
+      // Automatski popuni vrednost za novi kontekst
+      if (newContext === 'peskarenje' && item.taktPeskarenja_s !== null) {
+        setIfExists('timePerPiece', item.taktPeskarenja_s);
+      } else if (newContext === 'kovanje' && item.taktKovanja_s !== null) {
+        setIfExists('timePerPiece', item.taktKovanja_s);
+      } else if (newContext === 'suzavanje' && item.taktSuzavanja_s !== null) {
+        setIfExists('timePerPiece', item.taktSuzavanja_s);
+      }
+    }
+  };
 
 }
 
