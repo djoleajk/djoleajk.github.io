@@ -3,7 +3,7 @@
 // Cache strategija + Offline podrška
 // ============================================
 
-const CACHE_NAME = 'production-calculator-v1';
+const CACHE_NAME = 'production-calculator-v2';
 const urlsToCache = [
     './',
     './index.html',
@@ -14,6 +14,8 @@ const urlsToCache = [
     './zatvaranje-mine.html',
     './peskarenje.html',
     './history.html',
+    './vreme-po-komadu.html',
+    './koliko-komada.html',
     './styles.css',
     './favicon.svg',
     './time-sync.js',
@@ -24,7 +26,10 @@ const urlsToCache = [
     './ubadanje.js',
     './zatvaranje-mine.js',
     './peskarenje.js',
-    './history-manager.js'
+    './vreme-po-komadu.js',
+    './koliko-komada.js',
+    './history-manager.js',
+    './normativi.js'
 ];
 
 // Instalacija Service Worker-a

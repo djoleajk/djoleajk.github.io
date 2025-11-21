@@ -1,11 +1,23 @@
-// Normativi – Artiljerijski program
-const baseNormativi = [
-  { artikal: "105TF", kalibar: "105mm", taktKovanja_s: 154, kovanje_kom: 140, taktPeskarenja_s: 180, peskarenje_kom: 240, taktSuzavanja_s: 53, suzavanje_kom: 350 },
-  { artikal: "122TF", kalibar: "122mm", taktKovanja_s: 154, kovanje_kom: 140, taktPeskarenja_s: 180, peskarenje_kom: 240, taktSuzavanja_s: 53, suzavanje_kom: 350 },
-  { artikal: "122GG", kalibar: "122mm", taktKovanja_s: 145, kovanje_kom: 150, taktPeskarenja_s: 180, peskarenje_kom: 240, taktSuzavanja_s: 53, suzavanje_kom: 350 },
-  { artikal: "TF152", kalibar: "152mm", taktKovanja_s: 170, kovanje_kom: 130, taktPeskarenja_s: 190, peskarenje_kom: 230, taktSuzavanja_s: 64, suzavanje_kom: 300 },
-  { artikal: "M107", kalibar: "155mm", taktKovanja_s: 170, kovanje_kom: 130, taktPeskarenja_s: 190, peskarenje_kom: 230, taktSuzavanja_s: 64, suzavanje_kom: 300 }
+// Normativi – Minski program
+const minskiNormativi = [
+  { artikal: "AB94/AB150", kalibar: "60mm", taktKovanja_s: 24, kovanje_kom: 900, taktPeskarenja_s: 41, peskarenje_kom: 1050, peskarenje_2kom: true, taktSuzavanja_s: 25, suzavanje_kom: 860 },
+  { artikal: "AB114", kalibar: "60mm", taktKovanja_s: 28, kovanje_kom: 650, taktPeskarenja_s: 40, peskarenje_kom: 1080, peskarenje_2kom: true, taktSuzavanja_s: 25, suzavanje_kom: 750 },
+  { artikal: "AB153", kalibar: "60mm", taktKovanja_s: 24, kovanje_kom: 900, taktPeskarenja_s: null, peskarenje_kom: null, peskarenje_2kom: false, taktSuzavanja_s: null, suzavanje_kom: null },
+  { artikal: "AB66/AB159", kalibar: "81/82mm", taktKovanja_s: 24, kovanje_kom: 900, taktPeskarenja_s: 41, peskarenje_kom: 1050, peskarenje_2kom: true, taktSuzavanja_s: 25, suzavanje_kom: 860 },
+  { artikal: "AB169", kalibar: "81/82mm", taktKovanja_s: 28, kovanje_kom: 650, taktPeskarenja_s: 40, peskarenje_kom: 1080, peskarenje_2kom: true, taktSuzavanja_s: 25, suzavanje_kom: 750 },
+  { artikal: "AB156", kalibar: "120mm", taktKovanja_s: 154, kovanje_kom: 140, taktPeskarenja_s: 72, peskarenje_kom: 300, peskarenje_2kom: true, taktSuzavanja_s: 50, suzavanje_kom: 430 }
 ];
+
+// Normativi – Artiljerijski program
+const artiljerijskiNormativi = [
+  { artikal: "105TF", kalibar: "105mm", taktKovanja_s: 154, kovanje_kom: 140, taktPeskarenja_s: 180, peskarenje_kom: 240, peskarenje_2kom: false, taktSuzavanja_s: 53, suzavanje_kom: 350 },
+  { artikal: "122TF", kalibar: "122mm", taktKovanja_s: 154, kovanje_kom: 140, taktPeskarenja_s: 180, peskarenje_kom: 240, peskarenje_2kom: false, taktSuzavanja_s: 53, suzavanje_kom: 350 },
+  { artikal: "122GG", kalibar: "122mm", taktKovanja_s: 145, kovanje_kom: 150, taktPeskarenja_s: 180, peskarenje_kom: 240, peskarenje_2kom: false, taktSuzavanja_s: 53, suzavanje_kom: 350 },
+  { artikal: "TF152", kalibar: "152mm", taktKovanja_s: 170, kovanje_kom: 130, taktPeskarenja_s: 190, peskarenje_kom: 230, peskarenje_2kom: false, taktSuzavanja_s: 64, suzavanje_kom: 300 },
+  { artikal: "M107", kalibar: "155mm", taktKovanja_s: 170, kovanje_kom: 130, taktPeskarenja_s: 190, peskarenje_kom: 230, peskarenje_2kom: false, taktSuzavanja_s: 64, suzavanje_kom: 300 }
+];
+
+const baseNormativi = [...minskiNormativi, ...artiljerijskiNormativi];
 
 function getStoredCustomNormativi() {
   try {
@@ -35,9 +47,16 @@ function setIfExists(id, value) {
 
 function detectContext() {
   const path = (location && location.pathname) ? location.pathname : '';
+  // Prvo proveri URL putanju za specificne stranice
+  if (/peskarenje\.html$/i.test(path)) return 'peskarenje';
+  if (/ubadanje\.html$/i.test(path) || /italijanka\.html$/i.test(path) || /bem\.html$/i.test(path) || /robot\.html$/i.test(path) || /zatvaranje-mine\.html$/i.test(path) || /koliko-komada\.html$/i.test(path)) return 'kovanje';
+  if (/vreme-po-komadu\.html$/i.test(path)) return 'suzavanje';
+  
+  // Fallback na proveru elemenata
   if (document.getElementById('timePerCycle') && document.getElementById('numberOfMines')) return 'peskarenje';
-  if (/ubadanje\.html$/i.test(path) || /italijanka\.html$/i.test(path) || /bem\.html$/i.test(path)) return 'kovanje';
-  if (document.getElementById('timePerPiece') && document.getElementById('numberOfPieces')) return 'suzavanje';
+  if (document.getElementById('timePerPiece') && document.getElementById('startTimeInput')) return 'kovanje';
+  if (document.getElementById('totalHours') && document.getElementById('totalMinutes')) return 'suzavanje';
+  
   return 'generic';
 }
 
@@ -48,6 +67,9 @@ function renderNormativiTable(container, item) {
   let minWidth = 'min-width: 760px;';
 
   if (ctx === 'peskarenje') {
+    const taktText = item.taktPeskarenja_s !== null ? item.taktPeskarenja_s : 'нема';
+    const peskarenjeText = item.peskarenje_kom !== null ? item.peskarenje_kom : 'нема';
+    const napomena = item.peskarenje_2kom ? ' (2 ком.)' : '';
     headerCols = `
           <th>Артикал</th>
           <th>Калибар</th>
@@ -56,10 +78,12 @@ function renderNormativiTable(container, item) {
     rowCols = `
           <td><strong>${item.artikal}</strong></td>
           <td>${item.kalibar}</td>
-          <td>${item.taktPeskarenja_s}</td>
-          <td>${item.peskarenje_ком ?? item.peskarenje_kom}</td>`;
+          <td>${taktText}${napomena}</td>
+          <td>${peskarenjeText}</td>`;
     minWidth = 'min-width: 420px;';
   } else if (ctx === 'kovanje') {
+    const taktText = item.taktKovanja_s !== null ? item.taktKovanja_s : 'нема';
+    const kovanjeText = item.kovanje_kom !== null ? item.kovanje_kom : 'нема';
     headerCols = `
           <th>Артикал</th>
           <th>Калибар</th>
@@ -68,10 +92,12 @@ function renderNormativiTable(container, item) {
     rowCols = `
           <td><strong>${item.artikal}</strong></td>
           <td>${item.kalibar}</td>
-          <td>${item.taktKovanja_s}</td>
-          <td>${item.kovanje_ком ?? item.kovanje_kom}</td>`;
+          <td>${taktText}</td>
+          <td>${kovanjeText}</td>`;
     minWidth = 'min-width: 420px;';
   } else if (ctx === 'suzavanje') {
+    const taktText = item.taktSuzavanja_s !== null ? item.taktSuzavanja_s : 'нема';
+    const suzavanjeText = item.suzavanje_kom !== null ? item.suzavanje_kom : 'нема';
     headerCols = `
           <th>Артикал</th>
           <th>Калибар</th>
@@ -80,8 +106,8 @@ function renderNormativiTable(container, item) {
     rowCols = `
           <td><strong>${item.artikal}</strong></td>
           <td>${item.kalibar}</td>
-          <td>${item.taktSuzavanja_s}</td>
-          <td>${item.suzavanje_ком ?? item.suzavanje_kom}</td>`;
+          <td>${taktText}</td>
+          <td>${suzavanjeText}</td>`;
     minWidth = 'min-width: 420px;';
   } else {
     headerCols = `
@@ -145,24 +171,31 @@ function initNormativiUI() {
     });
   }
 
-  function applySelection(artikal) {
+  function applySelection(artikal, autoFill = false) {
     const item = getAllNormativi().find(n => n.artikal === artikal) || getAllNormativi()[0];
     if (!item) return;
     renderNormativiTable(tableHost, item);
 
-    // Autofill uklonjen - artikalSelect više ne utiče direktno na input section
-    // Korisnik mora ručno uneti vrednosti u input polja
+    // Autofill vrednosti samo kada je autoFill = true (kada korisnik klikne na dugme)
+    if (autoFill) {
+      const ctx = detectContext();
+      if (ctx === 'peskarenje' && item.taktPeskarenja_s !== null) {
+        setIfExists('timePerCycle', item.taktPeskarenja_s);
+      } else if (ctx === 'kovanje' && item.taktKovanja_s !== null) {
+        setIfExists('timePerPiece', item.taktKovanja_s);
+      } else if (ctx === 'suzavanje' && item.taktSuzavanja_s !== null) {
+        setIfExists('timePerPiece', item.taktSuzavanja_s);
+      }
+    }
 
     localStorage.setItem('normativ_selected_artikal', item.artikal);
   }
 
   const saved = localStorage.getItem('normativ_selected_artikal');
   refreshOptions(saved || (all[0] && all[0].artikal));
-  applySelection(select.value);
+  applySelection(select.value, true); // Automatski popuni pri inicijalizaciji
 
-  select.addEventListener('change', () => applySelection(select.value));
-
-  // Forma za dodavanje novih артикала je uklonjena
+  select.addEventListener('change', () => applySelection(select.value, true)); // Automatski popuni pri promeni
 
 }
 

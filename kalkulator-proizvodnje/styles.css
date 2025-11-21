@@ -843,6 +843,7 @@ input[type="number"]:focus {
     align-items: center;
     margin-bottom: 12px;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .normativi-table {
