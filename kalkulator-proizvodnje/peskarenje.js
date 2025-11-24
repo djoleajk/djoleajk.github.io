@@ -82,7 +82,7 @@ function calculate() {
 
     // Skroluj do rezultata
     setTimeout(() => {
-        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }, 100);
 
     // Sačuvaj u istoriju
