@@ -80,6 +80,11 @@ function calculate() {
 
     document.getElementById('results').classList.remove('hidden');
 
+    // Skroluj do rezultata
+    setTimeout(() => {
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
+
     // Sačuvaj u istoriju
     if (typeof historyManager !== 'undefined') {
         historyManager.addCalculation({
