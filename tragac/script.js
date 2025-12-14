@@ -1,5 +1,5 @@
 // OMDb API Configuration
-const OMDB_API_KEY = '3e097319';
+const OMDB_API_KEY = '6b9a2d7a';
 const OMDB_BASE_URL = 'https://www.omdbapi.com/';
 
 // Cache object to store movie data
@@ -97,7 +97,7 @@ function nextStep(step) {
         }
     }
     
-    if (step === 3) {
+    if (step === 2) {
         const selectedPeriod = document.querySelector('input[name="period"]:checked');
         if (!selectedPeriod) {
             alert('Molimo izaberite period!');
@@ -112,8 +112,8 @@ function nextStep(step) {
     // Show current step
     document.getElementById(`step${step}`).classList.remove('d-none');
     
-    // Update progress bar (3 steps total)
-    const progress = (step / 3) * 100;
+    // Update progress bar (2 steps total)
+    const progress = (step / 2) * 100;
     document.getElementById('progressBar').style.width = `${progress}%`;
 }
 
@@ -124,8 +124,8 @@ function previousStep(step) {
     // Show previous step
     document.getElementById(`step${step}`).classList.remove('d-none');
     
-    // Update progress bar (3 steps total)
-    const progress = (step / 3) * 100;
+    // Update progress bar (2 steps total)
+    const progress = (step / 2) * 100;
     document.getElementById('progressBar').style.width = `${progress}%`;
 }
 
@@ -137,34 +137,22 @@ function updateGenres() {
 
 // Main Function: Find Movie
 async function findMovie() {
-    // Get mood from desktop cards or mobile dropdown
-    let mood = '';
-    
-    // Check if on mobile (dropdown)
-    const moodSelectMobile = document.getElementById('moodSelectMobile');
-    if (window.innerWidth < 768) {
-        if (!moodSelectMobile.value) {
-            alert('Molimo izaberite raspoloženje!');
-            return;
-        }
-        mood = moodSelectMobile.value;
-    } else {
-        // Desktop - check radio buttons
-        const selectedMood = document.querySelector('input[name="mood"]:checked');
-        if (!selectedMood) {
-            alert('Molimo izaberite raspoloženje!');
-            return;
-        }
-        mood = selectedMood.value;
-    }
-    
-    surveyData.mood = mood;
-    
     // Validate all inputs
     if (surveyData.genres.length === 0) {
         alert('Molimo izaberite bar jedan žanr!');
         return;
     }
+    
+    // Validate period selection
+    const selectedPeriod = document.querySelector('input[name="period"]:checked');
+    if (!selectedPeriod) {
+        alert('Molimo izaberite period!');
+        return;
+    }
+    surveyData.period = selectedPeriod.value;
+    
+    // Set mood to neutral (not used)
+    surveyData.mood = 'neutral';
     
     // Show loading
     showLoading();
@@ -173,14 +161,13 @@ async function findMovie() {
         console.log('🤖 Smart AI analizira tvoje preferencije...');
         console.log(`📋 Žanrovi: ${surveyData.genres.join(', ')}`);
         console.log(`📅 Period: ${surveyData.period}`);
-        console.log(`🎭 Raspoloženje: ${surveyData.mood}`);
         
         // Generate AI explanation based on selected preferences
         const aiExplanation = generateAIExplanation(surveyData);
         
         let movie = null;
         let attempts = 0;
-        const maxAttempts = 15; // Increased from 10
+        const maxAttempts = 20; // Increased for better results
         
         // Try multiple queries until we find a movie that matches genre and period
         while (!movie && attempts < maxAttempts) {
@@ -189,19 +176,24 @@ async function findMovie() {
             
             // Generate search query based on survey data
             const searchQuery = generateSearchQuery(surveyData);
+            console.log(`   📝 Upit: "${searchQuery}"`);
             
             // Search for movies
             const searchResults = await searchMovies(searchQuery);
             
             if (searchResults && searchResults.length > 0) {
-                console.log(`   ✓ Pronađeno ${searchResults.length} filmova`);
+                console.log(`   ✓ Pronađeno ${searchResults.length} filmova u pretrazi`);
                 
                 // Try each result until we find one that matches genres
+                let checkedCount = 0;
                 for (const result of searchResults) {
+                    checkedCount++;
+                    console.log(`   🔍 Proveravam film ${checkedCount}/${searchResults.length}: "${result.Title}"`);
+                    
                     const movieDetails = await getMovieDetails(result.imdbID);
                     
-                    // Check if movie matches selected genres and mood
-                    if (movieMatchesGenres(movieDetails, surveyData.genres, surveyData.mood)) {
+                    // Check if movie matches selected genres
+                    if (movieMatchesGenres(movieDetails, surveyData.genres)) {
                         movie = movieDetails;
                         movie.aiExplanation = aiExplanation; // Add AI explanation
                         currentSearchResults = searchResults;
@@ -211,10 +203,10 @@ async function findMovie() {
                     }
                 }
                 if (!movie) {
-                    console.log(`   ✗ Nijedan od ${searchResults.length} filmova nije prošao filtere`);
+                    console.log(`   ✗ Nijedan od ${searchResults.length} filmova nije prošao sve filtere`);
                 }
             } else {
-                console.log(`   ✗ Pretraga nije vratila rezultate`);
+                console.log(`   ✗ Pretraga nije vratila rezultate (null ili prazan niz)`);
             }
         }
         
@@ -377,8 +369,8 @@ function filterByPeriod(movies, period) {
     });
 }
 
-// Check if movie matches selected genres and mood
-function movieMatchesGenres(movie, selectedGenres, mood = '') {
+// Check if movie matches selected genres
+function movieMatchesGenres(movie, selectedGenres) {
     if (!movie.Genre || movie.Genre === 'N/A') {
         console.log(`✗ Film "${movie.Title}" nema informacije o žanru`);
         return false;
@@ -396,9 +388,9 @@ function movieMatchesGenres(movie, selectedGenres, mood = '') {
         return false;
     }
     
-    // Exclude movies with rating below 5.5 (relaxed from 6.0)
+    // Exclude movies with rating below 5.0 (relaxed from 5.5)
     const rating = parseFloat(movie.imdbRating);
-    if (isNaN(rating) || rating < 5.5) {
+    if (isNaN(rating) || rating < 5.0) {
         console.log(`✗ Film "${movie.Title}" ima nisku ocenu (${movie.imdbRating}) - preskačemo`);
         return false;
     }
@@ -406,27 +398,25 @@ function movieMatchesGenres(movie, selectedGenres, mood = '') {
     // Get movie genres as lowercase array
     const movieGenres = movie.Genre.toLowerCase().split(',').map(g => g.trim());
     
-    // Exclude animations
-    if (movieGenres.some(g => g.includes('animation') || g.includes('animated'))) {
-        console.log(`✗ Film "${movie.Title}" je animacija - preskačemo`);
+    // Exclude pure animations (not mixed genres)
+    const hasAnimation = movieGenres.some(g => g === 'animation' || g === 'animated');
+    const hasOtherGenres = movieGenres.length > 1;
+    
+    if (hasAnimation && !hasOtherGenres) {
+        console.log(`✗ Film "${movie.Title}" je čista animacija - preskačemo`);
         return false;
     }
     
-    // Exclude films under 70 minutes (relaxed from 80)
+    // Exclude films under 60 minutes (relaxed from 70)
     if (movie.Runtime && movie.Runtime !== 'N/A') {
         const runtimeMatch = movie.Runtime.match(/(\d+)/);
         if (runtimeMatch) {
             const runtime = parseInt(runtimeMatch[1]);
-            if (runtime < 70) {
+            if (runtime < 60) {
                 console.log(`✗ Film "${movie.Title}" je prekratak (${runtime} min) - preskačemo`);
                 return false;
             }
         }
-    }
-    
-    // Check if movie mood matches user's mood
-    if (mood && !movieMatchesMood(movie, mood, movieGenres)) {
-        return false;
     }
     
     // Genre mapping for matching
@@ -439,7 +429,10 @@ function movieMatchesGenres(movie, selectedGenres, mood = '') {
         'thriller': ['thriller', 'mystery', 'crime']
     };
     
-    // Check if movie contains ALL selected genres (not just one)
+    // Check if movie contains selected genres
+    // If multiple genres selected - film must contain ALL
+    // If single genre selected - film must contain at least that one
+    
     let matchedGenres = 0;
     const requiredGenres = selectedGenres.length;
     
@@ -465,12 +458,15 @@ function movieMatchesGenres(movie, selectedGenres, mood = '') {
         }
     }
     
-    // Film must contain ALL selected genres
-    if (matchedGenres === requiredGenres) {
-        console.log(`✓ Film "${movie.Title}" sadrži SVE tražene žanrove (${matchedGenres}/${requiredGenres})`);
+    // If single genre - must have at least one match
+    // If multiple genres - should have majority of them (at least 50%)
+    const threshold = requiredGenres === 1 ? 1 : Math.ceil(requiredGenres * 0.6);
+    
+    if (matchedGenres >= threshold) {
+        console.log(`✓ Film "${movie.Title}" ima dovoljno žanrova (${matchedGenres}/${requiredGenres}, potrebno: ${threshold})`);
         return true;
     } else {
-        console.log(`✗ Film "${movie.Title}" (${movie.Genre}) ne sadrži sve žanrove. Ima: ${matchedGenres}/${requiredGenres}`);
+        console.log(`✗ Film "${movie.Title}" (${movie.Genre}) nema dovoljno žanrova. Ima: ${matchedGenres}/${requiredGenres}, potrebno: ${threshold}`);
         return false;
     }
 }
@@ -838,7 +834,7 @@ async function getNextSuggestion() {
         
         let movie = null;
         let attempts = 0;
-        const maxAttempts = 15; // Increased from 10
+        const maxAttempts = 20; // Increased for better results
         
         // Try multiple queries until we find a movie that matches genre and period
         while (!movie && attempts < maxAttempts) {
@@ -856,8 +852,8 @@ async function getNextSuggestion() {
                 for (const result of searchResults) {
                     const movieDetails = await getMovieDetails(result.imdbID);
                     
-                    // Check if movie matches selected genres and mood
-                    if (movieMatchesGenres(movieDetails, surveyData.genres, surveyData.mood)) {
+                    // Check if movie matches selected genres
+                    if (movieMatchesGenres(movieDetails, surveyData.genres)) {
                         movie = movieDetails;
                         movie.aiExplanation = aiExplanation; // Add AI explanation
                         currentSearchResults = searchResults;
@@ -903,7 +899,7 @@ function resetApp() {
     surveyData = {
         genres: [],
         period: '2020-2025',
-        mood: ''
+        mood: 'neutral'
     };
     
     // Reset search results
@@ -917,10 +913,6 @@ function resetApp() {
         cb.checked = false;
     });
     document.getElementById('period-modern').checked = true;
-    document.getElementById('moodSelectMobile').value = '';
-    document.querySelectorAll('input[name="mood"]').forEach(radio => {
-        radio.checked = false;
-    });
     
     // Hide all sections except survey
     document.getElementById('loadingSection').classList.add('d-none');
@@ -974,30 +966,19 @@ function generateAIExplanation(data) {
         '2020-2025': 'moderne filmove (2020+)'
     };
     
-    const moodDescriptions = {
-        'happy': 'veselo i zabavno raspoloženje',
-        'sad': 'emotivno i dirljivo raspoloženje',
-        'excited': 'uzbudljivo i adrenalinsko raspoloženje',
-        'scared': 'jezivo i napeto raspoloženje',
-        'thoughtful': 'zamišljeno i duboko raspoloženje',
-        'relaxed': 'opušteno raspoloženje',
-        'neutral': 'neutralno raspoloženje'
-    };
-    
     // Format genres
     const genreList = data.genres.map(g => genreNames[g] || g).join(', ');
     const periodName = periodNames[data.period] || data.period;
-    const moodDesc = moodDescriptions[data.mood] || 'tvoje raspoloženje';
     
     // Generate personalized explanation
     let explanation = `🤖 <strong>Smart AI Analiza:</strong>\n\n`;
     explanation += `Na osnovu tvojih odabira, analizirao sam da želiš:\n`;
     explanation += `📽️ <strong>Žanr:</strong> ${genreList}\n`;
-    explanation += `   ℹ️ Film MORA sadržati SVE izabrane žanrove\n`;
-    explanation += `📅 <strong>Period:</strong> ${periodName}\n`;
-    explanation += `🎭 <strong>Raspoloženje:</strong> ${moodDesc}\n`;
-    explanation += `   ℹ️ Film je odabran da odgovara tvojim emocijama\n\n`;
-    explanation += `Pronašao sam film koji SAVRŠENO odgovara SVIM tvojim kriterijumima - ima visoku ocenu (5.5+), kvalitetnu produkciju i garantovano će te zadovoljiti!`;
+    if (data.genres.length > 1) {
+        explanation += `   ℹ️ Film sadrži većinu ili sve izabrane žanrove\n`;
+    }
+    explanation += `📅 <strong>Period:</strong> ${periodName}\n\n`;
+    explanation += `Pronašao sam film koji odgovara tvojim kriterijumima - ima dobru ocenu (5.0+), kvalitetnu produkciju i garantovano će te zadovoljiti!`;
     
     console.log('📝 AI Objašnjenje generisano:', explanation);
     

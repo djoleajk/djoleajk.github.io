@@ -54,14 +54,14 @@
                 <h1 class="display-4 mb-3">
                     <i class="bi bi-stars"></i> Pronađi Savršen Film
                 </h1>
-                <p class="lead">Odgovori na nekoliko pitanja i otkrijemo idealan film za tebe!</p>
+                <p class="lead">Izaberi žanr i period, otkrijemo idealan film za tebe!</p>
             </div>
 
             <!-- Survey Section -->
             <div id="surveySection" class="card shadow-lg mb-5">
                 <div class="card-body p-4">
                     <h3 class="card-title mb-4 text-center">
-                        <i class="bi bi-ui-checks"></i> Odgovori na pitanja
+                        <i class="bi bi-ui-checks"></i> Izaberi Preferencije
                     </h3>
                     
                     <!-- Progress Bar -->
@@ -74,7 +74,7 @@
                     <div id="step1" class="survey-step">
                         <h5 class="mb-3">1. Koji žanr te zanima?</h5>
                         <p class="text-muted small mb-3">
-                            <i class="bi bi-info-circle"></i> Možeš izabrati više žanrova - film će sadržati SVE izabrane žanrove!
+                            <i class="bi bi-info-circle"></i> Možeš izabrati više žanrova - film će sadržati većinu ili sve izabrane žanrove!
                         </p>
                         <div class="row g-3">
                             <div class="col-md-4 col-sm-6">
@@ -154,14 +154,14 @@
                             <button class="btn btn-outline-secondary me-2" onclick="previousStep(1)">
                                 <i class="bi bi-arrow-left"></i> Nazad
                             </button>
-                            <button class="btn btn-primary btn-lg" onclick="nextStep(3)">
-                                Sledeće <i class="bi bi-arrow-right"></i>
+                            <button class="btn btn-success btn-lg" onclick="findMovie()">
+                                <i class="bi bi-search"></i> Preporuči Film
                             </button>
                         </div>
                     </div>
 
-                    <!-- Step 3: Mood -->
-                    <div id="step3" class="survey-step d-none">
+                    <!-- Step 3: Mood (Removed) -->
+                    <div id="step3" class="survey-step d-none" style="display: none !important;">
                         <h5 class="mb-4">3. Kakvo je tvoje trenutno raspoloženje?</h5>
                         <p class="text-muted small mb-3">
                             <i class="bi bi-info-circle"></i> Film će biti odabran da odgovara tvojim emocijama (npr. nećeš dobiti tužnu dramu ako si srećan)
