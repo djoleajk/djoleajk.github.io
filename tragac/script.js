@@ -43,7 +43,7 @@ function initializeApp() {
         checkbox.addEventListener('change', updateGenres);
     });
     
-    console.log('FilmFinder aplikacija inicijalizovana!');
+    console.log('FilmFinder aplikacija sa Smart AI inicijalizovana!');
 }
 
 // Set current year in footer
@@ -112,7 +112,7 @@ function nextStep(step) {
     // Show current step
     document.getElementById(`step${step}`).classList.remove('d-none');
     
-    // Update progress bar
+    // Update progress bar (3 steps total)
     const progress = (step / 3) * 100;
     document.getElementById('progressBar').style.width = `${progress}%`;
 }
@@ -124,7 +124,7 @@ function previousStep(step) {
     // Show previous step
     document.getElementById(`step${step}`).classList.remove('d-none');
     
-    // Update progress bar
+    // Update progress bar (3 steps total)
     const progress = (step / 3) * 100;
     document.getElementById('progressBar').style.width = `${progress}%`;
 }
@@ -170,6 +170,11 @@ async function findMovie() {
     showLoading();
     
     try {
+        console.log('🤖 Smart AI analizira tvoje preferencije...');
+        
+        // Generate AI explanation based on selected preferences
+        const aiExplanation = generateAIExplanation(surveyData);
+        
         let movie = null;
         let attempts = 0;
         const maxAttempts = 10;
@@ -193,6 +198,7 @@ async function findMovie() {
                     // Check if movie matches selected genres
                     if (movieMatchesGenres(movieDetails, surveyData.genres)) {
                         movie = movieDetails;
+                        movie.aiExplanation = aiExplanation; // Add AI explanation
                         currentSearchResults = searchResults;
                         currentResultIndex = 0;
                         break;
@@ -209,7 +215,7 @@ async function findMovie() {
         lastSuccessfulMovie = movie;
         
         // Display movie
-        displayMovie(movie);
+        displayMovie(movie, false); // false = hide AI explanation
         
     } catch (error) {
         showError(error.message);
@@ -474,7 +480,7 @@ async function getMovieDetails(imdbID) {
 }
 
 // Display movie information
-function displayMovie(movie) {
+function displayMovie(movie, isAIMode = false) {
     // Hide loading and survey
     hideLoading();
     document.getElementById('surveySection').classList.add('d-none');
@@ -483,6 +489,20 @@ function displayMovie(movie) {
     // Show movie section
     const movieSection = document.getElementById('movieSection');
     movieSection.classList.remove('d-none');
+    
+    // Show AI explanation if available
+    const aiExplanationDiv = document.getElementById('aiExplanation');
+    if (isAIMode && movie.aiExplanation) {
+        aiExplanationDiv.innerHTML = `
+            <div class="alert alert-info">
+                <h5><i class="bi bi-robot"></i> AI Preporuka:</h5>
+                <p style="white-space: pre-line;">${movie.aiExplanation}</p>
+            </div>
+        `;
+        aiExplanationDiv.classList.remove('d-none');
+    } else {
+        aiExplanationDiv.classList.add('d-none');
+    }
     
     // Set poster with fallback
     const posterImg = document.getElementById('moviePoster');
@@ -495,12 +515,26 @@ function displayMovie(movie) {
         posterImg.alt = 'Movie Poster Not Available';
     }
     
-    // Set movie information
-    document.getElementById('movieTitle').textContent = movie.Title;
+    // Set movie information with IMDb link
+    const titleElement = document.getElementById('movieTitle');
+    if (movie.imdbID && movie.imdbID !== 'N/A') {
+        titleElement.innerHTML = `${movie.Title} <a href="https://www.imdb.com/title/${movie.imdbID}" target="_blank" class="badge bg-warning text-dark ms-2"><i class="bi bi-box-arrow-up-right"></i> IMDb</a>`;
+    } else {
+        titleElement.textContent = movie.Title;
+    }
+    
     document.getElementById('movieYear').textContent = movie.Year;
     document.getElementById('movieGenre').textContent = movie.Genre !== 'N/A' ? movie.Genre : 'Nepoznat žanr';
     document.getElementById('movieRuntime').textContent = movie.Runtime !== 'N/A' ? movie.Runtime : 'Nepoznato trajanje';
-    document.getElementById('movieRating').textContent = movie.imdbRating !== 'N/A' ? `${movie.imdbRating}/10` : 'Nema ocene';
+    
+    // IMDb Rating with link
+    const ratingElement = document.getElementById('movieRating');
+    if (movie.imdbRating !== 'N/A' && movie.imdbID && movie.imdbID !== 'N/A') {
+        ratingElement.innerHTML = `<a href="https://www.imdb.com/title/${movie.imdbID}/ratings" target="_blank" style="text-decoration: none; color: inherit;">${movie.imdbRating}/10 <i class="bi bi-box-arrow-up-right" style="font-size: 0.8em;"></i></a>`;
+    } else {
+        ratingElement.textContent = 'Nema ocene';
+    }
+    
     document.getElementById('moviePlot').textContent = movie.Plot !== 'N/A' ? movie.Plot : 'Opis nije dostupan.';
     document.getElementById('movieActors').textContent = movie.Actors !== 'N/A' ? movie.Actors : 'Nepoznati glumci';
     document.getElementById('movieDirector').textContent = movie.Director !== 'N/A' ? movie.Director : 'Nepoznat režiser';
@@ -516,6 +550,17 @@ function displayMovie(movie) {
         const youtubeUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(youtubeQuery)}`;
         window.open(youtubeUrl, '_blank');
     };
+    
+    // Set IMDb button
+    const imdbBtn = document.getElementById('imdbBtn');
+    if (movie.imdbID && movie.imdbID !== 'N/A') {
+        imdbBtn.style.display = 'block';
+        imdbBtn.onclick = () => {
+            window.open(`https://www.imdb.com/title/${movie.imdbID}`, '_blank');
+        };
+    } else {
+        imdbBtn.style.display = 'none';
+    }
     
     // Scroll to movie section
     movieSection.scrollIntoView({ behavior: 'smooth' });
@@ -676,7 +721,10 @@ async function getNextSuggestion() {
     showLoading();
     
     try {
-        console.log('Tražim novi film prema parametrima ankete...');
+        console.log('🤖 Smart AI traži novi film prema tvojim preferencijama...');
+        
+        // Generate AI explanation
+        const aiExplanation = generateAIExplanation(surveyData);
         
         let movie = null;
         let attempts = 0;
@@ -701,6 +749,7 @@ async function getNextSuggestion() {
                     // Check if movie matches selected genres
                     if (movieMatchesGenres(movieDetails, surveyData.genres)) {
                         movie = movieDetails;
+                        movie.aiExplanation = aiExplanation; // Add AI explanation
                         currentSearchResults = searchResults;
                         currentResultIndex = 0;
                         break;
@@ -718,7 +767,7 @@ async function getNextSuggestion() {
                 showNotification('Nema više preporuka koje odgovaraju tvojim kriterijumima. Prikazujemo poslednji preporučeni film.');
                 
                 // Display last successful movie
-                displayMovie(lastSuccessfulMovie);
+                displayMovie(lastSuccessfulMovie, false);
             } else {
                 // If no previous movie, show error
                 throw new Error('Nažalost, nismo pronašli dodatne filmove za izabrane kriterijume.');
@@ -730,7 +779,7 @@ async function getNextSuggestion() {
         lastSuccessfulMovie = movie;
         
         // Display movie
-        displayMovie(movie);
+        displayMovie(movie, false);
         
     } catch (error) {
         showError(error.message);
@@ -795,8 +844,59 @@ function sanitizeInput(input) {
         .substring(0, 100); // Limit length
 }
 
+// AI Functions - Smart Local Algorithm (No external API needed!)
+
+// Generate AI explanation based on survey data
+function generateAIExplanation(data) {
+    const genreNames = {
+        'action': 'akciju',
+        'comedy': 'komediju', 
+        'drama': 'dramu',
+        'horror': 'horor',
+        'sci-fi': 'sci-fi',
+        'thriller': 'triler'
+    };
+    
+    const periodNames = {
+        '1970-1999': 'klasične filmove (1970-1999)',
+        '2000-2009': 'filmove iz 2000-tih',
+        '2010-2019': 'filmove iz 2010-tih',
+        '2020-2025': 'moderne filmove (2020+)'
+    };
+    
+    const moodDescriptions = {
+        'happy': 'veselo i zabavno raspoloženje',
+        'sad': 'emotivno i dirljivo raspoloženje',
+        'excited': 'uzbudljivo i adrenalinsko raspoloženje',
+        'scared': 'jezivo i napeto raspoloženje',
+        'thoughtful': 'zamišljeno i duboko raspoloženje',
+        'relaxed': 'opušteno raspoloženje',
+        'neutral': 'neutralno raspoloženje'
+    };
+    
+    // Format genres
+    const genreList = data.genres.map(g => genreNames[g] || g).join(', ');
+    const periodName = periodNames[data.period] || data.period;
+    const moodDesc = moodDescriptions[data.mood] || 'tvoje raspoloženje';
+    
+    // Generate personalized explanation
+    let explanation = `🤖 <strong>Smart AI Analiza:</strong>\n\n`;
+    explanation += `Na osnovu tvojih odabira, analizirao sam da želiš:\n`;
+    explanation += `📽️ <strong>Žanr:</strong> ${genreList}\n`;
+    explanation += `📅 <strong>Period:</strong> ${periodName}\n`;
+    explanation += `🎭 <strong>Raspoloženje:</strong> ${moodDesc}\n\n`;
+    explanation += `Pronašao sam film koji savršeno odgovara ovim kriterijumima - ima visoku ocenu (6.0+), kvalitetnu produkciju i garantovano će te zadovoljiti!`;
+    
+    console.log('📝 AI Objašnjenje generisano:', explanation);
+    
+    return explanation;
+}
+
+
+
+
 // Console welcome message
 console.log('%cFilmFinder 🎬', 'color: #667eea; font-size: 24px; font-weight: bold;');
 console.log('%cPronađi savršen film za sebe!', 'color: #764ba2; font-size: 14px;');
-console.log('%cPowered by OMDb API', 'color: #6c757d; font-size: 12px;');
+console.log('%cPowered by OMDb API + Smart AI', 'color: #6c757d; font-size: 12px;');
 

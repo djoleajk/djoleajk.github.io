@@ -260,11 +260,17 @@
             <div id="movieSection" class="d-none mb-5">
                 <div class="card shadow-lg">
                     <div class="card-body">
+                        <!-- AI Explanation -->
+                        <div id="aiExplanation" class="d-none mb-4"></div>
+                        
                         <div class="row">
                             <!-- Movie Poster -->
                             <div class="col-md-4 mb-4">
                                 <img id="moviePoster" src="" alt="Movie Poster" class="img-fluid rounded shadow">
                                 <div class="d-grid gap-2 mt-3">
+                                    <button class="btn btn-warning" id="imdbBtn" style="display: none;">
+                                        <i class="bi bi-star-fill"></i> Pogledaj na IMDb
+                                    </button>
                                     <button class="btn btn-outline-danger" id="trailerBtn">
                                         <i class="bi bi-youtube"></i> Trailer
                                     </button>
@@ -284,7 +290,7 @@
                                 <div class="mb-3">
                                     <h5>
                                         <i class="bi bi-star-fill text-warning"></i> 
-                                        IMDB Ocena: <span id="movieRating"></span>
+                                        IMDb Ocena: <span id="movieRating"></span>
                                     </h5>
                                 </div>
 
@@ -331,8 +337,11 @@
         <!-- Footer -->
         <footer class="bg-dark text-light text-center py-4 mt-5">
             <div class="container">
-                <p class="mb-0">
+                <p class="mb-1">
                     <i class="bi bi-film"></i> Agencija Sprint © <span id="currentYear"></span> | Powered by Đorđe Živanović
+                </p>
+                <p class="mb-0 text-muted small">
+                    <i class="bi bi-database"></i> Podaci o filmovima sa <a href="https://www.imdb.com" target="_blank" class="text-warning">IMDb</a> via OMDb API
                 </p>
             </div>
         </footer>
