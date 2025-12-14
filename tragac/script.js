@@ -223,20 +223,13 @@ async function searchMovies(query) {
         
         console.log('Pretraga filmova:', url);
         
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'default'
-        });
+        const response = await fetch(url);
         
         if (!response.ok) {
-            console.error('HTTP Status:', response.status);
-            throw new Error(`API greška: ${response.status}`);
+            throw new Error('Greška pri komunikaciji sa OMDb API');
         }
         
         const data = await response.json();
-        
-        console.log('API Response:', data);
         
         if (data.Response === 'False') {
             throw new Error(data.Error || 'Film nije pronađen');
@@ -248,10 +241,6 @@ async function searchMovies(query) {
         return data.Search;
         
     } catch (error) {
-        console.error('Detaljna greška:', error);
-        if (error.message.includes('Failed to fetch')) {
-            throw new Error('Nije moguće povezati se sa API-jem. Proveri internet konekciju ili pokušaj ponovo.');
-        }
         throw new Error(`Greška pri pretraživanju filmova: ${error.message}`);
     }
 }
@@ -270,20 +259,13 @@ async function getMovieDetails(imdbID) {
         
         console.log('Dohvatanje detalja filma:', url);
         
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'default'
-        });
+        const response = await fetch(url);
         
         if (!response.ok) {
-            console.error('HTTP Status:', response.status);
-            throw new Error(`API greška: ${response.status}`);
+            throw new Error('Greška pri komunikaciji sa OMDb API');
         }
         
         const data = await response.json();
-        
-        console.log('Movie Details:', data);
         
         if (data.Response === 'False') {
             throw new Error(data.Error || 'Detalji filma nisu dostupni');
@@ -295,10 +277,6 @@ async function getMovieDetails(imdbID) {
         return data;
         
     } catch (error) {
-        console.error('Detaljna greška:', error);
-        if (error.message.includes('Failed to fetch')) {
-            throw new Error('Nije moguće povezati se sa API-jem. Proveri internet konekciju ili pokušaj ponovo.');
-        }
         throw new Error(`Greška pri dohvatanju detalja filma: ${error.message}`);
     }
 }
