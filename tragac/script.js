@@ -12,6 +12,11 @@ let surveyData = {
     mood: ''
 };
 
+// Store current search results
+let currentSearchResults = [];
+let currentResultIndex = 0;
+let usedQueries = []; // Track used queries to avoid duplicates
+
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
@@ -174,6 +179,10 @@ async function findMovie() {
             throw new Error('Nažalost, nismo pronašli film koji odgovara tvojim kriterijumima. Pokušaj ponovo sa drugim opcijama!');
         }
         
+        // Store search results
+        currentSearchResults = searchResults;
+        currentResultIndex = 0;
+        
         // Get first movie details
         const movie = await getMovieDetails(searchResults[0].imdbID);
         
@@ -189,20 +198,33 @@ async function findMovie() {
 // Generate search query based on survey data
 function generateSearchQuery(data) {
     const queries = {
-        action: ['terminator', 'john wick', 'mad max', 'avengers', 'matrix', 'die hard'],
-        comedy: ['hangover', 'superbad', 'bridesmaids', 'tropic thunder', 'step brothers'],
-        drama: ['shawshank', 'forrest gump', 'goodfellas', 'departed', 'fight club'],
-        horror: ['conjuring', 'insidious', 'sinister', 'it', 'hereditary', 'midsommar'],
-        'sci-fi': ['interstellar', 'inception', 'blade runner', 'arrival', 'dune', 'tenet'],
-        thriller: ['gone girl', 'prisoners', 'zodiac', 'knives out', 'nightcrawler']
+        action: ['terminator', 'john wick', 'mad max', 'avengers', 'matrix', 'die hard', 'gladiator', 'dark knight', 'lethal weapon', 'mission impossible'],
+        comedy: ['hangover', 'superbad', 'bridesmaids', 'tropic thunder', 'step brothers', 'ace ventura', 'dumb and dumber', 'superbad', 'anchorman'],
+        drama: ['shawshank', 'forrest gump', 'goodfellas', 'departed', 'fight club', 'green mile', 'beautiful mind', 'schindler', 'godfather'],
+        horror: ['conjuring', 'insidious', 'sinister', 'it', 'hereditary', 'midsommar', 'exorcist', 'ring', 'nightmare', 'scream'],
+        'sci-fi': ['interstellar', 'inception', 'blade runner', 'arrival', 'dune', 'tenet', 'alien', 'prometheus', 'ex machina', 'gravity'],
+        thriller: ['gone girl', 'prisoners', 'zodiac', 'knives out', 'nightcrawler', 'shutter island', 'seven', 'memento', 'usual suspects']
     };
     
     // Pick a random genre from selected genres
     const randomGenre = data.genres[Math.floor(Math.random() * data.genres.length)];
     const genreQueries = queries[randomGenre] || queries['action'];
     
-    // Pick a random movie from that genre
-    const query = genreQueries[Math.floor(Math.random() * genreQueries.length)];
+    // Filter out already used queries
+    const availableQueries = genreQueries.filter(q => !usedQueries.includes(q));
+    
+    // If all queries used, reset the used queries list
+    if (availableQueries.length === 0) {
+        usedQueries = [];
+        console.log('Resetovan spisak korišćenih upita');
+    }
+    
+    // Pick a random movie from available queries
+    const queryList = availableQueries.length > 0 ? availableQueries : genreQueries;
+    const query = queryList[Math.floor(Math.random() * queryList.length)];
+    
+    // Add to used queries
+    usedQueries.push(query);
     
     return query;
 }
@@ -408,6 +430,45 @@ function showError(message) {
     errorSection.scrollIntoView({ behavior: 'smooth' });
 }
 
+// Get next movie suggestion
+async function getNextSuggestion() {
+    // Show loading
+    showLoading();
+    
+    try {
+        currentResultIndex++;
+        
+        // If we've reached the end of current results, search for new movies
+        if (currentResultIndex >= currentSearchResults.length) {
+            console.log('Generišem novu pretragu...');
+            
+            // Generate new search query
+            const searchQuery = generateSearchQuery(surveyData);
+            
+            // Search for new movies
+            const searchResults = await searchMovies(searchQuery);
+            
+            if (!searchResults || searchResults.length === 0) {
+                throw new Error('Nažalost, nismo pronašli dodatne filmove. Pokušaj sa drugim kriterijumima!');
+            }
+            
+            // Store new results
+            currentSearchResults = searchResults;
+            currentResultIndex = 0;
+        }
+        
+        // Get next movie details
+        const movie = await getMovieDetails(currentSearchResults[currentResultIndex].imdbID);
+        
+        // Display movie
+        displayMovie(movie);
+        
+    } catch (error) {
+        showError(error.message);
+        console.error('Greška:', error);
+    }
+}
+
 // Reset application
 function resetApp() {
     // Reset survey data
@@ -416,6 +477,11 @@ function resetApp() {
         period: '2020-2025',
         mood: ''
     };
+    
+    // Reset search results
+    currentSearchResults = [];
+    currentResultIndex = 0;
+    usedQueries = [];
     
     // Reset form inputs
     document.querySelectorAll('input[type="checkbox"][id^="genre-"]').forEach(cb => {
