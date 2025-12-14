@@ -1,1 +1,326 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FilmFinder - Pronađi Savršen Film</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="#">
+                    <i class="bi bi-film"></i> FilmFinder
+                </a>
+                <button class="btn btn-sm btn-outline-light" id="themeToggle">
+                    <i class="bi bi-sun-fill" id="themeIcon"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Container -->
+        <div class="container mt-5">
+            <!-- Hero Section -->
+            <div id="heroSection" class="text-center mb-5">
+                <h1 class="display-4 mb-3">
+                    <i class="bi bi-stars"></i> Pronađi Savršen Film
+                </h1>
+                <p class="lead">Odgovori na nekoliko pitanja i otkrijemo idealan film za tebe!</p>
+            </div>
+
+            <!-- Survey Section -->
+            <div id="surveySection" class="card shadow-lg mb-5">
+                <div class="card-body p-4">
+                    <h3 class="card-title mb-4 text-center">
+                        <i class="bi bi-ui-checks"></i> Odgovori na pitanja
+                    </h3>
+                    
+                    <!-- Progress Bar -->
+                    <div class="progress mb-4" style="height: 8px;">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                             role="progressbar" style="width: 0%"></div>
+                    </div>
+
+                    <!-- Step 1: Genre -->
+                    <div id="step1" class="survey-step">
+                        <h5 class="mb-3">1. Koji žanr te zanima?</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4 col-sm-6">
+                                <input type="checkbox" class="btn-check" id="genre-action" value="action" autocomplete="off">
+                                <label class="btn btn-outline-primary w-100" for="genre-action">
+                                    <i class="bi bi-lightning-charge"></i> Akcija
+                                </label>
+                            </div>
+                            <div class="col-md-4 col-sm-6">
+                                <input type="checkbox" class="btn-check" id="genre-comedy" value="comedy" autocomplete="off">
+                                <label class="btn btn-outline-primary w-100" for="genre-comedy">
+                                    <i class="bi bi-emoji-laugh"></i> Komedija
+                                </label>
+                            </div>
+                            <div class="col-md-4 col-sm-6">
+                                <input type="checkbox" class="btn-check" id="genre-drama" value="drama" autocomplete="off">
+                                <label class="btn btn-outline-primary w-100" for="genre-drama">
+                                    <i class="bi bi-heart"></i> Drama
+                                </label>
+                            </div>
+                            <div class="col-md-4 col-sm-6">
+                                <input type="checkbox" class="btn-check" id="genre-horror" value="horror" autocomplete="off">
+                                <label class="btn btn-outline-primary w-100" for="genre-horror">
+                                    <i class="bi bi-moon-stars"></i> Horor
+                                </label>
+                            </div>
+                            <div class="col-md-4 col-sm-6">
+                                <input type="checkbox" class="btn-check" id="genre-scifi" value="sci-fi" autocomplete="off">
+                                <label class="btn btn-outline-primary w-100" for="genre-scifi">
+                                    <i class="bi bi-rocket-takeoff"></i> Sci-Fi
+                                </label>
+                            </div>
+                            <div class="col-md-4 col-sm-6">
+                                <input type="checkbox" class="btn-check" id="genre-thriller" value="thriller" autocomplete="off">
+                                <label class="btn btn-outline-primary w-100" for="genre-thriller">
+                                    <i class="bi bi-eye"></i> Triler
+                                </label>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button class="btn btn-primary btn-lg" onclick="nextStep(2)">
+                                Sledeće <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Period -->
+                    <div id="step2" class="survey-step d-none">
+                        <h5 class="mb-3">2. Iz kojeg perioda želiš film?</h5>
+                        <div class="d-flex flex-column gap-3">
+                            <div class="form-check form-check-lg">
+                                <input class="form-check-input" type="radio" name="period" id="period-classic" value="1970-1999">
+                                <label class="form-check-label" for="period-classic">
+                                    <i class="bi bi-cassette"></i> Klasici (1970-1999)
+                                </label>
+                            </div>
+                            <div class="form-check form-check-lg">
+                                <input class="form-check-input" type="radio" name="period" id="period-2000s" value="2000-2009">
+                                <label class="form-check-label" for="period-2000s">
+                                    <i class="bi bi-disc"></i> 2000-te (2000-2009)
+                                </label>
+                            </div>
+                            <div class="form-check form-check-lg">
+                                <input class="form-check-input" type="radio" name="period" id="period-2010s" value="2010-2019">
+                                <label class="form-check-label" for="period-2010s">
+                                    <i class="bi bi-camera-reels"></i> 2010-te (2010-2019)
+                                </label>
+                            </div>
+                            <div class="form-check form-check-lg">
+                                <input class="form-check-input" type="radio" name="period" id="period-modern" value="2020-2025" checked>
+                                <label class="form-check-label" for="period-modern">
+                                    <i class="bi bi-play-circle"></i> Moderni (2020+)
+                                </label>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button class="btn btn-outline-secondary me-2" onclick="previousStep(1)">
+                                <i class="bi bi-arrow-left"></i> Nazad
+                            </button>
+                            <button class="btn btn-primary btn-lg" onclick="nextStep(3)">
+                                Sledeće <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Mood -->
+                    <div id="step3" class="survey-step d-none">
+                        <h5 class="mb-4">3. Kakvo je tvoje trenutno raspoloženje?</h5>
+                        
+                        <!-- Mobile: Dropdown -->
+                        <select class="form-select form-select-lg mb-4 d-md-none" id="moodSelectMobile">
+                            <option value="" selected>Izaberi raspoloženje...</option>
+                            <option value="happy">😊 Srećan/na - želim nešto zabavno</option>
+                            <option value="sad">😢 Tužan/na - želim emotivnu priču</option>
+                            <option value="excited">🤩 Uzbuđen/a - želim akciju!</option>
+                            <option value="scared">😨 Želim da se uplašim</option>
+                            <option value="thoughtful">🤔 Zamišljen/a - želim nešto duboko</option>
+                            <option value="relaxed">😌 Opušten/a - bilo šta može</option>
+                        </select>
+                        
+                        <!-- Desktop: Cards -->
+                        <div class="row g-3 d-none d-md-flex mb-4">
+                            <div class="col-md-4">
+                                <input type="radio" class="btn-check" name="mood" id="mood-happy" value="happy" autocomplete="off">
+                                <label class="mood-card" for="mood-happy">
+                                    <div class="mood-icon">😊</div>
+                                    <h6>Srećan/na</h6>
+                                    <p>Želim nešto zabavno</p>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="btn-check" name="mood" id="mood-sad" value="sad" autocomplete="off">
+                                <label class="mood-card" for="mood-sad">
+                                    <div class="mood-icon">😢</div>
+                                    <h6>Tužan/na</h6>
+                                    <p>Želim emotivnu priču</p>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="btn-check" name="mood" id="mood-excited" value="excited" autocomplete="off">
+                                <label class="mood-card" for="mood-excited">
+                                    <div class="mood-icon">🤩</div>
+                                    <h6>Uzbuđen/a</h6>
+                                    <p>Želim akciju!</p>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="btn-check" name="mood" id="mood-scared" value="scared" autocomplete="off">
+                                <label class="mood-card" for="mood-scared">
+                                    <div class="mood-icon">😨</div>
+                                    <h6>Uplašen/a</h6>
+                                    <p>Želim da se uplašim</p>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="btn-check" name="mood" id="mood-thoughtful" value="thoughtful" autocomplete="off">
+                                <label class="mood-card" for="mood-thoughtful">
+                                    <div class="mood-icon">🤔</div>
+                                    <h6>Zamišljen/a</h6>
+                                    <p>Želim nešto duboko</p>
+                                </label>
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio" class="btn-check" name="mood" id="mood-relaxed" value="relaxed" autocomplete="off">
+                                <label class="mood-card" for="mood-relaxed">
+                                    <div class="mood-icon">😌</div>
+                                    <h6>Opušten/a</h6>
+                                    <p>Bilo šta može</p>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mt-4">
+                            <button class="btn btn-outline-secondary me-2" onclick="previousStep(2)">
+                                <i class="bi bi-arrow-left"></i> Nazad
+                            </button>
+                            <button class="btn btn-success btn-lg" onclick="findMovie()">
+                                <i class="bi bi-search"></i> Preporuči Film
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading Section -->
+            <div id="loadingSection" class="text-center d-none mb-5">
+                <div class="spinner-border text-primary" style="width: 4rem; height: 4rem;" role="status">
+                    <span class="visually-hidden">Učitavanje...</span>
+                </div>
+                <p class="mt-3 lead">Tražim savršen film za tebe...</p>
+            </div>
+
+            <!-- Error Section -->
+            <div id="errorSection" class="alert alert-danger d-none" role="alert">
+                <h4 class="alert-heading">
+                    <i class="bi bi-exclamation-triangle"></i> Greška
+                </h4>
+                <p id="errorMessage"></p>
+                <hr>
+                <button class="btn btn-danger" onclick="resetApp()">
+                    <i class="bi bi-arrow-clockwise"></i> Pokušaj ponovo
+                </button>
+            </div>
+
+            <!-- Movie Details Section -->
+            <div id="movieSection" class="d-none mb-5">
+                <div class="card shadow-lg">
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Movie Poster -->
+                            <div class="col-md-4 mb-4">
+                                <img id="moviePoster" src="" alt="Movie Poster" class="img-fluid rounded shadow">
+                                <div class="d-grid gap-2 mt-3">
+                                    <button class="btn btn-outline-danger" id="trailerBtn">
+                                        <i class="bi bi-youtube"></i> Trailer
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Movie Info -->
+                            <div class="col-md-8">
+                                <h2 class="mb-3" id="movieTitle"></h2>
+                                
+                                <div class="mb-3">
+                                    <span class="badge bg-primary me-2" id="movieYear"></span>
+                                    <span class="badge bg-secondary me-2" id="movieGenre"></span>
+                                    <span class="badge bg-info" id="movieRuntime"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <h5>
+                                        <i class="bi bi-star-fill text-warning"></i> 
+                                        IMDB Ocena: <span id="movieRating"></span>
+                                    </h5>
+                                </div>
+
+                                <div class="mb-3">
+                                    <h6><i class="bi bi-file-text"></i> Opis:</h6>
+                                    <p id="moviePlot" class="text-muted"></p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <h6><i class="bi bi-people"></i> Glumci:</h6>
+                                    <p id="movieActors" class="text-muted"></p>
+                                </div>
+
+                                <div class="mb-3">
+                                    <h6><i class="bi bi-camera-video"></i> Režija:</h6>
+                                    <p id="movieDirector" class="text-muted"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Watch Links -->
+                        <hr class="my-4">
+                        <h4 class="mb-3">
+                            <i class="bi bi-play-btn"></i> Gledaj Film Online
+                        </h4>
+                        <div class="row g-3" id="watchLinks">
+                            <!-- Links will be generated here -->
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="text-center mt-4">
+                            <button class="btn btn-primary btn-lg" onclick="resetApp()">
+                                <i class="bi bi-arrow-repeat"></i> Preporuči Drugi Film
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="bg-dark text-light text-center py-4 mt-5">
+            <div class="container">
+                <p class="mb-0">
+                    <i class="bi bi-film"></i> Agencija Sprint © <span id="currentYear"></span> | Powered by Đorđe Živanović
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
 
