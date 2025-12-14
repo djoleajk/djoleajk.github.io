@@ -200,8 +200,8 @@ async function findMovie() {
                 for (const result of searchResults) {
                     const movieDetails = await getMovieDetails(result.imdbID);
                     
-                    // Check if movie matches selected genres
-                    if (movieMatchesGenres(movieDetails, surveyData.genres)) {
+                    // Check if movie matches selected genres and mood
+                    if (movieMatchesGenres(movieDetails, surveyData.genres, surveyData.mood)) {
                         movie = movieDetails;
                         movie.aiExplanation = aiExplanation; // Add AI explanation
                         currentSearchResults = searchResults;
@@ -281,6 +281,73 @@ function generateSearchQuery(data) {
     return query;
 }
 
+// Check if movie matches user's mood
+function movieMatchesMood(movie, mood, movieGenres) {
+    // Mood-to-genre compatibility mapping
+    const moodCompatibility = {
+        'happy': {
+            allowed: ['comedy', 'adventure', 'family', 'animation', 'musical', 'romance'],
+            forbidden: ['horror', 'war', 'crime'],
+            description: 'vesele i zabavne filmove'
+        },
+        'sad': {
+            allowed: ['drama', 'romance', 'biography', 'history'],
+            forbidden: ['comedy', 'action'],
+            description: 'emotivne i dirljive filmove'
+        },
+        'excited': {
+            allowed: ['action', 'adventure', 'thriller', 'sci-fi'],
+            forbidden: ['drama', 'documentary'],
+            description: 'uzbudljive i adrenalinske filmove'
+        },
+        'scared': {
+            allowed: ['horror', 'thriller', 'mystery'],
+            forbidden: ['comedy', 'romance', 'family'],
+            description: 'jezive i napete filmove'
+        },
+        'thoughtful': {
+            allowed: ['drama', 'sci-fi', 'mystery', 'thriller', 'biography', 'history'],
+            forbidden: ['comedy', 'action'],
+            description: 'zamišljene i duboke filmove'
+        },
+        'relaxed': {
+            allowed: [], // Sve je OK
+            forbidden: ['horror'],
+            description: 'opuštene filmove'
+        }
+    };
+    
+    const moodRules = moodCompatibility[mood];
+    if (!moodRules) {
+        return true; // Unknown mood, allow everything
+    }
+    
+    // Check for forbidden genres
+    for (const forbiddenGenre of moodRules.forbidden) {
+        if (movieGenres.some(g => g.includes(forbiddenGenre))) {
+            console.log(`   ✗ Raspoloženje "${mood}" ne odgovara žanru "${forbiddenGenre}" u filmu`);
+            console.log(`   ℹ️ Za "${mood}" raspoloženje preporučujemo: ${moodRules.description}`);
+            return false;
+        }
+    }
+    
+    // If there are allowed genres specified, check if movie has at least one
+    if (moodRules.allowed.length > 0) {
+        const hasAllowedGenre = movieGenres.some(movieGenre => 
+            moodRules.allowed.some(allowedGenre => movieGenre.includes(allowedGenre))
+        );
+        
+        if (!hasAllowedGenre) {
+            console.log(`   ✗ Film ne sadrži žanr koji odgovara raspoloženju "${mood}"`);
+            console.log(`   ℹ️ Za "${mood}" raspoloženje preporučujemo: ${moodRules.description}`);
+            return false;
+        }
+    }
+    
+    console.log(`   ✓ Film odgovara raspoloženju "${mood}"`);
+    return true;
+}
+
 // Filter movies by period
 function filterByPeriod(movies, period) {
     if (!movies || movies.length === 0) {
@@ -310,8 +377,8 @@ function filterByPeriod(movies, period) {
     });
 }
 
-// Check if movie matches selected genres
-function movieMatchesGenres(movie, selectedGenres) {
+// Check if movie matches selected genres and mood
+function movieMatchesGenres(movie, selectedGenres, mood = '') {
     if (!movie.Genre || movie.Genre === 'N/A') {
         console.log(`✗ Film "${movie.Title}" nema informacije o žanru`);
         return false;
@@ -357,6 +424,11 @@ function movieMatchesGenres(movie, selectedGenres) {
         }
     }
     
+    // Check if movie mood matches user's mood
+    if (mood && !movieMatchesMood(movie, mood, movieGenres)) {
+        return false;
+    }
+    
     // Genre mapping for matching
     const genreMap = {
         'action': ['action'],
@@ -367,22 +439,40 @@ function movieMatchesGenres(movie, selectedGenres) {
         'thriller': ['thriller', 'mystery', 'crime']
     };
     
-    // Check if any of the movie's genres match the selected genres
+    // Check if movie contains ALL selected genres (not just one)
+    let matchedGenres = 0;
+    const requiredGenres = selectedGenres.length;
+    
     for (const selectedGenre of selectedGenres) {
         const matchTerms = genreMap[selectedGenre] || [selectedGenre];
+        let genreFound = false;
         
         for (const movieGenre of movieGenres) {
             for (const matchTerm of matchTerms) {
                 if (movieGenre.includes(matchTerm) || matchTerm.includes(movieGenre)) {
-                    console.log(`✓ Film "${movie.Title}" sadrži žanr: ${movieGenre} (tražen: ${selectedGenre})`);
-                    return true;
+                    console.log(`   ✓ Žanr "${selectedGenre}" pronađen kao "${movieGenre}"`);
+                    genreFound = true;
+                    break;
                 }
             }
+            if (genreFound) break;
+        }
+        
+        if (genreFound) {
+            matchedGenres++;
+        } else {
+            console.log(`   ✗ Žanr "${selectedGenre}" NIJE pronađen u filmu`);
         }
     }
     
-    console.log(`✗ Film "${movie.Title}" (${movie.Genre}) ne odgovara izabranim žanrovima: ${selectedGenres.join(', ')}`);
-    return false;
+    // Film must contain ALL selected genres
+    if (matchedGenres === requiredGenres) {
+        console.log(`✓ Film "${movie.Title}" sadrži SVE tražene žanrove (${matchedGenres}/${requiredGenres})`);
+        return true;
+    } else {
+        console.log(`✗ Film "${movie.Title}" (${movie.Genre}) ne sadrži sve žanrove. Ima: ${matchedGenres}/${requiredGenres}`);
+        return false;
+    }
 }
 
 // Search movies using OMDb API
@@ -766,8 +856,8 @@ async function getNextSuggestion() {
                 for (const result of searchResults) {
                     const movieDetails = await getMovieDetails(result.imdbID);
                     
-                    // Check if movie matches selected genres
-                    if (movieMatchesGenres(movieDetails, surveyData.genres)) {
+                    // Check if movie matches selected genres and mood
+                    if (movieMatchesGenres(movieDetails, surveyData.genres, surveyData.mood)) {
                         movie = movieDetails;
                         movie.aiExplanation = aiExplanation; // Add AI explanation
                         currentSearchResults = searchResults;
@@ -903,9 +993,11 @@ function generateAIExplanation(data) {
     let explanation = `🤖 <strong>Smart AI Analiza:</strong>\n\n`;
     explanation += `Na osnovu tvojih odabira, analizirao sam da želiš:\n`;
     explanation += `📽️ <strong>Žanr:</strong> ${genreList}\n`;
+    explanation += `   ℹ️ Film MORA sadržati SVE izabrane žanrove\n`;
     explanation += `📅 <strong>Period:</strong> ${periodName}\n`;
-    explanation += `🎭 <strong>Raspoloženje:</strong> ${moodDesc}\n\n`;
-    explanation += `Pronašao sam film koji savršeno odgovara ovim kriterijumima - ima visoku ocenu (6.0+), kvalitetnu produkciju i garantovano će te zadovoljiti!`;
+    explanation += `🎭 <strong>Raspoloženje:</strong> ${moodDesc}\n`;
+    explanation += `   ℹ️ Film je odabran da odgovara tvojim emocijama\n\n`;
+    explanation += `Pronašao sam film koji SAVRŠENO odgovara SVIM tvojim kriterijumima - ima visoku ocenu (5.5+), kvalitetnu produkciju i garantovano će te zadovoljiti!`;
     
     console.log('📝 AI Objašnjenje generisano:', explanation);
     
@@ -919,4 +1011,5 @@ function generateAIExplanation(data) {
 console.log('%cFilmFinder 🎬', 'color: #667eea; font-size: 24px; font-weight: bold;');
 console.log('%cPronađi savršen film za sebe!', 'color: #764ba2; font-size: 14px;');
 console.log('%cPowered by OMDb API + Smart AI', 'color: #6c757d; font-size: 12px;');
+
 
