@@ -16,6 +16,7 @@ let surveyData = {
 let currentSearchResults = [];
 let currentResultIndex = 0;
 let usedQueries = []; // Track used queries to avoid duplicates
+let lastSuccessfulMovie = null; // Track last successful movie for fallback
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
@@ -169,22 +170,43 @@ async function findMovie() {
     showLoading();
     
     try {
-        // Generate search query based on survey data
-        const searchQuery = generateSearchQuery(surveyData);
+        let movie = null;
+        let attempts = 0;
+        const maxAttempts = 10;
         
-        // Search for movies
-        const searchResults = await searchMovies(searchQuery);
-        
-        if (!searchResults || searchResults.length === 0) {
-            throw new Error('Nažalost, nismo pronašli film koji odgovara tvojim kriterijumima. Pokušaj ponovo sa drugim opcijama!');
+        // Try multiple queries until we find a movie that matches genre and period
+        while (!movie && attempts < maxAttempts) {
+            attempts++;
+            console.log(`Pokušaj ${attempts}/${maxAttempts}`);
+            
+            // Generate search query based on survey data
+            const searchQuery = generateSearchQuery(surveyData);
+            
+            // Search for movies
+            const searchResults = await searchMovies(searchQuery);
+            
+            if (searchResults && searchResults.length > 0) {
+                // Try each result until we find one that matches genres
+                for (const result of searchResults) {
+                    const movieDetails = await getMovieDetails(result.imdbID);
+                    
+                    // Check if movie matches selected genres
+                    if (movieMatchesGenres(movieDetails, surveyData.genres)) {
+                        movie = movieDetails;
+                        currentSearchResults = searchResults;
+                        currentResultIndex = 0;
+                        break;
+                    }
+                }
+            }
         }
         
-        // Store search results
-        currentSearchResults = searchResults;
-        currentResultIndex = 0;
+        if (!movie) {
+            throw new Error('Nažalost, nismo pronašli film koji odgovara tvojim kriterijumima (žanr + period). Pokušaj sa drugim opcijama ili izaberi više žanrova!');
+        }
         
-        // Get first movie details
-        const movie = await getMovieDetails(searchResults[0].imdbID);
+        // Store successful movie
+        lastSuccessfulMovie = movie;
         
         // Display movie
         displayMovie(movie);
@@ -233,11 +255,115 @@ function generateSearchQuery(data) {
     return query;
 }
 
+// Filter movies by period
+function filterByPeriod(movies, period) {
+    if (!movies || movies.length === 0) {
+        return [];
+    }
+    
+    // Parse period range (e.g., "2020-2025")
+    const [startYear, endYear] = period.split('-').map(y => parseInt(y));
+    
+    console.log(`Filtriranje filmova za period: ${startYear}-${endYear}`);
+    
+    return movies.filter(movie => {
+        // Parse movie year (can be "2020" or "2020-2021" for series)
+        const yearMatch = movie.Year.match(/\d{4}/);
+        if (!yearMatch) {
+            return false;
+        }
+        
+        const movieYear = parseInt(yearMatch[0]);
+        const isInPeriod = movieYear >= startYear && movieYear <= endYear;
+        
+        if (isInPeriod) {
+            console.log(`✓ Film "${movie.Title}" (${movieYear}) je u periodu`);
+        }
+        
+        return isInPeriod;
+    });
+}
+
+// Check if movie matches selected genres
+function movieMatchesGenres(movie, selectedGenres) {
+    if (!movie.Genre || movie.Genre === 'N/A') {
+        console.log(`✗ Film "${movie.Title}" nema informacije o žanru`);
+        return false;
+    }
+    
+    // Exclude movies without poster
+    if (!movie.Poster || movie.Poster === 'N/A') {
+        console.log(`✗ Film "${movie.Title}" nema poster - preskačemo`);
+        return false;
+    }
+    
+    // Exclude movies without rating
+    if (!movie.imdbRating || movie.imdbRating === 'N/A') {
+        console.log(`✗ Film "${movie.Title}" nema ocenu - preskačemo`);
+        return false;
+    }
+    
+    // Exclude movies with rating below 6.0
+    const rating = parseFloat(movie.imdbRating);
+    if (isNaN(rating) || rating < 6.0) {
+        console.log(`✗ Film "${movie.Title}" ima nisku ocenu (${movie.imdbRating}) - preskačemo`);
+        return false;
+    }
+    
+    // Get movie genres as lowercase array
+    const movieGenres = movie.Genre.toLowerCase().split(',').map(g => g.trim());
+    
+    // Exclude animations
+    if (movieGenres.some(g => g.includes('animation') || g.includes('animated'))) {
+        console.log(`✗ Film "${movie.Title}" je animacija - preskačemo`);
+        return false;
+    }
+    
+    // Exclude films under 80 minutes
+    if (movie.Runtime && movie.Runtime !== 'N/A') {
+        const runtimeMatch = movie.Runtime.match(/(\d+)/);
+        if (runtimeMatch) {
+            const runtime = parseInt(runtimeMatch[1]);
+            if (runtime < 80) {
+                console.log(`✗ Film "${movie.Title}" je prekratak (${runtime} min) - preskačemo`);
+                return false;
+            }
+        }
+    }
+    
+    // Genre mapping for matching
+    const genreMap = {
+        'action': ['action'],
+        'comedy': ['comedy'],
+        'drama': ['drama'],
+        'horror': ['horror'],
+        'sci-fi': ['sci-fi', 'science fiction', 'fantasy'],
+        'thriller': ['thriller', 'mystery', 'crime']
+    };
+    
+    // Check if any of the movie's genres match the selected genres
+    for (const selectedGenre of selectedGenres) {
+        const matchTerms = genreMap[selectedGenre] || [selectedGenre];
+        
+        for (const movieGenre of movieGenres) {
+            for (const matchTerm of matchTerms) {
+                if (movieGenre.includes(matchTerm) || matchTerm.includes(movieGenre)) {
+                    console.log(`✓ Film "${movie.Title}" sadrži žanr: ${movieGenre} (tražen: ${selectedGenre})`);
+                    return true;
+                }
+            }
+        }
+    }
+    
+    console.log(`✗ Film "${movie.Title}" (${movie.Genre}) ne odgovara izabranim žanrovima: ${selectedGenres.join(', ')}`);
+    return false;
+}
+
 // Search movies using OMDb API
 async function searchMovies(query) {
     try {
         // Check cache first
-        const cacheKey = `search_${query}`;
+        const cacheKey = `search_${query}_${surveyData.period}`;
         if (movieCache[cacheKey]) {
             console.log('Korišćenje cache-a za pretragu:', query);
             return movieCache[cacheKey];
@@ -245,29 +371,69 @@ async function searchMovies(query) {
         
         // Sanitize and encode query
         const sanitizedQuery = sanitizeInput(query);
-        const url = `${OMDB_BASE_URL}?s=${encodeURIComponent(sanitizedQuery)}&type=movie&apikey=${OMDB_API_KEY}`;
         
-        console.log('Pretraga filmova:', url);
+        // Parse period to get a random year for narrowing search
+        const [startYear, endYear] = surveyData.period.split('-').map(y => parseInt(y));
+        const randomYear = Math.floor(Math.random() * (endYear - startYear + 1)) + startYear;
         
-        const response = await fetch(url);
+        // Try search with year parameter to narrow results
+        let url = `${OMDB_BASE_URL}?s=${encodeURIComponent(sanitizedQuery)}&type=movie&y=${randomYear}&apikey=${OMDB_API_KEY}`;
+        
+        console.log(`Pretraga filmova: "${sanitizedQuery}" (godina: ${randomYear})`);
+        
+        let response = await fetch(url);
         
         if (!response.ok) {
             throw new Error('Greška pri komunikaciji sa OMDb API');
         }
         
-        const data = await response.json();
+        let data = await response.json();
+        
+        // If "Too many results" or not found with specific year, try without year
+        if (data.Response === 'False' && (data.Error === 'Too many results.' || data.Error === 'Movie not found!')) {
+            console.log(`Pokušavam pretragu bez godine za: "${sanitizedQuery}"`);
+            url = `${OMDB_BASE_URL}?s=${encodeURIComponent(sanitizedQuery)}&type=movie&apikey=${OMDB_API_KEY}`;
+            
+            response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error('Greška pri komunikaciji sa OMDb API');
+            }
+            
+            data = await response.json();
+            
+            // If still "Too many results", return null to try another query
+            if (data.Response === 'False') {
+                if (data.Error === 'Too many results.') {
+                    console.log('Previše rezultata, pokušavam sa drugim upitom...');
+                    return null;
+                }
+                console.log(`Film nije pronađen: ${data.Error}`);
+                return null;
+            }
+        }
         
         if (data.Response === 'False') {
-            throw new Error(data.Error || 'Film nije pronađen');
+            console.log(`Pretraga nije uspela: ${data.Error}`);
+            return null;
+        }
+        
+        // Filter results by selected period
+        const filteredResults = filterByPeriod(data.Search, surveyData.period);
+        
+        if (!filteredResults || filteredResults.length === 0) {
+            console.log(`Nema rezultata za period ${surveyData.period}, pokušavam sa drugim upitom...`);
+            return null;
         }
         
         // Cache results
-        movieCache[cacheKey] = data.Search;
+        movieCache[cacheKey] = filteredResults;
         
-        return data.Search;
+        return filteredResults;
         
     } catch (error) {
-        throw new Error(`Greška pri pretraživanju filmova: ${error.message}`);
+        console.error('Greška pri pretraživanju:', error);
+        return null; // Return null instead of throwing to allow retry with different query
     }
 }
 
@@ -434,6 +600,76 @@ function showError(message) {
     errorSection.scrollIntoView({ behavior: 'smooth' });
 }
 
+// Show notification message (non-blocking alert)
+function showNotification(message) {
+    // Create notification element if it doesn't exist
+    let notification = document.getElementById('notification');
+    
+    if (!notification) {
+        notification = document.createElement('div');
+        notification.id = 'notification';
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 9999;
+            font-size: 16px;
+            max-width: 90%;
+            text-align: center;
+            animation: slideDown 0.5s ease-out;
+        `;
+        document.body.appendChild(notification);
+        
+        // Add animation keyframes
+        if (!document.getElementById('notificationStyles')) {
+            const style = document.createElement('style');
+            style.id = 'notificationStyles';
+            style.textContent = `
+                @keyframes slideDown {
+                    from {
+                        opacity: 0;
+                        transform: translateX(-50%) translateY(-20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateX(-50%) translateY(0);
+                    }
+                }
+                @keyframes slideUp {
+                    from {
+                        opacity: 1;
+                        transform: translateX(-50%) translateY(0);
+                    }
+                    to {
+                        opacity: 0;
+                        transform: translateX(-50%) translateY(-20px);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+    
+    // Set message and show notification
+    notification.innerHTML = `<i class="bi bi-info-circle"></i> ${message}`;
+    notification.style.display = 'block';
+    notification.style.animation = 'slideDown 0.5s ease-out';
+    
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+        notification.style.animation = 'slideUp 0.5s ease-out';
+        setTimeout(() => {
+            notification.style.display = 'none';
+        }, 500);
+    }, 4000);
+}
+
 // Get next movie suggestion
 async function getNextSuggestion() {
     // Show loading
@@ -442,22 +678,56 @@ async function getNextSuggestion() {
     try {
         console.log('Tražim novi film prema parametrima ankete...');
         
-        // Always generate NEW search query based on survey data
-        const searchQuery = generateSearchQuery(surveyData);
+        let movie = null;
+        let attempts = 0;
+        const maxAttempts = 10;
         
-        // Search for new movies
-        const searchResults = await searchMovies(searchQuery);
-        
-        if (!searchResults || searchResults.length === 0) {
-            throw new Error('Nažalost, nismo pronašli dodatne filmove. Pokušaj sa drugim kriterijumima!');
+        // Try multiple queries until we find a movie that matches genre and period
+        while (!movie && attempts < maxAttempts) {
+            attempts++;
+            console.log(`Pokušaj ${attempts}/${maxAttempts}`);
+            
+            // Always generate NEW search query based on survey data
+            const searchQuery = generateSearchQuery(surveyData);
+            
+            // Search for new movies
+            const searchResults = await searchMovies(searchQuery);
+            
+            if (searchResults && searchResults.length > 0) {
+                // Try each result until we find one that matches genres
+                for (const result of searchResults) {
+                    const movieDetails = await getMovieDetails(result.imdbID);
+                    
+                    // Check if movie matches selected genres
+                    if (movieMatchesGenres(movieDetails, surveyData.genres)) {
+                        movie = movieDetails;
+                        currentSearchResults = searchResults;
+                        currentResultIndex = 0;
+                        break;
+                    }
+                }
+            }
         }
         
-        // Store new results
-        currentSearchResults = searchResults;
-        currentResultIndex = 0;
+        if (!movie) {
+            // If no new movie found, show message and return to last successful movie
+            hideLoading();
+            
+            if (lastSuccessfulMovie) {
+                // Show notification
+                showNotification('Nema više preporuka koje odgovaraju tvojim kriterijumima. Prikazujemo poslednji preporučeni film.');
+                
+                // Display last successful movie
+                displayMovie(lastSuccessfulMovie);
+            } else {
+                // If no previous movie, show error
+                throw new Error('Nažalost, nismo pronašli dodatne filmove za izabrane kriterijume.');
+            }
+            return;
+        }
         
-        // Get first movie from new results
-        const movie = await getMovieDetails(searchResults[0].imdbID);
+        // Store successful movie
+        lastSuccessfulMovie = movie;
         
         // Display movie
         displayMovie(movie);
@@ -481,6 +751,7 @@ function resetApp() {
     currentSearchResults = [];
     currentResultIndex = 0;
     usedQueries = [];
+    lastSuccessfulMovie = null;
     
     // Reset form inputs
     document.querySelectorAll('input[type="checkbox"][id^="genre-"]').forEach(cb => {
