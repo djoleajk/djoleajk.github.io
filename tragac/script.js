@@ -198,17 +198,19 @@ async function findMovie() {
 // Generate search query based on survey data
 function generateSearchQuery(data) {
     const queries = {
-        action: ['terminator', 'john wick', 'mad max', 'avengers', 'matrix', 'die hard', 'gladiator', 'dark knight', 'lethal weapon', 'mission impossible'],
-        comedy: ['hangover', 'superbad', 'bridesmaids', 'tropic thunder', 'step brothers', 'ace ventura', 'dumb and dumber', 'superbad', 'anchorman'],
-        drama: ['shawshank', 'forrest gump', 'goodfellas', 'departed', 'fight club', 'green mile', 'beautiful mind', 'schindler', 'godfather'],
-        horror: ['conjuring', 'insidious', 'sinister', 'it', 'hereditary', 'midsommar', 'exorcist', 'ring', 'nightmare', 'scream'],
-        'sci-fi': ['interstellar', 'inception', 'blade runner', 'arrival', 'dune', 'tenet', 'alien', 'prometheus', 'ex machina', 'gravity'],
-        thriller: ['gone girl', 'prisoners', 'zodiac', 'knives out', 'nightcrawler', 'shutter island', 'seven', 'memento', 'usual suspects']
+        action: ['terminator', 'john wick', 'mad max', 'avengers', 'matrix', 'die hard', 'gladiator', 'dark knight', 'lethal weapon', 'mission impossible', 'rambo', 'predator', 'expendables', 'fast furious', 'equalizer', 'taken', 'bourne', 'deadpool', 'kingsman', 'atomic blonde'],
+        comedy: ['hangover', 'superbad', 'bridesmaids', 'tropic thunder', 'step brothers', 'ace ventura', 'dumb and dumber', 'anchorman', '21 jump street', 'neighbors', 'wedding crashers', 'dodgeball', 'zoolander', 'borat', 'austin powers', 'rush hour', 'scary movie', 'game night', 'tag', 'blockers'],
+        drama: ['shawshank', 'forrest gump', 'goodfellas', 'departed', 'fight club', 'green mile', 'beautiful mind', 'schindler', 'godfather', 'casino', 'american beauty', 'prestige', 'social network', 'whiplash', 'spotlight', 'manchester', 'moonlight', 'birdman', 'wolf wall street', 'pianist'],
+        horror: ['conjuring', 'insidious', 'sinister', 'it', 'hereditary', 'midsommar', 'exorcist', 'ring', 'nightmare', 'scream', 'saw', 'halloween', 'friday 13th', 'babadook', 'witch', 'get out', 'quiet place', 'us', 'cabin woods', 'evil dead'],
+        'sci-fi': ['interstellar', 'inception', 'blade runner', 'arrival', 'dune', 'tenet', 'alien', 'prometheus', 'ex machina', 'gravity', 'martian', 'edge tomorrow', 'district 9', 'elysium', 'looper', 'oblivion', 'annihilation', 'passengers', 'moon', 'her'],
+        thriller: ['gone girl', 'prisoners', 'zodiac', 'knives out', 'nightcrawler', 'shutter island', 'seven', 'memento', 'usual suspects', 'silence lambs', 'dark knight', 'no country', 'sicario', 'wind river', 'nocturnal animals', 'girl train', 'girl dragon tattoo', 'mystic river', 'witness prosecution', 'uncut gems']
     };
     
-    // Pick a random genre from selected genres
+    // Pick a random genre from selected genres in the survey
     const randomGenre = data.genres[Math.floor(Math.random() * data.genres.length)];
     const genreQueries = queries[randomGenre] || queries['action'];
+    
+    console.log(`Odabran žanr iz ankete: ${randomGenre}`);
     
     // Filter out already used queries
     const availableQueries = genreQueries.filter(q => !usedQueries.includes(q));
@@ -216,7 +218,7 @@ function generateSearchQuery(data) {
     // If all queries used, reset the used queries list
     if (availableQueries.length === 0) {
         usedQueries = [];
-        console.log('Resetovan spisak korišćenih upita');
+        console.log('Resetovan spisak korišćenih upita - svi filmovi iz žanra su prikazani');
     }
     
     // Pick a random movie from available queries
@@ -225,6 +227,8 @@ function generateSearchQuery(data) {
     
     // Add to used queries
     usedQueries.push(query);
+    
+    console.log(`Pretraga za film: "${query}"`);
     
     return query;
 }
@@ -436,29 +440,24 @@ async function getNextSuggestion() {
     showLoading();
     
     try {
-        currentResultIndex++;
+        console.log('Tražim novi film prema parametrima ankete...');
         
-        // If we've reached the end of current results, search for new movies
-        if (currentResultIndex >= currentSearchResults.length) {
-            console.log('Generišem novu pretragu...');
-            
-            // Generate new search query
-            const searchQuery = generateSearchQuery(surveyData);
-            
-            // Search for new movies
-            const searchResults = await searchMovies(searchQuery);
-            
-            if (!searchResults || searchResults.length === 0) {
-                throw new Error('Nažalost, nismo pronašli dodatne filmove. Pokušaj sa drugim kriterijumima!');
-            }
-            
-            // Store new results
-            currentSearchResults = searchResults;
-            currentResultIndex = 0;
+        // Always generate NEW search query based on survey data
+        const searchQuery = generateSearchQuery(surveyData);
+        
+        // Search for new movies
+        const searchResults = await searchMovies(searchQuery);
+        
+        if (!searchResults || searchResults.length === 0) {
+            throw new Error('Nažalost, nismo pronašli dodatne filmove. Pokušaj sa drugim kriterijumima!');
         }
         
-        // Get next movie details
-        const movie = await getMovieDetails(currentSearchResults[currentResultIndex].imdbID);
+        // Store new results
+        currentSearchResults = searchResults;
+        currentResultIndex = 0;
+        
+        // Get first movie from new results
+        const movie = await getMovieDetails(searchResults[0].imdbID);
         
         // Display movie
         displayMovie(movie);
