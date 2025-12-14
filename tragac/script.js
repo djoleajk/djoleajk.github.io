@@ -171,18 +171,21 @@ async function findMovie() {
     
     try {
         console.log('🤖 Smart AI analizira tvoje preferencije...');
+        console.log(`📋 Žanrovi: ${surveyData.genres.join(', ')}`);
+        console.log(`📅 Period: ${surveyData.period}`);
+        console.log(`🎭 Raspoloženje: ${surveyData.mood}`);
         
         // Generate AI explanation based on selected preferences
         const aiExplanation = generateAIExplanation(surveyData);
         
         let movie = null;
         let attempts = 0;
-        const maxAttempts = 10;
+        const maxAttempts = 15; // Increased from 10
         
         // Try multiple queries until we find a movie that matches genre and period
         while (!movie && attempts < maxAttempts) {
             attempts++;
-            console.log(`Pokušaj ${attempts}/${maxAttempts}`);
+            console.log(`🔍 Pokušaj ${attempts}/${maxAttempts}`);
             
             // Generate search query based on survey data
             const searchQuery = generateSearchQuery(surveyData);
@@ -191,6 +194,8 @@ async function findMovie() {
             const searchResults = await searchMovies(searchQuery);
             
             if (searchResults && searchResults.length > 0) {
+                console.log(`   ✓ Pronađeno ${searchResults.length} filmova`);
+                
                 // Try each result until we find one that matches genres
                 for (const result of searchResults) {
                     const movieDetails = await getMovieDetails(result.imdbID);
@@ -201,14 +206,29 @@ async function findMovie() {
                         movie.aiExplanation = aiExplanation; // Add AI explanation
                         currentSearchResults = searchResults;
                         currentResultIndex = 0;
+                        console.log(`   🎬 PRONAĐEN: "${movie.Title}" (${movie.Year}) - Ocena: ${movie.imdbRating}`);
                         break;
                     }
                 }
+                if (!movie) {
+                    console.log(`   ✗ Nijedan od ${searchResults.length} filmova nije prošao filtere`);
+                }
+            } else {
+                console.log(`   ✗ Pretraga nije vratila rezultate`);
             }
         }
         
         if (!movie) {
-            throw new Error('Nažalost, nismo pronašli film koji odgovara tvojim kriterijumima (žanr + period). Pokušaj sa drugim opcijama ili izaberi više žanrova!');
+            // Provide helpful error message with suggestions
+            const selectedGenres = surveyData.genres.join(', ');
+            const errorMsg = `Nažalost, nismo pronašli film za kombinaciju:\n\n` +
+                           `Žanr: ${selectedGenres}\n` +
+                           `Period: ${surveyData.period}\n\n` +
+                           `Pokušaj:\n` +
+                           `• Izaberi više žanrova\n` +
+                           `• Izaberi drugi period (ima više filmova u 2010-2019)\n` +
+                           `• Pokušaj ponovo - pretraga koristi različite upite`;
+            throw new Error(errorMsg);
         }
         
         // Store successful movie
@@ -309,9 +329,9 @@ function movieMatchesGenres(movie, selectedGenres) {
         return false;
     }
     
-    // Exclude movies with rating below 6.0
+    // Exclude movies with rating below 5.5 (relaxed from 6.0)
     const rating = parseFloat(movie.imdbRating);
-    if (isNaN(rating) || rating < 6.0) {
+    if (isNaN(rating) || rating < 5.5) {
         console.log(`✗ Film "${movie.Title}" ima nisku ocenu (${movie.imdbRating}) - preskačemo`);
         return false;
     }
@@ -325,12 +345,12 @@ function movieMatchesGenres(movie, selectedGenres) {
         return false;
     }
     
-    // Exclude films under 80 minutes
+    // Exclude films under 70 minutes (relaxed from 80)
     if (movie.Runtime && movie.Runtime !== 'N/A') {
         const runtimeMatch = movie.Runtime.match(/(\d+)/);
         if (runtimeMatch) {
             const runtime = parseInt(runtimeMatch[1]);
-            if (runtime < 80) {
+            if (runtime < 70) {
                 console.log(`✗ Film "${movie.Title}" je prekratak (${runtime} min) - preskačemo`);
                 return false;
             }
@@ -728,7 +748,7 @@ async function getNextSuggestion() {
         
         let movie = null;
         let attempts = 0;
-        const maxAttempts = 10;
+        const maxAttempts = 15; // Increased from 10
         
         // Try multiple queries until we find a movie that matches genre and period
         while (!movie && attempts < maxAttempts) {
