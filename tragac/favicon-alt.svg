@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- Background -->
+  <rect width="64" height="64" rx="12" fill="#667eea"/>
+  
+  <!-- Film Icon -->
+  <g transform="translate(12, 16)">
+    <!-- Main Film Strip -->
+    <rect x="0" y="0" width="40" height="32" rx="3" fill="#ffffff"/>
+    
+    <!-- Film Perforations (Holes) -->
+    <circle cx="4" cy="6" r="2" fill="#667eea"/>
+    <circle cx="36" cy="6" r="2" fill="#667eea"/>
+    <circle cx="4" cy="16" r="2" fill="#667eea"/>
+    <circle cx="36" cy="16" r="2" fill="#667eea"/>
+    <circle cx="4" cy="26" r="2" fill="#667eea"/>
+    <circle cx="36" cy="26" r="2" fill="#667eea"/>
+    
+    <!-- Film Dividers -->
+    <line x1="0" y1="11" x2="40" y2="11" stroke="#667eea" stroke-width="1"/>
+    <line x1="0" y1="21" x2="40" y2="21" stroke="#667eea" stroke-width="1"/>
+    
+    <!-- Film Frames Content -->
+    <rect x="10" y="4" width="8" height="7" fill="#e8ecf7"/>
+    <rect x="22" y="4" width="8" height="7" fill="#e8ecf7"/>
+    <rect x="10" y="13" width="8" height="8" fill="#e8ecf7"/>
+    <rect x="22" y="13" width="8" height="8" fill="#e8ecf7"/>
+    <rect x="10" y="23" width="8" height="7" fill="#e8ecf7"/>
+    <rect x="22" y="23" width="8" height="7" fill="#e8ecf7"/>
+    
+    <!-- Star (Cinema Symbol) -->
+    <path d="M 20 6 L 21.5 9 L 25 9 L 22 11 L 23 14 L 20 12 L 17 14 L 18 11 L 15 9 L 18.5 9 Z" 
+          fill="#ffd54f" stroke="#ffc107" stroke-width="0.5"/>
+  </g>
+</svg>
+
