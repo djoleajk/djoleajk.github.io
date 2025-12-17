@@ -183,9 +183,30 @@ async function initializeApp() {
     // Add event listeners
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
     
+    // Check if this is a page refresh (not initial load or shared link)
+    const isRefresh = sessionStorage.getItem('pageLoaded') === 'true';
+    sessionStorage.setItem('pageLoaded', 'true');
+    
     // Check if URL contains movie parameter (shared link)
     const urlParams = new URLSearchParams(window.location.search);
     const movieId = urlParams.get('movie');
+    
+    // If it's a refresh and we have a movie in session, restore it
+    if (isRefresh && !movieId) {
+        const savedMovieId = sessionStorage.getItem('currentMovieId');
+        if (savedMovieId) {
+            try {
+                const movieDetails = await getMovieDetails(savedMovieId);
+                currentMovie = movieDetails;
+                displayMovie(movieDetails);
+                return; // Don't initialize survey
+            } catch (error) {
+                console.error('Error restoring movie:', error);
+                sessionStorage.removeItem('currentMovieId');
+                // Continue to normal initialization
+            }
+        }
+    }
     
     if (movieId) {
         // User came from a shared link - show the movie directly
@@ -198,6 +219,8 @@ async function initializeApp() {
             shownMoviesSet.add(movieId);
             // Set current movie
             currentMovie = movieDetails;
+            // Save to session for refresh
+            sessionStorage.setItem('currentMovieId', movieId);
             // Display the movie
             displayMovie(movieDetails);
             
@@ -211,6 +234,7 @@ async function initializeApp() {
                         newSearchBtn.className = 'btn btn-primary btn-lg mt-3';
                         newSearchBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Pronađi Svoj Film';
                         newSearchBtn.onclick = () => {
+                            sessionStorage.removeItem('currentMovieId');
                             window.location.href = window.location.pathname; // Remove query params
                         };
                         actionButtons.appendChild(newSearchBtn);
@@ -222,6 +246,7 @@ async function initializeApp() {
         } catch (error) {
             console.error('Error loading shared movie:', error);
             showError('Film nije pronađen. Možda je link nevažeći.');
+            sessionStorage.removeItem('currentMovieId');
             // Continue to normal initialization
         }
     }
@@ -916,6 +941,13 @@ function displayMovie(movie) {
         shownMoviesSet.add(movie.imdbID);
     }
     
+    // Mark this movie as shown (prevent duplicates)
+    if (movie && movie.imdbID) {
+        shownMoviesSet.add(movie.imdbID);
+        // Save to session for refresh
+        sessionStorage.setItem('currentMovieId', movie.imdbID);
+    }
+    
     // Hide loading and survey
     hideLoading();
     document.getElementById('surveySection').classList.add('d-none');
@@ -1115,6 +1147,9 @@ function resetApp() {
     
     // Clear shown movies set (start fresh for new search)
     shownMoviesSet.clear();
+    
+    // Clear session storage
+    sessionStorage.removeItem('currentMovieId');
     
     // Hide all sections except survey
     document.getElementById('loadingSection').classList.add('d-none');
