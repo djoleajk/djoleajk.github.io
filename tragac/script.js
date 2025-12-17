@@ -984,11 +984,16 @@ function displayMovie(movie) {
     // Translate plot to Serbian if needed
     const plotElement = document.getElementById('moviePlot');
     if (movie.Plot && movie.Plot !== 'N/A') {
+        // Show original text first
+        plotElement.textContent = movie.Plot;
+        // Then translate
         translateToSerbian(movie.Plot).then(translatedPlot => {
-            plotElement.textContent = translatedPlot || movie.Plot;
+            if (translatedPlot && translatedPlot !== movie.Plot) {
+                plotElement.textContent = translatedPlot;
+            }
         }).catch(error => {
             console.log('Translation error, using original:', error);
-            plotElement.textContent = movie.Plot;
+            // Keep original text if translation fails
         });
     } else {
         plotElement.textContent = 'Opis nije dostupan.';
@@ -1776,42 +1781,102 @@ function showStatistics() {
 
 // Functions are already integrated into displayMovie above
 
+// Summarize long text to approximately 500 characters
+function summarizeText(text, maxLength = 500) {
+    if (!text || text.length <= maxLength) {
+        return text;
+    }
+    
+    // Try to cut at sentence boundary
+    const truncated = text.substring(0, maxLength);
+    const lastPeriod = truncated.lastIndexOf('.');
+    const lastExclamation = truncated.lastIndexOf('!');
+    const lastQuestion = truncated.lastIndexOf('?');
+    
+    const lastSentenceEnd = Math.max(lastPeriod, lastExclamation, lastQuestion);
+    
+    if (lastSentenceEnd > maxLength * 0.7) {
+        // Cut at sentence boundary if it's not too early
+        return text.substring(0, lastSentenceEnd + 1);
+    } else {
+        // Cut at word boundary
+        const lastSpace = truncated.lastIndexOf(' ');
+        if (lastSpace > maxLength * 0.7) {
+            return text.substring(0, lastSpace) + '...';
+        } else {
+            return truncated + '...';
+        }
+    }
+}
+
 // Translate text to Serbian (Latin) using MyMemory Translation API
 async function translateToSerbian(text) {
-    if (!text || text === 'N/A') return text;
-    
-    // Check if text is already in Serbian (Cyrillic or Latin)
-    const cyrillicPattern = /[А-Яа-яЂђЉљЊњЋћЏџ]/;
-    const latinSerbianPattern = /[čćđšžČĆĐŠŽ]/;
-    if (cyrillicPattern.test(text) || latinSerbianPattern.test(text)) {
-        // Already in Serbian, return as is
+    if (!text || text === 'N/A' || text.trim().length === 0) {
         return text;
+    }
+    
+    // Summarize if text is longer than 500 characters
+    let textToTranslate = text;
+    if (text.length > 500) {
+        textToTranslate = summarizeText(text, 500);
+        console.log('Text summarized from', text.length, 'to', textToTranslate.length, 'characters');
     }
     
     try {
         // Use MyMemory Translation API (free, no API key required for basic use)
         // Translate to Serbian Latin (sr-Latn)
-        const encodedText = encodeURIComponent(text);
+        const encodedText = encodeURIComponent(textToTranslate);
         const url = `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=en|sr-Latn`;
+        
+        console.log('Translating text:', textToTranslate.substring(0, 50) + '...');
         
         const response = await fetch(url, {
             method: 'GET',
-            mode: 'cors'
+            mode: 'cors',
+            cache: 'no-cache'
         });
         
         if (!response.ok) {
-            throw new Error('Translation API error');
+            throw new Error(`Translation API error: ${response.status}`);
         }
         
         const data = await response.json();
         
+        console.log('Translation response:', data);
+        
         if (data.responseStatus === 200 && data.responseData && data.responseData.translatedText) {
-            return data.responseData.translatedText;
+            let translated = data.responseData.translatedText;
+            
+            // Clean up translation (sometimes API returns extra text)
+            if (translated.includes('MYMEMORY WARNING')) {
+                // Extract actual translation from warning message
+                const match = translated.match(/MYMEMORY WARNING.*?([A-Z].*)/s);
+                if (match && match[1]) {
+                    translated = match[1].trim();
+                }
+            }
+            
+            // If text was summarized, add note
+            if (text.length > 500 && translated) {
+                translated = translated.trim();
+                // Ensure it ends properly
+                if (!translated.endsWith('.') && !translated.endsWith('!') && !translated.endsWith('?')) {
+                    translated += '...';
+                }
+            }
+            
+            console.log('Translation successful:', translated.substring(0, 50) + '...');
+            return translated;
         } else {
-            throw new Error('Translation failed');
+            console.error('Translation API returned error:', data);
+            throw new Error(`Translation failed: ${data.responseStatus || 'Unknown error'}`);
         }
     } catch (error) {
         console.error('Translation error:', error);
+        // If translation fails and text was summarized, return summarized original
+        if (text.length > 500) {
+            return summarizeText(text, 500);
+        }
         // Return original text if translation fails
         return text;
     }
