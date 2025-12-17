@@ -792,6 +792,95 @@ body.light-mode .modal-body .form-control {
     border-color: #e0e0e0;
 }
 
+/* Share Icon Buttons Styles */
+.share-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    text-decoration: none;
+    color: white;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.share-icon-btn:hover {
+    transform: translateY(-3px) scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+.share-icon-btn:active {
+    transform: translateY(-1px) scale(1.05);
+}
+
+/* Facebook */
+.share-icon-btn:nth-child(1) {
+    background-color: #1877f2;
+}
+
+.share-icon-btn:nth-child(1):hover {
+    background-color: #166fe5;
+}
+
+/* Twitter */
+.share-icon-btn:nth-child(2) {
+    background-color: #1da1f2;
+}
+
+.share-icon-btn:nth-child(2):hover {
+    background-color: #1a91da;
+}
+
+/* WhatsApp */
+.share-icon-btn:nth-child(3) {
+    background-color: #25d366;
+}
+
+.share-icon-btn:nth-child(3):hover {
+    background-color: #20ba5a;
+}
+
+/* Telegram */
+.share-icon-btn:nth-child(4) {
+    background-color: #0088cc;
+}
+
+.share-icon-btn:nth-child(4):hover {
+    background-color: #0077b5;
+}
+
+/* Email */
+.share-icon-btn:nth-child(5) {
+    background-color: #6c757d;
+}
+
+.share-icon-btn:nth-child(5):hover {
+    background-color: #5a6268;
+}
+
+/* Copy Link */
+.share-icon-btn:nth-child(6) {
+    background-color: #495057;
+}
+
+.share-icon-btn:nth-child(6):hover {
+    background-color: #3d4146;
+}
+
+/* Light mode adjustments */
+body.light-mode .share-icon-btn {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+body.light-mode .share-icon-btn:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+}
+
 /* Smooth Transitions */
 * {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;

@@ -1374,23 +1374,124 @@ async function sortResults() {
 }
 
 // ========== SHARE SYSTEM ==========
+function toggleShareButtons() {
+    const shareButtons = document.getElementById('shareButtons');
+    if (shareButtons) {
+        shareButtons.classList.toggle('d-none');
+    }
+}
+
+function getShareUrl() {
+    return window.location.href;
+}
+
+function getShareText() {
+    if (!currentMovie) return 'FilmFinder - Pronađi Savršen Film';
+    return `Preporučujem film: ${currentMovie.Title} (${currentMovie.Year}) - ${currentMovie.Plot ? currentMovie.Plot.substring(0, 100) + '...' : 'Odličan film!'}`;
+}
+
+function shareToFacebook(event) {
+    event.preventDefault();
+    if (!currentMovie) return;
+    
+    const url = encodeURIComponent(getShareUrl());
+    const text = encodeURIComponent(getShareText());
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
+    window.open(shareUrl, '_blank', 'width=600,height=400');
+}
+
+function shareToTwitter(event) {
+    event.preventDefault();
+    if (!currentMovie) return;
+    
+    const url = encodeURIComponent(getShareUrl());
+    const text = encodeURIComponent(getShareText());
+    const shareUrl = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
+    window.open(shareUrl, '_blank', 'width=600,height=400');
+}
+
+function shareToWhatsApp(event) {
+    event.preventDefault();
+    if (!currentMovie) return;
+    
+    const url = encodeURIComponent(getShareUrl());
+    const text = encodeURIComponent(getShareText());
+    const shareUrl = `https://wa.me/?text=${text}%20${url}`;
+    window.open(shareUrl, '_blank');
+}
+
+function shareToTelegram(event) {
+    event.preventDefault();
+    if (!currentMovie) return;
+    
+    const url = encodeURIComponent(getShareUrl());
+    const text = encodeURIComponent(getShareText());
+    const shareUrl = `https://t.me/share/url?url=${url}&text=${text}`;
+    window.open(shareUrl, '_blank');
+}
+
+function shareToEmail(event) {
+    event.preventDefault();
+    if (!currentMovie) return;
+    
+    const subject = encodeURIComponent(`Preporuka filma: ${currentMovie.Title}`);
+    const body = encodeURIComponent(`${getShareText()}\n\n${getShareUrl()}`);
+    const mailtoLink = `mailto:?subject=${subject}&body=${body}`;
+    window.location.href = mailtoLink;
+}
+
+function copyLink(event) {
+    event.preventDefault();
+    const url = getShareUrl();
+    
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(url).then(() => {
+            alert('Link je kopiran u clipboard!');
+        }).catch(err => {
+            console.error('Error copying:', err);
+            fallbackCopyTextToClipboard(url);
+        });
+    } else {
+        fallbackCopyTextToClipboard(url);
+    }
+}
+
+function fallbackCopyTextToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    textArea.style.top = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        alert('Link je kopiran u clipboard!');
+    } catch (err) {
+        console.error('Fallback copy failed:', err);
+        alert('Neuspešno kopiranje. Link: ' + text);
+    }
+    
+    document.body.removeChild(textArea);
+}
+
+// Legacy function for backward compatibility
 function shareMovie() {
     if (!currentMovie) return;
     
     const shareData = {
         title: `${currentMovie.Title} (${currentMovie.Year})`,
-        text: `Preporučujem film: ${currentMovie.Title} - ${currentMovie.Plot || 'Odličan film!'}`,
-        url: window.location.href
+        text: getShareText(),
+        url: getShareUrl()
     };
     
     if (navigator.share) {
         navigator.share(shareData).catch(err => console.log('Error sharing:', err));
     } else {
-        // Fallback: copy to clipboard
-        const text = `${shareData.title}\n${shareData.text}\n${shareData.url}`;
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Link kopiran u clipboard!');
-        });
+        // Fallback: show share buttons
+        toggleShareButtons();
     }
 }
 

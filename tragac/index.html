@@ -218,9 +218,30 @@
                                     <button class="btn btn-outline-danger" id="trailerBtn">
                                         <i class="bi bi-youtube"></i> Trailer
                                     </button>
-                                    <button class="btn btn-outline-primary" id="shareBtn" onclick="shareMovie()">
-                                        <i class="bi bi-share"></i> Podeli
-                                    </button>
+                                    <!-- Share Buttons -->
+                                    <div class="mt-2">
+                                        <label class="small text-muted mb-2 d-block">Podeli:</label>
+                                        <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                            <a href="#" class="share-icon-btn" onclick="shareToFacebook(event)" title="Podeli na Facebook">
+                                                <i class="bi bi-facebook"></i>
+                                            </a>
+                                            <a href="#" class="share-icon-btn" onclick="shareToTwitter(event)" title="Podeli na Twitter">
+                                                <i class="bi bi-twitter"></i>
+                                            </a>
+                                            <a href="#" class="share-icon-btn" onclick="shareToWhatsApp(event)" title="Podeli na WhatsApp">
+                                                <i class="bi bi-whatsapp"></i>
+                                            </a>
+                                            <a href="#" class="share-icon-btn" onclick="shareToTelegram(event)" title="Podeli na Telegram">
+                                                <i class="bi bi-telegram"></i>
+                                            </a>
+                                            <a href="#" class="share-icon-btn" onclick="shareToEmail(event)" title="Podeli preko Email-a">
+                                                <i class="bi bi-envelope"></i>
+                                            </a>
+                                            <a href="#" class="share-icon-btn" onclick="copyLink(event)" title="Kopiraj Link">
+                                                <i class="bi bi-link-45deg"></i>
+                                            </a>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
