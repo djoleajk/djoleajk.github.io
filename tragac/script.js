@@ -973,7 +973,14 @@ function displayMovie(movie) {
     document.getElementById('movieYear').textContent = movie.Year;
     document.getElementById('movieGenre').textContent = movie.Genre !== 'N/A' ? movie.Genre : 'Nepoznat žanr';
     document.getElementById('movieRuntime').textContent = movie.Runtime !== 'N/A' ? movie.Runtime : 'Nepoznato trajanje';
-    document.getElementById('movieRating').textContent = movie.imdbRating !== 'N/A' ? `${movie.imdbRating}/10` : 'Nema ocene';
+    // Set IMDb rating with link to IMDb page
+    const ratingElement = document.getElementById('movieRating');
+    if (movie.imdbRating && movie.imdbRating !== 'N/A' && movie.imdbID) {
+        const imdbUrl = `https://www.imdb.com/title/${movie.imdbID}/`;
+        ratingElement.innerHTML = `<a href="${imdbUrl}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">${movie.imdbRating}/10 <i class="bi bi-box-arrow-up-right"></i></a>`;
+    } else {
+        ratingElement.textContent = 'Nema ocene';
+    }
     // Translate plot to Serbian if needed
     const plotElement = document.getElementById('moviePlot');
     if (movie.Plot && movie.Plot !== 'N/A') {
