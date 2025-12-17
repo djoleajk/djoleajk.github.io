@@ -13,6 +13,9 @@ let aiAnswers = {};
 let currentMovieResults = [];
 let currentMovieIndex = 0;
 
+// Global set to track all shown movies in current session (prevents duplicates)
+let shownMoviesSet = new Set();
+
 // Movie search queries database - used to search OMDb API directly
 // All movies are fetched from OMDb API in real-time, no local catalog
 const movieSearchQueries = {
@@ -268,9 +271,10 @@ function previousAIQuestion() {
 
 // Get movies from OMDb API directly based on AI answers
 // Uses intelligent search with fallback system to always find minimum 5 movies
+// Excludes movies that have already been shown in this session
 async function getMoviesByPreferences(answers, minimum = 5) {
     let allResults = [];
-    const seenIds = new Set();
+    const seenIds = new Set(shownMoviesSet); // Start with already shown movies
     
     // Get primary genre/type
     const primaryType = answers.type || 'action';
@@ -453,6 +457,8 @@ async function findMovie() {
                 }
                 if (bestMovie) {
                     currentMovieIndex = bestIndex;
+                    // Mark all candidates as shown (prevent duplicates in future searches)
+                    candidates.forEach(m => shownMoviesSet.add(m.imdbID));
                     displayMovie(bestMovie);
                     return;
                 }
@@ -461,6 +467,10 @@ async function findMovie() {
 
         // Fallback – uzmi prvi film iz kandidata
         firstMovieDetails = await getMovieDetails(candidates[0].imdbID);
+        
+        // Mark all candidates as shown (prevent duplicates in future searches)
+        candidates.forEach(m => shownMoviesSet.add(m.imdbID));
+        
         displayMovie(firstMovieDetails);
 
     } catch (error) {
@@ -473,17 +483,17 @@ async function findMovie() {
 
 // Get movies with same preferences using OMDb API directly
 async function getMoviesWithSamePreferences(answers, needed) {
-    // Use the same function as getMoviesByPreferences but with existing IDs filter
-    const seenIds = new Set();
-    if (currentMovieResults && currentMovieResults.length > 0) {
-        currentMovieResults.forEach(m => seenIds.add(m.imdbID));
-    }
-    
-    // Get movies using same logic
+    // Get movies using same logic (already excludes shownMoviesSet)
     const allResults = await getMoviesByPreferences(answers, needed * 2);
     
-    // Filter out already seen movies
-    const additionalResults = allResults.filter(m => !seenIds.has(m.imdbID));
+    // Filter out movies from current results
+    const currentIds = new Set();
+    if (currentMovieResults && currentMovieResults.length > 0) {
+        currentMovieResults.forEach(m => currentIds.add(m.imdbID));
+    }
+    
+    // Filter out already seen movies (both from current results and shownMoviesSet)
+    const additionalResults = allResults.filter(m => !currentIds.has(m.imdbID));
     
     return additionalResults.slice(0, needed);
 }
@@ -731,6 +741,11 @@ async function getMovieDetails(imdbID) {
 
 // Display movie information
 function displayMovie(movie) {
+    // Mark this movie as shown (prevent duplicates)
+    if (movie && movie.imdbID) {
+        shownMoviesSet.add(movie.imdbID);
+    }
+    
     // Hide loading and survey
     hideLoading();
     document.getElementById('surveySection').classList.add('d-none');
@@ -927,6 +942,9 @@ function resetApp() {
     // Reset movie results
     currentMovieResults = [];
     currentMovieIndex = 0;
+    
+    // Clear shown movies set (start fresh for new search)
+    shownMoviesSet.clear();
     
     // Hide all sections except survey
     document.getElementById('loadingSection').classList.add('d-none');

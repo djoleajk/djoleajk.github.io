@@ -35,10 +35,14 @@ body.light-mode {
     background-color: #0d1424 !important;
     border-bottom: 2px solid var(--border-color);
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    color: var(--text-color);
 }
 
 body.light-mode .navbar-dark {
-    background-color: #37474f !important;
+    background-color: #ffffff !important;
+    border-bottom: 2px solid #e0e0e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    color: #2c3e50;
 }
 
 .card {
@@ -316,6 +320,7 @@ body.light-mode #moviePoster:hover {
     font-weight: 700;
     letter-spacing: 1px;
     text-shadow: 0 0 10px var(--glow-color);
+    color: var(--text-color) !important;
 }
 
 .navbar-brand i {
@@ -325,10 +330,50 @@ body.light-mode #moviePoster:hover {
 
 body.light-mode .navbar-brand {
     text-shadow: none;
+    color: #2c3e50 !important;
 }
 
 body.light-mode .navbar-brand i {
     filter: none;
+    color: #5e72e4;
+}
+
+/* Navbar Buttons */
+.navbar .btn-outline-light {
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.navbar .btn-outline-light:hover {
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
+    color: var(--text-color);
+}
+
+body.light-mode .navbar .btn-outline-light {
+    color: #2c3e50;
+    border-color: #5e72e4;
+}
+
+body.light-mode .navbar .btn-outline-light:hover {
+    background-color: #5e72e4;
+    border-color: #5e72e4;
+    color: white;
+}
+
+/* Navbar Text Elements */
+.navbar,
+.navbar * {
+    color: var(--text-color);
+}
+
+body.light-mode .navbar,
+body.light-mode .navbar * {
+    color: #2c3e50;
+}
+
+body.light-mode .navbar .text-light {
+    color: #2c3e50 !important;
 }
 
 /* Hero Section */
@@ -616,6 +661,135 @@ body.light-mode #movieSection h6 {
 
 body.light-mode .text-warning {
     filter: none;
+}
+
+/* Modal Styles - Dark Mode */
+.modal-content {
+    background-color: var(--card-bg);
+    border: 2px solid var(--border-color);
+    color: var(--text-color);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+.modal-header {
+    background-color: var(--card-bg);
+    border-bottom: 2px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.modal-body {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.modal-footer {
+    background-color: var(--card-bg);
+    border-top: 2px solid var(--border-color);
+}
+
+.btn-close {
+    filter: invert(1);
+}
+
+body.light-mode .btn-close {
+    filter: invert(0);
+}
+
+/* Modal List Items */
+.modal-body .list-group-item {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.modal-body .list-group-item:hover {
+    background-color: var(--bg-color);
+}
+
+body.light-mode .modal-body .list-group-item {
+    background-color: #fafafa;
+    border-color: #e0e0e0;
+    color: #2c3e50;
+}
+
+body.light-mode .modal-body .list-group-item:hover {
+    background-color: #f0f0f0;
+}
+
+/* Modal Cards */
+.modal-body .card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-color);
+}
+
+.modal-body .card-body {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+}
+
+.modal-body .card-title {
+    color: var(--text-color);
+}
+
+.modal-body .card-text {
+    color: var(--text-color);
+}
+
+.modal-body .text-muted {
+    color: #c5c5c5 !important;
+}
+
+body.light-mode .modal-body .text-muted {
+    color: #6c757d !important;
+}
+
+/* Modal Buttons */
+.modal-body .btn {
+    border-color: var(--border-color);
+}
+
+/* Modal Text Elements */
+.modal-body h6,
+.modal-body h5,
+.modal-body h3,
+.modal-body h4,
+.modal-body p {
+    color: var(--text-color);
+}
+
+.modal-body .small {
+    color: #c5c5c5;
+}
+
+body.light-mode .modal-body .small {
+    color: #6c757d;
+}
+
+/* Modal Form Elements */
+.modal-body .form-label {
+    color: var(--text-color);
+}
+
+.modal-body .form-select,
+.modal-body .form-control {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+.modal-body .form-select:focus,
+.modal-body .form-control:focus {
+    background-color: var(--bg-color);
+    border-color: var(--accent-color);
+    color: var(--text-color);
+}
+
+body.light-mode .modal-body .form-select,
+body.light-mode .modal-body .form-control {
+    background-color: white;
+    color: #2c3e50;
+    border-color: #e0e0e0;
 }
 
 /* Smooth Transitions */
