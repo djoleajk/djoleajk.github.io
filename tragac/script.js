@@ -1386,8 +1386,10 @@ function getShareUrl() {
 }
 
 function getShareText() {
-    if (!currentMovie) return 'FilmFinder - Pronađi Savršen Film';
-    return `Preporučujem film: ${currentMovie.Title} (${currentMovie.Year}) - ${currentMovie.Plot ? currentMovie.Plot.substring(0, 100) + '...' : 'Odličan film!'}`;
+    if (!currentMovie) {
+        return '🎬 FilmFinder - Pronađi savršen film za sebe!\n\nOdgovori na nekoliko pitanja i dobij personalizovane preporuke filmova koje ćeš voleti.\n\nBesplatno, brzo i jednostavno!\n\n';
+    }
+    return `🎬 Preporučujem film: ${currentMovie.Title} (${currentMovie.Year})\n\n${currentMovie.Plot ? currentMovie.Plot.substring(0, 150) + '...' : 'Odličan film!'}\n\nPronađi i ti svoj savršen film na FilmFinder!\n\n`;
 }
 
 function shareToFacebook(event) {
