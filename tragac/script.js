@@ -974,7 +974,18 @@ function displayMovie(movie) {
     document.getElementById('movieGenre').textContent = movie.Genre !== 'N/A' ? movie.Genre : 'Nepoznat žanr';
     document.getElementById('movieRuntime').textContent = movie.Runtime !== 'N/A' ? movie.Runtime : 'Nepoznato trajanje';
     document.getElementById('movieRating').textContent = movie.imdbRating !== 'N/A' ? `${movie.imdbRating}/10` : 'Nema ocene';
-    document.getElementById('moviePlot').textContent = movie.Plot !== 'N/A' ? movie.Plot : 'Opis nije dostupan.';
+    // Translate plot to Serbian if needed
+    const plotElement = document.getElementById('moviePlot');
+    if (movie.Plot && movie.Plot !== 'N/A') {
+        translateToSerbian(movie.Plot).then(translatedPlot => {
+            plotElement.textContent = translatedPlot || movie.Plot;
+        }).catch(error => {
+            console.log('Translation error, using original:', error);
+            plotElement.textContent = movie.Plot;
+        });
+    } else {
+        plotElement.textContent = 'Opis nije dostupan.';
+    }
     document.getElementById('movieActors').textContent = movie.Actors !== 'N/A' ? movie.Actors : 'Nepoznati glumci';
     document.getElementById('movieDirector').textContent = movie.Director !== 'N/A' ? movie.Director : 'Nepoznat režiser';
     
@@ -1757,6 +1768,47 @@ function showStatistics() {
 }
 
 // Functions are already integrated into displayMovie above
+
+// Translate text to Serbian (Latin) using MyMemory Translation API
+async function translateToSerbian(text) {
+    if (!text || text === 'N/A') return text;
+    
+    // Check if text is already in Serbian (Cyrillic or Latin)
+    const cyrillicPattern = /[А-Яа-яЂђЉљЊњЋћЏџ]/;
+    const latinSerbianPattern = /[čćđšžČĆĐŠŽ]/;
+    if (cyrillicPattern.test(text) || latinSerbianPattern.test(text)) {
+        // Already in Serbian, return as is
+        return text;
+    }
+    
+    try {
+        // Use MyMemory Translation API (free, no API key required for basic use)
+        // Translate to Serbian Latin (sr-Latn)
+        const encodedText = encodeURIComponent(text);
+        const url = `https://api.mymemory.translated.net/get?q=${encodedText}&langpair=en|sr-Latn`;
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors'
+        });
+        
+        if (!response.ok) {
+            throw new Error('Translation API error');
+        }
+        
+        const data = await response.json();
+        
+        if (data.responseStatus === 200 && data.responseData && data.responseData.translatedText) {
+            return data.responseData.translatedText;
+        } else {
+            throw new Error('Translation failed');
+        }
+    } catch (error) {
+        console.error('Translation error:', error);
+        // Return original text if translation fails
+        return text;
+    }
+}
 
 // Console welcome message
 console.log('%cFilmFinder 🎬', 'color: #667eea; font-size: 24px; font-weight: bold;');
