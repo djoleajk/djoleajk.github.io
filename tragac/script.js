@@ -27,6 +27,61 @@ const movieSearchQueries = {
     'thriller': ['thriller', 'mystery', 'suspense', 'crime', 'psychological', 'neo-noir']
 };
 
+// Genre mapping for strict filtering
+const genreMapping = {
+    'action': ['Action', 'Adventure', 'War', 'Western'],
+    'comedy': ['Comedy', 'Romance'],
+    'drama': ['Drama', 'Biography', 'History', 'Sport', 'Musical'],
+    'horror': ['Horror', 'Thriller'],
+    'scifi': ['Sci-Fi', 'Science Fiction', 'Fantasy'],
+    'thriller': ['Thriller', 'Mystery', 'Crime']
+};
+
+// Helper function to check if movie matches genre
+function matchesGenre(movieDetails, targetGenre) {
+    if (!movieDetails || !movieDetails.Genre || movieDetails.Genre === 'N/A') {
+        return false;
+    }
+    
+    const movieGenres = movieDetails.Genre.split(',').map(g => g.trim());
+    const allowedGenres = genreMapping[targetGenre] || [];
+    
+    // Check if at least one genre matches
+    return movieGenres.some(mg => 
+        allowedGenres.some(ag => 
+            mg.toLowerCase().includes(ag.toLowerCase()) || 
+            ag.toLowerCase().includes(mg.toLowerCase())
+        )
+    );
+}
+
+// Extract keywords from plot for similarity comparison
+function extractKeywords(text) {
+    if (!text) return [];
+    
+    // Remove common words and extract meaningful keywords
+    const stopWords = ['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'can', 'this', 'that', 'these', 'those', 'i', 'you', 'he', 'she', 'it', 'we', 'they', 'his', 'her', 'its', 'our', 'their'];
+    
+    const words = text.toLowerCase()
+        .replace(/[^\w\s]/g, ' ')
+        .split(/\s+/)
+        .filter(word => word.length > 3 && !stopWords.includes(word));
+    
+    // Return unique keywords
+    return [...new Set(words)];
+}
+
+// Calculate similarity between two texts based on shared keywords
+function calculateSimilarity(keywords1, text2) {
+    if (!keywords1 || keywords1.length === 0 || !text2) return 0;
+    
+    const keywords2 = extractKeywords(text2);
+    const commonKeywords = keywords1.filter(kw => keywords2.includes(kw));
+    
+    // Return ratio of common keywords
+    return commonKeywords.length / Math.max(keywords1.length, keywords2.length);
+}
+
 
 // AI Questions Database
 const aiQuestions = [
@@ -367,18 +422,52 @@ async function getMoviesByPreferences(answers, minimum = 5) {
         }
     }
     
+    // Now filter by actual genre from OMDb details (strict genre matching)
+    // This ensures we only return movies that match the requested genre
+    const genreFilteredResults = [];
+    
+    console.log(`Filtering ${allResults.length} results by genre: ${primaryType}`);
+    
+    for (const movie of allResults) {
+        try {
+            // Get full movie details to check genre
+            const movieDetails = await getMovieDetails(movie.imdbID);
+            
+            // Check if movie matches the target genre
+            if (matchesGenre(movieDetails, primaryType)) {
+                genreFilteredResults.push(movie);
+            }
+            
+            // Small delay to avoid rate limiting
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // If we have enough, break early
+            if (genreFilteredResults.length >= minimum * 2) {
+                break;
+            }
+        } catch (error) {
+            console.log('Error checking genre for movie:', movie.imdbID, error);
+            // Skip this movie if we can't get details
+        }
+    }
+    
+    // If we don't have enough after genre filtering, use what we have
+    let finalResults = genreFilteredResults.length >= minimum ? genreFilteredResults : allResults;
+    
     // Shuffle for variety
-    allResults = allResults.sort(() => Math.random() - 0.5);
+    finalResults = finalResults.sort(() => Math.random() - 0.5);
     
     // Remove duplicates
     const uniqueResults = [];
     const seen = new Set();
-    for (const movie of allResults) {
+    for (const movie of finalResults) {
         if (!seen.has(movie.imdbID)) {
             seen.add(movie.imdbID);
             uniqueResults.push(movie);
         }
     }
+    
+    console.log(`Returning ${uniqueResults.length} unique results for genre: ${primaryType}`);
     
     // Return minimum required, but up to 20 for variety
     return uniqueResults.slice(0, Math.max(minimum, 20));
@@ -434,8 +523,17 @@ async function findMovie() {
         currentMovieResults = candidates;
         currentMovieIndex = 0;
 
-        // If user traži film sa višom ocenom – probaj da nađeš najbolji među kandidatima
+        // Get first movie details to use as reference for similarity
         let firstMovieDetails = null;
+        let referencePlot = null;
+        
+        // Get first movie
+        firstMovieDetails = await getMovieDetails(candidates[0].imdbID);
+        referencePlot = firstMovieDetails.Plot && firstMovieDetails.Plot !== 'N/A' 
+            ? firstMovieDetails.Plot.toLowerCase() 
+            : null;
+        
+        // If user traži film sa višom ocenom – probaj da nađeš najbolji među kandidatima
         if (aiAnswers.rating && aiAnswers.rating !== 'any') {
             const ratingQuestion = aiQuestions.find(q => q.id === 'rating');
             const ratingOption = ratingQuestion.options.find(opt => opt.value === aiAnswers.rating);
@@ -465,8 +563,37 @@ async function findMovie() {
             }
         }
 
-        // Fallback – uzmi prvi film iz kandidata
-        firstMovieDetails = await getMovieDetails(candidates[0].imdbID);
+        // Filter candidates by plot similarity if we have a reference plot
+        if (referencePlot && candidates.length > 1) {
+            const similarMovies = [];
+            const plotKeywords = extractKeywords(referencePlot);
+            
+            // Check similarity for other candidates
+            for (let i = 1; i < Math.min(candidates.length, 10); i++) {
+                try {
+                    const movieDetails = await getMovieDetails(candidates[i].imdbID);
+                    const moviePlot = movieDetails.Plot && movieDetails.Plot !== 'N/A' 
+                        ? movieDetails.Plot.toLowerCase() 
+                        : '';
+                    
+                    if (moviePlot && calculateSimilarity(plotKeywords, moviePlot) > 0.2) {
+                        similarMovies.push(candidates[i]);
+                    }
+                } catch (e) {
+                    console.log('Error checking similarity:', e);
+                }
+            }
+            
+            // If we found similar movies, prioritize them
+            if (similarMovies.length > 0) {
+                // Reorder: similar movies first, then others
+                const similarIds = new Set(similarMovies.map(m => m.imdbID));
+                currentMovieResults = [
+                    ...similarMovies,
+                    ...candidates.filter(m => !similarIds.has(m.imdbID))
+                ];
+            }
+        }
         
         // Mark all candidates as shown (prevent duplicates in future searches)
         candidates.forEach(m => shownMoviesSet.add(m.imdbID));
