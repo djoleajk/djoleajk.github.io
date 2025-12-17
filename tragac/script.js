@@ -173,7 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Initialize application
-function initializeApp() {
+async function initializeApp() {
     // Initialize theme
     loadTheme();
     
@@ -183,7 +183,50 @@ function initializeApp() {
     // Add event listeners
     document.getElementById('themeToggle').addEventListener('click', toggleTheme);
     
-    // Initialize AI Survey
+    // Check if URL contains movie parameter (shared link)
+    const urlParams = new URLSearchParams(window.location.search);
+    const movieId = urlParams.get('movie');
+    
+    if (movieId) {
+        // User came from a shared link - show the movie directly
+        console.log('Loading shared movie:', movieId);
+        showLoading();
+        
+        try {
+            const movieDetails = await getMovieDetails(movieId);
+            // Mark as shown to prevent duplicates
+            shownMoviesSet.add(movieId);
+            // Set current movie
+            currentMovie = movieDetails;
+            // Display the movie
+            displayMovie(movieDetails);
+            
+            // Add a button to start new search
+            setTimeout(() => {
+                const movieSection = document.getElementById('movieSection');
+                if (movieSection) {
+                    const actionButtons = movieSection.querySelector('.text-center');
+                    if (actionButtons) {
+                        const newSearchBtn = document.createElement('button');
+                        newSearchBtn.className = 'btn btn-primary btn-lg mt-3';
+                        newSearchBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Pronađi Svoj Film';
+                        newSearchBtn.onclick = () => {
+                            window.location.href = window.location.pathname; // Remove query params
+                        };
+                        actionButtons.appendChild(newSearchBtn);
+                    }
+                }
+            }, 500);
+            
+            return; // Don't initialize survey if showing shared movie
+        } catch (error) {
+            console.error('Error loading shared movie:', error);
+            showError('Film nije pronađen. Možda je link nevažeći.');
+            // Continue to normal initialization
+        }
+    }
+    
+    // Initialize AI Survey (normal flow)
     initializeAISurvey();
     
     console.log('FilmFinder AI aplikacija inicijalizovana!');
@@ -1382,6 +1425,11 @@ function toggleShareButtons() {
 }
 
 function getShareUrl() {
+    // If sharing a movie, include movie ID in URL
+    if (currentMovie && currentMovie.imdbID) {
+        const baseUrl = window.location.origin + window.location.pathname;
+        return `${baseUrl}?movie=${currentMovie.imdbID}`;
+    }
     return window.location.href;
 }
 
