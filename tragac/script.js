@@ -591,6 +591,13 @@ async function findMovie() {
         currentMovieResults = candidates;
         currentMovieIndex = 0;
 
+        // Save initial search to history (only once, before displaying first movie)
+        if (aiAnswers && currentMovieResults && currentMovieResults.length > 0) {
+            saveToHistory(aiAnswers, currentMovieResults).catch(error => {
+                console.error('Error saving to history:', error);
+            });
+        }
+
         // Get first movie details to use as reference for similarity
         let firstMovieDetails = null;
         let referencePlot = null;
@@ -1033,10 +1040,8 @@ function displayMovie(movie) {
         }
     }
     
-    // Save to history
-    if (currentMovieResults && currentMovieResults.length > 0) {
-        saveToHistory(aiAnswers, currentMovieResults);
-    }
+    // Add current movie to history (only if history entry exists)
+    addMovieToHistory(movie);
     
     // Scroll to movie section
     movieSection.scrollIntoView({ behavior: 'smooth' });
@@ -1143,6 +1148,9 @@ async function getNextRecommendation() {
     try {
         // Get next movie details
         const nextMovie = await getMovieDetails(currentMovieResults[currentMovieIndex].imdbID);
+        
+        // Add to history
+        addMovieToHistory(nextMovie);
         
         // Display movie
         displayMovie(nextMovie);
@@ -1345,21 +1353,64 @@ function getHistory() {
     return history ? JSON.parse(history) : [];
 }
 
-function saveToHistory(answers, results) {
+// Add a single movie to history with link (only once, no duplicates)
+function addMovieToHistory(movie) {
+    if (!movie || !movie.imdbID || !movie.Title) return;
+    
     const history = getHistory();
-    history.unshift({
-        timestamp: new Date().toISOString(),
-        answers: { ...answers },
-        resultsCount: results.length,
-        firstMovie: results[0] ? results[0].Title : null
-    });
     
-    // Keep only last 20 entries
-    if (history.length > 20) {
-        history.pop();
+    // Find the most recent history entry (last search)
+    if (history.length > 0) {
+        const lastEntry = history[0];
+        
+        // Initialize movies array if it doesn't exist
+        if (!lastEntry.movies) {
+            lastEntry.movies = [];
+        }
+        
+        // Check if this movie is already in the list (by imdbID)
+        const exists = lastEntry.movies.some(m => m.imdbID === movie.imdbID);
+        
+        if (!exists) {
+            // Add movie with link (only if it doesn't exist)
+            lastEntry.movies.push({
+                imdbID: movie.imdbID,
+                Title: movie.Title,
+                link: `${window.location.origin}${window.location.pathname}?movie=${movie.imdbID}`
+            });
+            
+            // Update localStorage
+            localStorage.setItem('movieHistory', JSON.stringify(history));
+        }
     }
+}
+
+// Save initial search to history (only once per search)
+async function saveToHistory(answers, results) {
+    const history = getHistory();
     
-    localStorage.setItem('movieHistory', JSON.stringify(history));
+    // Check if we already have an entry for this exact search (by timestamp and answers)
+    // This prevents creating duplicate entries if saveToHistory is called multiple times
+    const recentEntry = history[0];
+    const now = new Date().toISOString();
+    const timeDiff = recentEntry ? new Date(now) - new Date(recentEntry.timestamp) : Infinity;
+    
+    // Only create new entry if last entry is older than 2 seconds (new search)
+    if (!recentEntry || timeDiff > 2000) {
+        history.unshift({
+            timestamp: now,
+            answers: { ...answers },
+            resultsCount: results.length,
+            movies: [] // Will be populated as movies are displayed
+        });
+        
+        // Keep only last 20 entries
+        if (history.length > 20) {
+            history.pop();
+        }
+        
+        localStorage.setItem('movieHistory', JSON.stringify(history));
+    }
 }
 
 function showHistory() {
@@ -1368,12 +1419,12 @@ function showHistory() {
     const listEl = document.getElementById('historyList');
     
     if (history.length === 0) {
-        listEl.innerHTML = '<p class="text-center text-muted">Nemate istorije preporuka.</p>';
+        listEl.innerHTML = '<p class="text-center text-muted py-4">Nemate istorije preporuka.</p>';
         modal.show();
         return;
     }
     
-    listEl.innerHTML = '<div class="list-group">';
+    listEl.innerHTML = '';
     
     history.forEach((entry, index) => {
         const date = new Date(entry.timestamp);
@@ -1386,19 +1437,67 @@ function showHistory() {
             'thriller': 'Triler'
         };
         
-        listEl.innerHTML += `
-            <div class="list-group-item">
-                <div class="d-flex w-100 justify-content-between">
-                    <h6 class="mb-1">${typeLabels[entry.answers.type] || 'Film'} - ${entry.resultsCount} preporuka</h6>
-                    <small>${date.toLocaleDateString('sr-RS')} ${date.toLocaleTimeString('sr-RS', { hour: '2-digit', minute: '2-digit' })}</small>
+        const genre = typeLabels[entry.answers.type] || 'Film';
+        const formattedDate = date.toLocaleDateString('sr-RS', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        // Get movies from history entry (new format with links)
+        const movies = entry.movies || [];
+        // Fallback to old format if needed
+        const movieTitles = entry.movieTitles || (entry.firstMovie ? [entry.firstMovie] : []);
+        
+        // Remove duplicates by imdbID (for movies) or by title (for old format)
+        let uniqueMovies = [];
+        if (movies.length > 0) {
+            const seenIds = new Set();
+            for (const movie of movies) {
+                if (movie.imdbID && !seenIds.has(movie.imdbID)) {
+                    seenIds.add(movie.imdbID);
+                    uniqueMovies.push(movie);
+                }
+            }
+        }
+        
+        let uniqueTitles = [];
+        if (movieTitles.length > 0) {
+            uniqueTitles = [...new Set(movieTitles)];
+        }
+        
+        const item = document.createElement('div');
+        item.className = 'list-group-item list-group-item-action';
+        item.innerHTML = `
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <div class="flex-grow-1">
+                    <h6 class="mb-1">${genre}</h6>
+                    ${uniqueMovies.length > 0 ? `
+                        <div class="mb-1">
+                            ${uniqueMovies.map(movie => `
+                                <p class="mb-0 small">
+                                    <a href="${movie.link}" class="text-decoration-none">${movie.Title}</a>
+                                </p>
+                            `).join('')}
+                        </div>
+                    ` : uniqueTitles.length > 0 ? `
+                        <div class="mb-1">
+                            ${uniqueTitles.map(title => `<p class="mb-0 small">${title}</p>`).join('')}
+                        </div>
+                    ` : ''}
+                    <small class="text-muted">${formattedDate}</small>
                 </div>
-                <p class="mb-1 small text-muted">${entry.firstMovie || 'N/A'}</p>
-                <button class="btn btn-sm btn-primary" onclick="restoreFromHistory(${index})">Ponovi Pretragu</button>
+                <button class="btn btn-sm btn-outline-primary ms-3" onclick="restoreFromHistory(${index})">
+                    <i class="bi bi-arrow-repeat"></i> Ponovi
+                </button>
             </div>
         `;
+        
+        listEl.appendChild(item);
     });
     
-    listEl.innerHTML += '</div>';
     modal.show();
 }
 
