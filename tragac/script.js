@@ -1,5 +1,5 @@
 // OMDb API Configuration
-const OMDB_API_KEY = '3e097319';
+const OMDB_API_KEY = 'f8b1874a';
 const OMDB_BASE_URL = 'https://www.omdbapi.com/';
 
 // Cache object to store movie data
