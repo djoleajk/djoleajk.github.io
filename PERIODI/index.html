@@ -1,1 +1,366 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Periodi - Praćenje Menstrualnog Ciklusa</title>
+    <meta name="description" content="Jednostavna aplikacija za praćenje menstrualnog ciklusa sa svim potrebnim funkcijama">
+    <meta name="keywords" content="menstrualni ciklus, praćenje, kalendar, simptomi, period">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🩸%3C/text%3E%3C/svg%3E">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo-gradient">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h1>Periodi</h1>
+                </div>
+                <div class="header-actions">
+                    <button id="theme-toggle" class="theme-toggle" title="Promeni temu">
+                        <i class="fas fa-sun"></i>
+                        <i class="fas fa-moon"></i>
+                    </button>
+                </div>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                    <div class="nav-indicator"></div>
+                </button>
+                <button class="nav-tab" data-tab="calendar">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Kalendar</span>
+                    <div class="nav-indicator"></div>
+                </button>
+                <button class="nav-tab" data-tab="symptoms">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Simptomi</span>
+                    <div class="nav-indicator"></div>
+                </button>
+                <button class="nav-tab" data-tab="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Podešavanja</span>
+                    <div class="nav-indicator"></div>
+                </button>
+            </nav>
+        </header>
 
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Tab -->
+            <div id="dashboard-tab" class="tab-content active">
+                <div class="dashboard-grid">
+                    <!-- Current Cycle Status -->
+                    <div class="dashboard-card cycle-status">
+                        <h3><i class="fas fa-clock"></i> Trenutni Ciklus</h3>
+                        <div id="cycle-status" class="cycle-info">
+                            <div class="cycle-phase">Nema aktivnog ciklusa</div>
+                            <div class="cycle-days">Dan 0</div>
+                        </div>
+                        <div id="cycle-progress" class="cycle-progress" style="display: none;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progress-fill"></div>
+                            </div>
+                            <div class="progress-labels">
+                                <span>Menstruacija</span>
+                                <span>Ovulacija</span>
+                                <span>Kraj ciklusa</span>
+                            </div>
+                        </div>
+                        <button id="start-cycle-btn" class="btn btn-primary">
+                            <i class="fas fa-play"></i> Počni Ciklus
+                        </button>
+                    </div>
+
+                    <!-- Next Period Prediction -->
+                    <div class="dashboard-card prediction">
+                        <h3><i class="fas fa-calendar-check"></i> Sledeća Menstruacija</h3>
+                        <div id="next-period" class="prediction-date">
+                            Nije izračunato
+                        </div>
+                        <div id="days-until" class="days-count">-</div>
+                    </div>
+
+                    <!-- Cycle Statistics -->
+                    <div class="dashboard-card stats">
+                        <h3><i class="fas fa-chart-bar"></i> Statistika</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-label">Prosečna dužina ciklusa</span>
+                                <span id="avg-cycle-length" class="stat-value">28 dana</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Prosečna dužina menstruacije</span>
+                                <span id="avg-period-length" class="stat-value">5 dana</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Ukupno ciklusa</span>
+                                <span id="total-cycles" class="stat-value">0</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="dashboard-card actions">
+                        <h3><i class="fas fa-bolt"></i> Brze Akcije</h3>
+                        <div class="action-buttons">
+                            <button id="log-period-btn" class="btn btn-secondary">
+                                <i class="fas fa-tint"></i> Zabeleži Menstruaciju
+                            </button>
+                            <button id="log-symptoms-btn" class="btn btn-secondary">
+                                <i class="fas fa-notes-medical"></i> Zabeleži Simptome
+                            </button>
+                            <button id="add-reminder-btn" class="btn btn-secondary">
+                                <i class="fas fa-bell"></i> Dodaj Podsetnik
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calendar Tab -->
+            <div id="calendar-tab" class="tab-content">
+                <div class="calendar-container">
+                    <div class="calendar-header">
+                        <button id="prev-month" class="btn btn-outline"><i class="fas fa-chevron-left"></i></button>
+                        <h2 id="current-month-year">Decembar 2024</h2>
+                        <button id="next-month" class="btn btn-outline"><i class="fas fa-chevron-right"></i></button>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="weekdays">
+                            <div>Pon</div>
+                            <div>Uto</div>
+                            <div>Sre</div>
+                            <div>Čet</div>
+                            <div>Pet</div>
+                            <div>Sub</div>
+                            <div>Ned</div>
+                        </div>
+                        <div id="calendar-days" class="days-grid">
+                            <!-- Calendar days will be generated by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="calendar-legend">
+                        <div class="legend-item">
+                            <div class="legend-color period"></div>
+                            <span>Menstruacija</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color ovulation"></div>
+                            <span>Ovulacija</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color fertile"></div>
+                            <span>Płodni dani</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Symptoms Tab -->
+            <div id="symptoms-tab" class="tab-content">
+                <div class="symptoms-container">
+                    <h2><i class="fas fa-chart-line"></i> Praćenje Simptoma</h2>
+
+                    <!-- Symptoms Form -->
+                    <div class="symptoms-form">
+                        <h3>Zabeleži današnje simptome</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Datum:</label>
+                                <input type="date" id="symptom-date" class="form-input">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Energija (1-10):</label>
+                                <input type="range" id="energy-level" min="1" max="10" value="5" class="form-range">
+                                <span id="energy-value">5</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Raspoloženje (1-10):</label>
+                                <input type="range" id="mood-level" min="1" max="10" value="5" class="form-range">
+                                <span id="mood-value">5</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Bol (1-10):</label>
+                                <input type="range" id="pain-level" min="1" max="10" value="1" class="form-range">
+                                <span id="pain-value">1</span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Libido (1-10):</label>
+                                <input type="range" id="libido-level" min="1" max="10" value="5" class="form-range">
+                                <span id="libido-value">5</span>
+                            </div>
+                        </div>
+
+                        <div class="symptoms-checklist">
+                            <h4>Dodatni simptomi:</h4>
+                            <div class="checkbox-grid">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="symptom-cramps"> Grčevi
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="symptom-headache"> Glavobolja
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="symptom-nausea"> Mučnina
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="symptom-bloating"> Nadutost
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="symptom-breast-tenderness"> Osetljivost grudi
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="symptom-acne"> Akne
+                                </label>
+                            </div>
+                        </div>
+
+                        <button id="save-symptoms-btn" class="btn btn-primary">
+                            <i class="fas fa-save"></i> Sačuvaj Simptome
+                        </button>
+                    </div>
+
+                    <!-- Symptoms History -->
+                    <div class="symptoms-history">
+                        <h3>Istorija Simptoma</h3>
+                        <div id="symptoms-list" class="symptoms-list">
+                            <!-- Symptoms will be displayed here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="tab-content">
+                <div class="settings-container">
+                    <h2><i class="fas fa-cog"></i> Podešavanja</h2>
+
+                    <div class="settings-section">
+                        <h3>Ciklus Podešavanja</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Prosečna dužina ciklusa (dana):</label>
+                                <input type="number" id="cycle-length" min="21" max="35" value="28" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label>Prosečna dužina menstruacije (dana):</label>
+                                <input type="number" id="period-length" min="3" max="7" value="5" class="form-input">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Notifikacije</h3>
+                        <div class="checkbox-settings">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="notify-period-start" checked>
+                                Podseti me za početak menstruacije
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="notify-ovulation" checked>
+                                Podseti me za ovulaciju
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="notify-fertile-window">
+                                Podseti me za plodne dane
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-section">
+                        <h3>Podaci</h3>
+                        <div class="data-actions">
+                            <button id="export-data-btn" class="btn btn-secondary">
+                                <i class="fas fa-download"></i> Izvezi Podatke
+                            </button>
+                            <button id="clear-data-btn" class="btn btn-danger">
+                                <i class="fas fa-trash"></i> Obriši Sve Podatke
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="save-settings-btn" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Sačuvaj Podešavanja
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Floating Action Button -->
+        <button id="fab" class="fab">
+            <i class="fas fa-plus"></i>
+        </button>
+
+        <!-- Modals -->
+        <div id="cycle-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Počni Novi Ciklus</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Datum početka menstruacije:</label>
+                        <input type="date" id="cycle-start-date" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Procenjena dužina ciklusa (dana):</label>
+                        <input type="number" id="cycle-duration" min="21" max="35" value="28" class="form-input">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="save-cycle-btn" class="btn btn-primary">Sačuvaj</button>
+                    <button class="btn btn-secondary close-modal">Otkaži</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="reminder-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Dodaj Podsetnik</h3>
+                    <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Naslov podsetnika:</label>
+                        <input type="text" id="reminder-title" placeholder="npr. Uzmi lekove" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Vreme:</label>
+                        <input type="datetime-local" id="reminder-time" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Ponavljaj:</label>
+                        <select id="reminder-repeat" class="form-input">
+                            <option value="once">Jednom</option>
+                            <option value="daily">Svakodnevno</option>
+                            <option value="weekly">Nedeljno</option>
+                            <option value="monthly">Mesečno</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="save-reminder-btn" class="btn btn-primary">Sačuvaj</button>
+                    <button class="btn btn-secondary close-modal">Otkaži</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
