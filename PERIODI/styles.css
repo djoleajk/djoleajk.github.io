@@ -25,21 +25,28 @@
 }
 
 [data-theme="dark"] {
-    /* Dark Theme */
-    --bg-primary: #1a1a1a;
-    --bg-secondary: #242424;
-    --bg-tertiary: #2d2d2d;
+    /* Dark Theme - Maksimalni kontrasti */
+    --bg-primary: #000000;
+    --bg-secondary: #0f0f0f;
+    --bg-tertiary: #1a1a1a;
     --text-primary: #ffffff;
-    --text-secondary: #b0b0b0;
-    --text-tertiary: #808080;
-    --accent-primary: #f06292;
-    --accent-secondary: #ff94c2;
-    --accent-gradient: linear-gradient(135deg, #f06292 0%, #ff94c2 100%);
-    --border-color: #404040;
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.5);
-    --shadow-glow: 0 0 20px rgba(240, 98, 146, 0.4);
+    --text-secondary: #f5f5f5;
+    --text-tertiary: #d0d0d0;
+    --accent-primary: #ff6b9d;
+    --accent-secondary: #ffa5c7;
+    --accent-gradient: linear-gradient(135deg, #ff6b9d 0%, #ffa5c7 100%);
+    --border-color: #606060;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.8);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.9);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 1);
+    --shadow-glow: 0 0 20px rgba(255, 107, 157, 0.6);
+    
+    /* Cycle Colors - Maksimalni kontrasti */
+    --color-menstruation: #ff1744;
+    --color-ovulation: #66bb6a;
+    --color-fertile: #ffa726;
+    --color-follicular: #42a5f5;
+    --color-luteal: #ab47bc;
 }
 
 /* Reset & Base Styles */
@@ -576,6 +583,14 @@ body {
     font-size: 0.95rem;
 }
 
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
 .form-group input[type="date"],
 .form-group input[type="time"],
 .form-group input[type="number"],
@@ -625,6 +640,7 @@ input[type="time"] {
     background: var(--bg-tertiary);
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
 }
 
 .range-input::-webkit-slider-thumb {
@@ -2643,6 +2659,476 @@ textarea:focus {
     cursor: pointer;
 }
 
+
+/* Dark Mode - Poboljšani kontrasti za sve elemente */
+[data-theme="dark"] .card {
+    border: 1px solid #505050;
+    box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .card-title {
+    color: #ffffff;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .form-group label,
+[data-theme="dark"] .form-label {
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .form-check-label {
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+[data-theme="dark"] #settings .form-check-label,
+[data-theme="dark"] .settings-container .form-check-label,
+[data-theme="dark"] .notifications-card .form-check-label {
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+[data-theme="dark"] #symptoms label,
+[data-theme="dark"] .symptoms-container label,
+[data-theme="dark"] .symptom-form-card label {
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+[data-theme="dark"] #symptoms .form-label,
+[data-theme="dark"] .symptoms-container .form-label,
+[data-theme="dark"] .symptom-form-card .form-label {
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] input[type="date"],
+[data-theme="dark"] input[type="time"],
+[data-theme="dark"] input[type="number"],
+[data-theme="dark"] input[type="text"],
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+    background: #1a1a1a;
+    border: 2px solid #707070;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .form-control:focus,
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] select:focus {
+    border-color: var(--accent-primary);
+    background: #1a1a1a;
+    box-shadow: 0 0 0 3px rgba(255, 107, 157, 0.3);
+    color: #ffffff;
+    outline: none;
+}
+
+[data-theme="dark"] .modal-content {
+    background: #0f0f0f;
+    border: 2px solid #707070;
+    box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .modal-header {
+    border-bottom: 2px solid #707070;
+    background: #0f0f0f;
+}
+
+[data-theme="dark"] .modal-header .modal-title {
+    color: #ffffff;
+    font-weight: 800;
+}
+
+[data-theme="dark"] .modal-body {
+    background: #0f0f0f;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .prediction-label {
+    color: #f5f5f5;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .prediction-value {
+    color: #ff6b9d;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .stat-item {
+    background: #1a1a1a;
+    border: 2px solid #707070;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .stat-label {
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .stat-value {
+    color: #ffffff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .symptom-stat-label {
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .symptom-stat-value {
+    color: #ff6b9d;
+    font-weight: 800;
+}
+
+[data-theme="dark"] .symptom-stat-bar {
+    background: #1a1a1a;
+    border: 1px solid #606060;
+}
+
+[data-theme="dark"] .symptom-entry {
+    background: #1a1a1a;
+    border-left: 4px solid #ff6b9d;
+    border: 2px solid #606060;
+    border-left: 4px solid #ff6b9d;
+}
+
+[data-theme="dark"] .symptom-entry-date {
+    color: #ff6b9d;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .symptom-entry-value {
+    color: #f5f5f5;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .symptom-entry-summary {
+    color: #d0d0d0;
+}
+
+[data-theme="dark"] .btn-secondary {
+    background: #1a1a1a;
+    color: #ffffff;
+    border: 2px solid #707070;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .btn-secondary:active {
+    background: #2a2a2a;
+    border-color: #808080;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .action-btn {
+    box-shadow: var(--shadow-lg);
+    border: 2px solid rgba(255, 107, 157, 0.5);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .survey-answer-item {
+    background: #1a1a1a;
+    border: 2px solid #606060;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .survey-answer-item.selected {
+    background: rgba(255, 107, 157, 0.3);
+    border: 2px solid #ff6b9d;
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 0 10px rgba(255, 107, 157, 0.4);
+}
+
+[data-theme="dark"] .toast {
+    background: #0f0f0f;
+    border: 2px solid #707070;
+    box-shadow: var(--shadow-lg);
+}
+
+[data-theme="dark"] .toast-message {
+    color: #ffffff;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .legend-label {
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .calendar-legend {
+    background: #0f0f0f;
+    border: 2px solid #707070;
+    box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .calendar-header {
+    background: #0f0f0f;
+    border: 2px solid #707070;
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .calendar-month-year {
+    color: #ffffff;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .calendar-day-header {
+    color: #f5f5f5;
+    font-weight: 700;
+}
+
+[data-theme="dark"] .calendar-day {
+    background: #1a1a1a;
+    border: 2px solid #606060;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .calendar-day.other-month {
+    opacity: 0.5;
+    background: #000000;
+    border-color: #404040;
+}
+
+[data-theme="dark"] .calendar-day.today {
+    border: 3px solid #ff6b9d;
+    box-shadow: 0 0 0 2px #ff6b9d, 0 0 15px rgba(255, 107, 157, 0.5);
+    background: #1a1a1a;
+    color: #ffffff;
+    font-weight: 800;
+}
+
+[data-theme="dark"] .day-option-btn {
+    background: #1a1a1a;
+    border: 2px solid #707070;
+    color: #ffffff;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .day-option-btn span {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .day-option-btn i {
+    color: var(--accent-primary);
+}
+
+[data-theme="dark"] .cycle-day-number {
+    color: #ffffff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .cycle-day-label {
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .cycle-phase {
+    background: #1a1a1a;
+    border: 2px solid #707070;
+    color: #ff6b9d;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .progress-bar {
+    background: #1a1a1a;
+    border: 2px solid #606060;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .progress-label {
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .checkbox-label {
+    background: #1a1a1a;
+    border: 2px solid #606060;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .checkbox-label span {
+    color: #f5f5f5;
+}
+
+[data-theme="dark"] .checkbox-label input:checked + span {
+    color: #ffffff;
+    font-weight: 700;
+}
+
+[data-theme="dark"] .checkbox-label:hover {
+    background: #2a2a2a;
+    border-color: #707070;
+}
+
+[data-theme="dark"] .alert {
+    background: #1a1a1a;
+    border: 2px solid #707070;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .alert-info {
+    background: rgba(33, 150, 243, 0.25);
+    border: 2px solid #42a5f5;
+    color: #90caf9;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .alert-success {
+    background: rgba(76, 175, 80, 0.25);
+    border: 2px solid #66bb6a;
+    color: #81c784;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .alert-warning {
+    background: rgba(255, 152, 0, 0.25);
+    border: 2px solid #ffa726;
+    color: #ffb74d;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .alert-danger {
+    background: rgba(244, 67, 54, 0.25);
+    border: 2px solid #ef5350;
+    color: #e57373;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .text-muted {
+    color: #d0d0d0 !important;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .phase-item {
+    background: #1a1a1a;
+    border: 2px solid #606060;
+    border-left: 4px solid transparent;
+}
+
+[data-theme="dark"] .phase-item strong {
+    color: #ffffff;
+    font-weight: 800;
+}
+
+[data-theme="dark"] .phase-item p {
+    color: #f5f5f5;
+}
+
+[data-theme="dark"] .tab-btn {
+    color: #f5f5f5;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .tab-btn.active {
+    color: #ff6b9d;
+    background: #1a1a1a;
+    font-weight: 700;
+    border-bottom: 3px solid #ff6b9d;
+}
+
+[data-theme="dark"] .range-input {
+    background: #1a1a1a;
+    border: 1px solid #606060;
+}
+
+[data-theme="dark"] .range-input::-webkit-slider-thumb {
+    background: var(--accent-gradient);
+    box-shadow: 0 0 10px rgba(255, 107, 157, 0.6);
+    border: 2px solid #ffffff;
+}
+
+[data-theme="dark"] .symptom-stat-bar {
+    background: #1a1a1a;
+    border: 2px solid #606060;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .chart-container {
+    background: #1a1a1a;
+    border: 2px solid #606060;
+    box-shadow: var(--shadow-sm);
+}
+
+[data-theme="dark"] .chart-tab {
+    background: #1a1a1a;
+    border: 2px solid #707070;
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .chart-tab.active {
+    background: var(--accent-gradient);
+    color: #ffffff;
+    border: 2px solid #ff6b9d;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px rgba(255, 107, 157, 0.4);
+}
+
+[data-theme="dark"] .empty-state {
+    color: #f5f5f5;
+}
+
+[data-theme="dark"] .empty-message {
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .empty-icon {
+    opacity: 0.8;
+}
+
+[data-theme="dark"] .cycle-phases-card {
+    background: #0f0f0f;
+    border: 2px solid #707070;
+    box-shadow: var(--shadow-md);
+}
+
+[data-theme="dark"] .cycle-phases-card .card-title {
+    color: #ffffff;
+    font-weight: 800;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .cycle-day-label {
+    color: #f5f5f5;
+    font-weight: 600;
+}
+
+[data-theme="dark"] .calendar-day-header {
+    color: #f5f5f5;
+    font-weight: 700;
+}
+
+[data-theme="dark"] .cycle-info-content {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .cycle-info-content h5 {
+    color: #ffffff;
+    font-weight: 800;
+}
+
+[data-theme="dark"] .cycle-info-content li {
+    color: #f5f5f5;
+}
+
+[data-theme="dark"] .cycle-info-content strong {
+    color: #ffffff;
+    font-weight: 800;
+}
 
 /* Reduce motion for accessibility */
 @media (prefers-reduced-motion: reduce) {
