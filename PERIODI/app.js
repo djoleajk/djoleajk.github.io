@@ -58,6 +58,30 @@ class PeriodTracker {
     // Metode će biti dodate preko prototype-a u modulima
 }
 
+// Registruj Service Worker za PWA
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+            .then((registration) => {
+                console.log('Service Worker registered successfully:', registration.scope);
+                
+                // Proveri za update
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // Novi service worker je spreman
+                            console.log('New service worker available');
+                        }
+                    });
+                });
+            })
+            .catch((error) => {
+                console.error('Service Worker registration failed:', error);
+            });
+    });
+}
+
 // Pokreni aplikaciju kada se DOM učita
 document.addEventListener('DOMContentLoaded', () => {
     window.tracker = new PeriodTracker();
