@@ -47,6 +47,11 @@ class PeriodTracker {
             this.updateNotificationStatus();
         }
         
+        // Mobile optimizacije
+        if (this.initMobileOptimizations) {
+            this.initMobileOptimizations();
+        }
+        
         // Anketa se ne pokreće automatski - korisnik može da je pokrene klikom na dugme
     }
     

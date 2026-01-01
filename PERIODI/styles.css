@@ -1654,9 +1654,22 @@ input[type="time"] {
     height: 300px;
 }
 
-/* Smooth Transitions */
+/* Smooth Transitions - Optimized for mobile */
 * {
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Disable transitions on mobile for better performance */
+@media (hover: none) and (pointer: coarse) {
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    .card,
+    .symptom-entry {
+        animation: fadeIn 0.2s ease !important;
+    }
 }
 
 /* Enhanced Colors and Contrast */
