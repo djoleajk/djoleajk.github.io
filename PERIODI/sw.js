@@ -90,3 +90,43 @@ self.addEventListener('fetch', (event) => {
       })
   );
 });
+
+// Push Notification Event Handler
+self.addEventListener('push', (event) => {
+  const data = event.data ? event.data.json() : {};
+  const title = data.title || 'Periodi';
+  const options = {
+    body: data.body || 'Nova notifikacija',
+    icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" rx="20" fill="%23e91e63"/%3E%3Ctext x="50" y="70" font-size="60" text-anchor="middle" fill="white"%3E%F0%9F%A9%B8%3C/text%3E%3C/svg%3E',
+    badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" rx="20" fill="%23e91e63"/%3E%3Ctext x="50" y="70" font-size="60" text-anchor="middle" fill="white"%3E%F0%9F%A9%B8%3C/text%3E%3C/svg%3E',
+    tag: data.tag || 'periodi-notification',
+    requireInteraction: false,
+    silent: false,
+    vibrate: [200, 100, 200]
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+// Notification Click Event Handler
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      // Ako postoji otvoren prozor, fokusiraj ga
+      for (let i = 0; i < clientList.length; i++) {
+        const client = clientList[i];
+        if (client.url === '/' && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // Ako nema otvorenog prozora, otvori novi
+      if (clients.openWindow) {
+        return clients.openWindow('/');
+      }
+    })
+  );
+});

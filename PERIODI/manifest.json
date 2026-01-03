@@ -51,6 +51,10 @@
   "lang": "sr",
   "dir": "ltr",
   "screenshots": [],
+  "permissions": [
+    "notifications"
+  ],
+  "gcm_sender_id": "103953800507",
   "shortcuts": [
     {
       "name": "Dodaj Simptome",

@@ -75,11 +75,23 @@ if ('serviceWorker' in navigator) {
                         }
                     });
                 });
+                
+                // Za Android, proveri dozvolu za notifikacije nakon registracije
+                if ('Notification' in window && Notification.permission === 'default') {
+                    // Ne traži automatski, već čekaj da korisnik klikne na dugme
+                    console.log('Notification permission is default, waiting for user action');
+                }
             })
             .catch((error) => {
                 console.error('Service Worker registration failed:', error);
             });
     });
+}
+
+// Zatraži dozvolu za notifikacije pri učitavanju (samo ako je default)
+if ('Notification' in window && Notification.permission === 'default') {
+    // Ne traži automatski - korisnik mora eksplicitno da klikne na dugme
+    // Ovo je bolje za Android jer ne blokira notifikacije
 }
 
 // Pokreni aplikaciju kada se DOM učita

@@ -206,6 +206,8 @@ body {
     box-shadow: var(--shadow-sm);
     border: 1px solid var(--border-color);
     transition: all 0.3s ease;
+    height: auto;
+    align-self: start;
 }
 
 
@@ -221,6 +223,7 @@ body {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 1.5rem;
+    align-items: start;
 }
 
 .cycle-status-card {
@@ -2903,6 +2906,58 @@ textarea:focus {
     box-shadow: 0 0 0 2px #ff6b9d, 0 0 15px rgba(255, 107, 157, 0.5);
     background: #1a1a1a;
     color: #ffffff;
+    font-weight: 800;
+}
+
+/* Dark mode - Faze ciklusa moraju biti vidljive */
+[data-theme="dark"] .calendar-day.menstruation {
+    background: var(--color-menstruation) !important;
+    color: white !important;
+    border-color: var(--color-menstruation) !important;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(255, 23, 68, 0.4);
+}
+
+[data-theme="dark"] .calendar-day.follicular {
+    background: var(--color-follicular) !important;
+    color: white !important;
+    border-color: var(--color-follicular) !important;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(66, 165, 245, 0.4);
+}
+
+[data-theme="dark"] .calendar-day.ovulation {
+    background: var(--color-ovulation) !important;
+    color: white !important;
+    border-color: var(--color-ovulation) !important;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(102, 187, 106, 0.4);
+}
+
+[data-theme="dark"] .calendar-day.fertile {
+    background: var(--color-fertile) !important;
+    color: white !important;
+    border-color: var(--color-fertile) !important;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(255, 167, 38, 0.4);
+}
+
+[data-theme="dark"] .calendar-day.luteal {
+    background: var(--color-luteal) !important;
+    color: white !important;
+    border-color: var(--color-luteal) !important;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(171, 71, 188, 0.4);
+}
+
+/* Dark mode - Danas sa fazom ciklusa */
+[data-theme="dark"] .calendar-day.today.menstruation,
+[data-theme="dark"] .calendar-day.today.follicular,
+[data-theme="dark"] .calendar-day.today.ovulation,
+[data-theme="dark"] .calendar-day.today.fertile,
+[data-theme="dark"] .calendar-day.today.luteal {
+    border: 3px solid #ff6b9d !important;
+    box-shadow: 0 0 0 2px #ff6b9d, 0 0 15px rgba(255, 107, 157, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
     font-weight: 800;
 }
 
