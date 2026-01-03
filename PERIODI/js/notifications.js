@@ -1,5 +1,15 @@
 // Modul za notifikacije
-PeriodTracker.prototype.requestNotificationPermission = function() {
+PeriodTracker.prototype.requestNotificationPermission = async function() {
+    // Proveri da li service worker postoji
+    if ('serviceWorker' in navigator) {
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            console.log('Service Worker ready for notifications');
+        } catch (error) {
+            console.error('Service Worker not ready:', error);
+        }
+    }
+    
     if (!('Notification' in window)) {
         this.showWarning('Tvoj pregledač ne podržava notifikacije.');
         return;
@@ -13,12 +23,14 @@ PeriodTracker.prototype.requestNotificationPermission = function() {
     }
     
     if (Notification.permission === 'denied') {
-        this.showWarning('Dozvola za notifikacije je odbijena. Molimo te omogući notifikacije u podešavanjima pregledača.');
+        this.showWarning('Dozvola za notifikacije je odbijena. Molimo te omogući notifikacije u podešavanjima aplikacije ili pregledača.');
         this.updateNotificationStatus();
         return;
     }
     
-    Notification.requestPermission().then(permission => {
+    // Za Android, koristi async/await za bolju podršku
+    try {
+        const permission = await Notification.requestPermission();
         this.updateNotificationStatus();
         if (permission === 'granted') {
             this.showSuccess('Dozvola za notifikacije je data!');
@@ -26,7 +38,10 @@ PeriodTracker.prototype.requestNotificationPermission = function() {
         } else {
             this.showWarning('Dozvola za notifikacije je odbijena.');
         }
-    });
+    } catch (error) {
+        console.error('Error requesting notification permission:', error);
+        this.showWarning('Greška pri traženju dozvole za notifikacije.');
+    }
 };
 
 PeriodTracker.prototype.updateNotificationStatus = function() {
@@ -193,27 +208,55 @@ PeriodTracker.prototype.checkScheduledNotifications = function() {
     localStorage.setItem('periodi_scheduledNotifications', JSON.stringify(toKeep));
 };
 
-PeriodTracker.prototype.showNotification = function(title, body, options = {}) {
+PeriodTracker.prototype.showNotification = async function(title, body, options = {}) {
     if (Notification.permission !== 'granted') {
+        console.warn('Notification permission not granted');
         return;
     }
     
-    const notification = new Notification(title, {
-        body: body,
-        icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ctext y=".9em" font-size="90"%3E🩸%3C/text%3E%3C/svg%3E',
-        badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Ctext y=".9em" font-size="90"%3E🩸%3C/text%3E%3C/svg%3E',
-        tag: options.tag || 'periodi-notification',
-        requireInteraction: false,
-        silent: false
-    });
+    // Pokušaj da koristiš service worker notifikacije ako je dostupan
+    if ('serviceWorker' in navigator) {
+        try {
+            const registration = await navigator.serviceWorker.ready;
+            await registration.showNotification(title, {
+                body: body,
+                icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" rx="20" fill="%23e91e63"/%3E%3Ctext x="50" y="70" font-size="60" text-anchor="middle" fill="white"%3E%F0%9F%A9%B8%3C/text%3E%3C/svg%3E',
+                badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" rx="20" fill="%23e91e63"/%3E%3Ctext x="50" y="70" font-size="60" text-anchor="middle" fill="white"%3E%F0%9F%A9%B8%3C/text%3E%3C/svg%3E',
+                tag: options.tag || 'periodi-notification',
+                requireInteraction: false,
+                silent: false,
+                vibrate: [200, 100, 200],
+                data: {
+                    url: window.location.href
+                }
+            });
+            return;
+        } catch (error) {
+            console.warn('Service Worker notification failed, falling back to regular notification:', error);
+        }
+    }
     
-    notification.onclick = function() {
-        window.focus();
-        notification.close();
-    };
-    
-    // Automatski zatvori nakon 10 sekundi
-    setTimeout(() => {
-        notification.close();
-    }, 10000);
+    // Fallback na regularne notifikacije
+    try {
+        const notification = new Notification(title, {
+            body: body,
+            icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" rx="20" fill="%23e91e63"/%3E%3Ctext x="50" y="70" font-size="60" text-anchor="middle" fill="white"%3E%F0%9F%A9%B8%3C/text%3E%3C/svg%3E',
+            badge: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" rx="20" fill="%23e91e63"/%3E%3Ctext x="50" y="70" font-size="60" text-anchor="middle" fill="white"%3E%F0%9F%A9%B8%3C/text%3E%3C/svg%3E',
+            tag: options.tag || 'periodi-notification',
+            requireInteraction: false,
+            silent: false
+        });
+        
+        notification.onclick = function() {
+            window.focus();
+            notification.close();
+        };
+        
+        // Automatski zatvori nakon 10 sekundi
+        setTimeout(() => {
+            notification.close();
+        }, 10000);
+    } catch (error) {
+        console.error('Error showing notification:', error);
+    }
 };
