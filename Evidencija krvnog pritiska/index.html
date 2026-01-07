@@ -335,6 +335,14 @@
         </div>
     </main>
 
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">
+                &copy; <span id="currentYear"></span> Đorđe Živanović. Sva prava zadržana.
+            </p>
+        </div>
+    </footer>
+
     <!-- Modal za izmenu -->
     <div id="editModal" class="modal">
         <div class="modal-content">
@@ -386,6 +394,15 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Automatsko ažuriranje godine u footer-u
+        document.addEventListener('DOMContentLoaded', function() {
+            const yearElement = document.getElementById('currentYear');
+            if (yearElement) {
+                yearElement.textContent = new Date().getFullYear();
+            }
+        });
+    </script>
     <script type="module" src="js/app.js"></script>
 </body>
 </html>
