@@ -1227,3 +1227,40 @@ body {
         padding: var(--spacing-lg);
     }
 }
+
+/* ===== FOOTER ===== */
+.footer {
+    background-color: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    padding: var(--spacing-lg) 0;
+    margin-top: var(--spacing-2xl);
+    text-align: center;
+}
+
+.footer-text {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* Dark mode footer */
+[data-theme="dark"] .footer {
+    background-color: var(--bg-secondary);
+    border-top-color: var(--border-color);
+}
+
+[data-theme="dark"] .footer-text {
+    color: var(--text-secondary);
+}
+
+/* Responsive footer */
+@media (max-width: 768px) {
+    .footer {
+        padding: var(--spacing-md) 0;
+        margin-top: var(--spacing-xl);
+    }
+    
+    .footer-text {
+        font-size: 0.8125rem;
+    }
+}
