@@ -107,8 +107,14 @@ document.addEventListener('DOMContentLoaded', () => {
         setFilter(filter);
     });
     
-    // Učitaj i prikaži podatke
+    // Učitaj i prikaži podatke (sa default filterom 'today')
     loadAndDisplayData();
+    
+    // Postavi default vrednost filtera u select elementu
+    const periodFilter = document.getElementById('periodFilter');
+    if (periodFilter) {
+        periodFilter.value = 'today';
+    }
     
     // Inicijalizuj modale sa callback-om
     initModals(loadAndDisplayData);

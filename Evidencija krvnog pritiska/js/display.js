@@ -13,7 +13,7 @@ import {
 import { updateAllCharts } from './charts.js';
 
 // Globalne varijable za trenutni filter i merenja
-let currentFilter = 'all';
+let currentFilter = 'today'; // Default: prikazuj samo današnja merenja
 let measurements = [];
 
 /**
@@ -32,7 +32,20 @@ export function loadAndDisplayData() {
  */
 export function setFilter(filter) {
     currentFilter = filter;
+    // Ažuriraj select element da odražava trenutni filter
+    const periodFilter = document.getElementById('periodFilter');
+    if (periodFilter) {
+        periodFilter.value = filter;
+    }
     displayMeasurements();
+}
+
+/**
+ * Vraća trenutni filter
+ * @returns {string} Trenutni filter
+ */
+export function getCurrentFilter() {
+    return currentFilter;
 }
 
 /**
@@ -48,10 +61,11 @@ export function getMeasurements() {
  */
 export function displayMeasurements() {
     const tbody = document.getElementById('measurementsTableBody');
+    const cardsContainer = document.getElementById('measurementsCardsContainer');
     const emptyState = document.getElementById('emptyState');
     const table = document.getElementById('measurementsTable');
     
-    if (!tbody) return;
+    if (!tbody || !cardsContainer) return;
     
     // Filtriraj merenja
     const filtered = measurements.filter(m => isInPeriod(m.datetime || m.createdAt, currentFilter));
@@ -65,14 +79,18 @@ export function displayMeasurements() {
     
     if (filtered.length === 0) {
         tbody.innerHTML = '';
+        if (cardsContainer) cardsContainer.innerHTML = '';
         if (emptyState) emptyState.classList.add('active');
         if (table) table.style.display = 'none';
+        if (cardsContainer) cardsContainer.style.display = 'none';
         return;
     }
     
     if (emptyState) emptyState.classList.remove('active');
     if (table) table.style.display = 'table';
+    if (cardsContainer) cardsContainer.style.display = 'grid';
     
+    // Generiši tabelu (za desktop)
     tbody.innerHTML = filtered.map(m => {
         const status = getPressureStatus(m.systolic, m.diastolic);
         const symptoms = Array.isArray(m.symptoms) ? m.symptoms.join(', ') : (m.symptoms || '-');
@@ -103,7 +121,63 @@ export function displayMeasurements() {
         `;
     }).join('');
     
-    // Dodaj event listenere za dugmad
+    // Generiši kartice (za mobilne)
+    cardsContainer.innerHTML = filtered.map(m => {
+        const status = getPressureStatus(m.systolic, m.diastolic);
+        const symptoms = Array.isArray(m.symptoms) && m.symptoms.length > 0 ? m.symptoms.join(', ') : 'Bez simptoma';
+        const activity = m.activity ? m.activity.replace(/-/g, ' ') : 'N/A';
+        
+        return `
+            <div class="measurement-card">
+                <div class="card-header">
+                    <div class="card-date">
+                        <i class="fas fa-calendar-alt"></i>
+                        ${formatDateTime(m.datetime || m.createdAt)}
+                    </div>
+                    <span class="status-badge ${status.class}">${status.label}</span>
+                </div>
+                <div class="card-body">
+                    <div class="card-main-value">
+                        <strong>${m.systolic}/${m.diastolic}</strong>
+                        <span class="unit">mmHg</span>
+                    </div>
+                    <div class="card-details">
+                        <div class="card-detail-item">
+                            <i class="fas fa-heartbeat"></i>
+                            <span class="detail-label">Puls:</span>
+                            <span class="detail-value">${m.pulse || '-'}</span>
+                        </div>
+                        <div class="card-detail-item">
+                            <i class="fas fa-running"></i>
+                            <span class="detail-label">Aktivnost:</span>
+                            <span class="detail-value">${activity}</span>
+                        </div>
+                        <div class="card-detail-item">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <span class="detail-label">Simptomi:</span>
+                            <span class="detail-value">${symptoms}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-icon ai-analyze" data-ai-id="${m.id}" title="AI Analiza">
+                        <i class="fas fa-robot"></i>
+                        <span>AI</span>
+                    </button>
+                    <button class="btn-icon edit" data-edit-id="${m.id}" title="Izmeni">
+                        <i class="fas fa-edit"></i>
+                        <span>Izmeni</span>
+                    </button>
+                    <button class="btn-icon delete" data-delete-id="${m.id}" title="Obriši">
+                        <i class="fas fa-trash"></i>
+                        <span>Obriši</span>
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Dodaj event listenere za dugmad u tabeli
     tbody.querySelectorAll('[data-ai-id]').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.getAttribute('data-ai-id');
@@ -123,6 +197,34 @@ export function displayMeasurements() {
     });
     
     tbody.querySelectorAll('[data-delete-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-delete-id');
+            if (window.deleteMeasurement) {
+                window.deleteMeasurement(id);
+            }
+        });
+    });
+    
+    // Dodaj event listenere za dugmad u karticama
+    cardsContainer.querySelectorAll('[data-ai-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-ai-id');
+            if (window.analyzeSingleMeasurement) {
+                window.analyzeSingleMeasurement(id);
+            }
+        });
+    });
+    
+    cardsContainer.querySelectorAll('[data-edit-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-edit-id');
+            if (window.editMeasurement) {
+                window.editMeasurement(id);
+            }
+        });
+    });
+    
+    cardsContainer.querySelectorAll('[data-delete-id]').forEach(btn => {
         btn.addEventListener('click', () => {
             const id = btn.getAttribute('data-delete-id');
             if (window.deleteMeasurement) {

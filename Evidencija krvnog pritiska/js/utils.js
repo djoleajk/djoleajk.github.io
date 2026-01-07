@@ -81,7 +81,7 @@ export function getPressureStatus(systolic, diastolic) {
 /**
  * Proverava da li je datum u određenom periodu
  * @param {string|Date} date - Datum
- * @param {string} period - Period ('today', 'week', 'month', 'all')
+ * @param {string} period - Period ('today', 'week', 'month', 'all', ili 'YYYY-MM' za konkretan mesec)
  * @returns {boolean}
  */
 export function isInPeriod(date, period) {
@@ -106,7 +106,48 @@ export function isInPeriod(date, period) {
         return d >= monthAgo;
     }
     
+    // Provera za konkretan mesec (format: 'YYYY-MM')
+    if (period.match(/^\d{4}-\d{2}$/)) {
+        const [year, month] = period.split('-').map(Number);
+        const dateYear = d.getFullYear();
+        const dateMonth = d.getMonth() + 1; // getMonth() vraća 0-11
+        
+        return dateYear === year && dateMonth === month;
+    }
+    
     return true;
+}
+
+/**
+ * Generiše opcije za prethodne mesece
+ * @param {number} monthsBack - Broj meseci unazad (default: 12)
+ * @returns {Array} Niz objekata sa {value, label}
+ */
+export function generateMonthOptions(monthsBack = 12) {
+    const options = [];
+    const now = new Date();
+    
+    for (let i = 0; i < monthsBack; i++) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        const monthValue = `${year}-${String(month).padStart(2, '0')}`;
+        
+        // Nazivi meseci na srpskom
+        const monthNames = [
+            'Januar', 'Februar', 'Mart', 'April', 'Maj', 'Jun',
+            'Jul', 'Avgust', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'
+        ];
+        
+        const monthLabel = `${monthNames[date.getMonth()]} ${year}`;
+        
+        options.push({
+            value: monthValue,
+            label: monthLabel
+        });
+    }
+    
+    return options;
 }
 
 /**

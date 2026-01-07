@@ -1,7 +1,7 @@
 // Filteri i export funkcionalnosti
 
 import { exportMeasurements } from './storage.js';
-import { showMessage } from './utils.js';
+import { showMessage, generateMonthOptions } from './utils.js';
 
 /**
  * Inicijalizuje filtere
@@ -10,6 +10,31 @@ import { showMessage } from './utils.js';
 export function initFilters(onFilterChange) {
     const periodFilter = document.getElementById('periodFilter');
     if (periodFilter) {
+        // Generiši opcije za prethodne mesece
+        const monthOptions = generateMonthOptions(12);
+        
+        // Pronađi opciju "Ovaj mesec" da znamo gde da ubacimo mesečne opcije
+        const monthOption = periodFilter.querySelector('option[value="month"]');
+        const allOption = periodFilter.querySelector('option[value="all"]');
+        
+        // Kreiraj optgroup za prethodne mesece
+        const monthGroup = document.createElement('optgroup');
+        monthGroup.label = 'Prethodni meseci';
+        
+        monthOptions.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option.value;
+            optionElement.textContent = option.label;
+            monthGroup.appendChild(optionElement);
+        });
+        
+        // Ubaci optgroup posle "Ovaj mesec", pre "Sva merenja"
+        if (monthOption && allOption) {
+            periodFilter.insertBefore(monthGroup, allOption);
+        } else if (monthOption) {
+            periodFilter.appendChild(monthGroup);
+        }
+        
         periodFilter.addEventListener('change', (e) => {
             if (onFilterChange) {
                 onFilterChange(e.target.value);
