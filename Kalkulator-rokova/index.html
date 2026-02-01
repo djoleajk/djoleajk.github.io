@@ -1,1 +1,116 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="description" content="Kalkulator roka izrade - Računanje krajnjeg datuma na osnovu radnih dana">
+    <title>Kalkulator Rokova - Radni Dani</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+<body>
+    <div class="container">
+        <!-- Main Calculator Card -->
+        <div class="card">
+            <h1>📅 Kalkulator roka izrade</h1>
+            <p class="subtitle">Računanje na osnovu radnih dana</p>
 
+            <div class="input-group">
+                <label for="startDate">Početni datum:</label>
+                <input type="date" id="startDate" required>
+            </div>
+
+            <div class="input-group">
+                <label for="workingDays">Broj radnih dana:</label>
+                <input type="number" id="workingDays" min="1" placeholder="npr. 10" required>
+            </div>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="includeHolidays">
+                <label for="includeHolidays">Uključi državne praznike</label>
+            </div>
+
+            <button class="btn-primary" onclick="calculateDeadline()">
+                Izračunaj rok
+            </button>
+
+            <div id="result" class="result hidden">
+                <div class="result-content">
+                    <h2>Rok završetka je:</h2>
+                    <p class="deadline-date" id="deadlineDate"></p>
+                    <p class="deadline-day" id="deadlineDay"></p>
+                    <p class="working-days-info" id="workingDaysInfo"></p>
+                </div>
+            </div>
+
+            <div id="error" class="error hidden"></div>
+        </div>
+
+        <!-- Working Hours Calculator -->
+        <div class="card">
+            <h2>⏰ Kalkulator radnih sati</h2>
+            <p class="subtitle">Računanje sa satima rada</p>
+
+            <div class="input-group">
+                <label for="startDateHours">Početni datum i vreme:</label>
+                <input type="datetime-local" id="startDateHours" required>
+            </div>
+
+            <div class="input-group">
+                <label for="workingHours">Broj radnih sati:</label>
+                <input type="number" id="workingHours" min="1" placeholder="npr. 80" required>
+            </div>
+
+            <div class="input-group">
+                <label for="hoursPerDay">Radnih sati dnevno:</label>
+                <input type="number" id="hoursPerDay" min="1" max="24" value="8" required>
+            </div>
+
+            <button class="btn-secondary" onclick="calculateDeadlineWithHours()">
+                Izračunaj rok sa satima
+            </button>
+
+            <div id="resultHours" class="result hidden">
+                <div class="result-content">
+                    <h2>Rok završetka je:</h2>
+                    <p class="deadline-date" id="deadlineDateHours"></p>
+                    <p class="deadline-day" id="deadlineDayHours"></p>
+                    <p class="working-days-info" id="workingHoursInfo"></p>
+                </div>
+            </div>
+
+            <div id="errorHours" class="error hidden"></div>
+        </div>
+
+        <!-- Multiple Projects Manager -->
+        <div class="card">
+            <h2>📊 Menadžer projekata</h2>
+            <p class="subtitle">Upravljanje sa više rokova</p>
+
+            <div class="input-group">
+                <label for="projectName">Naziv projekta:</label>
+                <input type="text" id="projectName" placeholder="npr. Web sajt" required>
+            </div>
+
+            <div class="input-group">
+                <label for="projectStartDate">Početni datum:</label>
+                <input type="date" id="projectStartDate" required>
+            </div>
+
+            <div class="input-group">
+                <label for="projectDays">Broj radnih dana:</label>
+                <input type="number" id="projectDays" min="1" placeholder="npr. 15" required>
+            </div>
+
+            <button class="btn-success" onclick="addProject()">
+                + Dodaj projekat
+            </button>
+
+            <div id="projectsList" class="projects-list"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
