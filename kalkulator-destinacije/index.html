@@ -1,1 +1,140 @@
+<!DOCTYPE html>
+<html lang="sr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Brzine - Planiranje Putovanja</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚗 Kalkulator Brzine</h1>
+            <p class="subtitle">Izračunajte potrebnu brzinu da stignete na vreme</p>
+        </header>
 
+        <div class="card">
+            <form id="speedForm">
+                <div class="form-group">
+                    <label for="distance">
+                        <span class="label-icon">📍</span>
+                        Udaljenost do odredišta
+                    </label>
+                    <div class="input-group">
+                        <input type="number" id="distance" step="0.1" min="0.1" required placeholder="npr. 120">
+                        <select id="distanceUnit">
+                            <option value="km">Kilometri (km)</option>
+                            <option value="m">Metri (m)</option>
+                            <option value="mi">Milje (mi)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="hours">
+                        <span class="label-icon">⏰</span>
+                        Vreme do dolaska
+                    </label>
+                    <div class="time-inputs">
+                        <div class="time-input">
+                            <input type="number" id="hours" min="0" value="0" required>
+                            <span class="time-label">sati</span>
+                        </div>
+                        <div class="time-input">
+                            <input type="number" id="minutes" min="0" max="59" value="0" required>
+                            <span class="time-label">minuta</span>
+                        </div>
+                        <div class="time-input">
+                            <input type="number" id="seconds" min="0" max="59" value="0">
+                            <span class="time-label">sekundi</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="fuelConsumption">
+                        <span class="label-icon">⛽</span>
+                        Prosečna potrošnja goriva
+                    </label>
+                    <div class="input-group">
+                        <input type="number" id="fuelConsumption" step="0.1" min="0.1" value="7.0" required placeholder="npr. 7.5">
+                        <select id="fuelUnit">
+                            <option value="l100km">L/100km</option>
+                        </select>
+                    </div>
+                    <small class="input-hint">Unesite prosečnu potrošnju vašeg vozila</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="fuelPrice">
+                        <span class="label-icon">💰</span>
+                        Cena goriva (opciono)
+                    </label>
+                    <div class="input-group">
+                        <input type="number" id="fuelPrice" step="0.01" min="0" placeholder="npr. 180">
+                        <select id="currency">
+                            <option value="rsd">RSD/litar</option>
+                            <option value="eur">EUR/litar</option>
+                        </select>
+                    </div>
+                    <small class="input-hint">Ostavite prazno ako ne želite prikaz cene</small>
+                </div>
+
+                <button type="submit" class="btn-calculate">
+                    <span>Izračunaj Brzinu</span>
+                    <span class="btn-icon">→</span>
+                </button>
+            </form>
+        </div>
+
+        <div id="results" class="results hidden">
+            <h2>📊 Rezultati</h2>
+            
+            <div class="result-card primary">
+                <div class="result-label">Potrebna brzina</div>
+                <div class="result-value" id="mainSpeed">--</div>
+            </div>
+
+            <div class="result-grid">
+                <div class="result-card">
+                    <div class="result-label">km/h</div>
+                    <div class="result-value small" id="speedKmh">--</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">m/s</div>
+                    <div class="result-value small" id="speedMs">--</div>
+                </div>
+                <div class="result-card">
+                    <div class="result-label">mph</div>
+                    <div class="result-value small" id="speedMph">--</div>
+                </div>
+            </div>
+
+            <div class="fuel-section">
+                <h3>⛽ Potrošnja goriva</h3>
+                <div class="result-grid">
+                    <div class="result-card fuel">
+                        <div class="result-label">Ukupna potrošnja</div>
+                        <div class="result-value small" id="fuelAmount">--</div>
+                    </div>
+                    <div class="result-card fuel" id="fuelCostCard" style="display: none;">
+                        <div class="result-label">Cena goriva</div>
+                        <div class="result-value small" id="fuelCost">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <h3>ℹ️ Dodatne informacije</h3>
+                <div id="additionalInfo"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Napomena: Uvek vozite bezbedno i poštujte ograničenja brzine!</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
