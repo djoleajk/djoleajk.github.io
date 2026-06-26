@@ -3,27 +3,828 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="description" content="Jednostavna aplikacija za praćenje menstrualnog ciklusa sa AI anketama i predviđanjima">
+    <meta name="description" content="Jednostavna aplikacija za pracenje menstrualnog ciklusa sa AI anketama i predvidjanjima">
     <meta name="theme-color" content="#e91e63">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Periodi">
-    <!-- Android PWA meta tags -->
-    <meta name="application-name" content="Periodi">
-    <meta name="msapplication-TileColor" content="#e91e63">
-    <meta name="msapplication-tap-highlight" content="no">
-    <title>Periodi - Praćenje Menstrualnog Ciklusa</title>
-    <link rel="manifest" href="manifest.json">
-    <!-- Bootstrap CSS -->
+    <title>Periodi - Pracenje Menstrualnog Ciklusa</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css">
+<style>
+/* Periodi – čist CSS, optimizovan za mobilne uređaje */
+
+:root {
+    --bg-primary: #fefefe;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f5f5f5;
+    --text-primary: #1a1a1a;
+    --text-secondary: #666666;
+    --text-tertiary: #999999;
+    --accent-primary: #e91e63;
+    --accent-secondary: #f06292;
+    --accent-gradient: linear-gradient(135deg, #e91e63 0%, #f06292 100%);
+    --border-color: #e0e0e0;
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --color-menstruation: #e91e63;
+    --color-ovulation: #4caf50;
+    --color-fertile: #ff9800;
+    --color-follicular: #2196f3;
+    --color-luteal: #9c27b0;
+    --vh: 1vh;
+}
+
+[data-theme="dark"] {
+    --bg-primary: #000000;
+    --bg-secondary: #0f0f0f;
+    --bg-tertiary: #1a1a1a;
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --text-tertiary: #b0b0b0;
+    --accent-primary: #ff6b9d;
+    --accent-secondary: #ffa5c7;
+    --accent-gradient: linear-gradient(135deg, #ff6b9d 0%, #ffa5c7 100%);
+    --border-color: #505050;
+    --color-menstruation: #ff1744;
+    --color-ovulation: #66bb6a;
+    --color-fertile: #ffa726;
+    --color-follicular: #42a5f5;
+    --color-luteal: #ab47bc;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+    min-height: calc(var(--vh, 1vh) * 100);
+}
+
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 100vh;
+    min-height: calc(var(--vh, 1vh) * 100);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header */
+.app-header {
+    background: var(--accent-gradient);
+    color: #fff;
+    padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-md);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.app-title {
+    font-size: clamp(1.25rem, 4vw, 1.75rem);
+    font-weight: 700;
+}
+
+.theme-toggle {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff !important;
+    cursor: pointer;
+}
+
+/* Tabs */
+.tab-navigation {
+    display: flex;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    overflow-x: auto;
+    position: sticky;
+    top: 60px;
+    z-index: 99;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tab-navigation::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+    flex: 1;
+    min-width: 72px;
+    padding: 0.75rem 0.5rem;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    border-bottom: 3px solid transparent;
+    font-size: 0.75rem;
+}
+
+.tab-btn.active {
+    color: var(--accent-primary);
+    border-bottom-color: var(--accent-primary);
+    font-weight: 600;
+}
+
+.tab-icon { font-size: 1.1rem; }
+
+/* Main */
+.main-content { flex: 1; padding: 1rem; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.dashboard-container,
+.calendar-container,
+.symptoms-container,
+.settings-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Cards */
+.card {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+/* Cycle status */
+.cycle-status-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.cycle-day-number {
+    font-size: clamp(2.5rem, 8vw, 3.5rem);
+    font-weight: 700;
+    color: var(--accent-primary);
+    line-height: 1;
+}
+
+.cycle-day-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 0.35rem;
+}
+
+.cycle-phase {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--accent-primary);
+    padding: 0.5rem 0.75rem;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    text-align: right;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 12px;
+    background: var(--bg-tertiary);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--accent-gradient);
+    border-radius: 6px;
+    transition: width 0.4s ease;
+    width: 0%;
+}
+
+.progress-label {
+    text-align: right;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* Predictions */
+.prediction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.prediction-item:last-child { border-bottom: none; }
+
+.prediction-label { color: var(--text-secondary); font-size: 0.9rem; }
+
+.prediction-value {
+    font-weight: 600;
+    color: var(--accent-primary);
+    text-align: right;
+}
+
+/* Stats */
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+@media (min-width: 480px) {
+    .stat-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.stat-item {
+    text-align: center;
+    padding: 0.85rem;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+}
+
+.stat-value {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.chart-container {
+    margin-top: 1rem;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Symptom stats */
+.symptom-stat-grid { display: flex; flex-direction: column; gap: 0.85rem; }
+
+.symptom-stat-item {
+    display: grid;
+    grid-template-columns: 80px 1fr 48px;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.symptom-stat-label { font-size: 0.85rem; color: var(--text-secondary); }
+
+.symptom-stat-bar {
+    height: 8px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.symptom-stat-fill {
+    height: 100%;
+    background: var(--accent-gradient);
+    border-radius: 4px;
+    transition: width 0.4s ease;
+}
+
+.symptom-stat-value {
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: right;
+    color: var(--accent-primary);
+}
+
+/* Quick actions */
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 0.5rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.15s;
+}
+
+.action-btn:active { transform: scale(0.97); }
+
+.action-btn:hover,
+.action-btn:focus {
+    border-color: var(--accent-primary);
+}
+
+.action-icon {
+    font-size: 1.5rem;
+    color: var(--accent-primary);
+}
+
+.action-text {
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-align: center;
+}
+
+/* Reminders */
+.reminders-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.reminder-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-tertiary);
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.reminder-item.reminder-past { opacity: 0.6; }
+
+.reminder-item-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.reminder-item-details {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Phase info */
+.phase-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.menstruation-color { background: var(--color-menstruation); }
+.follicular-color { background: var(--color-follicular); }
+.ovulation-color { background: var(--color-ovulation); }
+.fertile-color { background: var(--color-fertile); }
+.luteal-color { background: var(--color-luteal); }
+
+.phase-item { margin-bottom: 0.75rem; }
+
+/* Calendar */
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.calendar-month-year {
+    font-size: 1.15rem;
+    font-weight: 600;
+    text-align: center;
+    flex: 1;
+}
+
+.calendar-nav-btn {
+    min-width: 44px;
+    min-height: 44px;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+}
+
+.calendar-day-header {
+    text-align: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    padding: 0.5rem 0;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    background: var(--bg-tertiary);
+    border: 2px solid transparent;
+    min-height: 40px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.calendar-day.other-month {
+    opacity: 0.35;
+}
+
+.calendar-day.today {
+    border-color: var(--accent-primary);
+    font-weight: 700;
+}
+
+.calendar-day.menstruation { background: rgba(233, 30, 99, 0.25); color: var(--color-menstruation); }
+.calendar-day.follicular { background: rgba(33, 150, 243, 0.2); color: var(--color-follicular); }
+.calendar-day.ovulation { background: rgba(76, 175, 80, 0.3); color: var(--color-ovulation); font-weight: 700; }
+.calendar-day.fertile { background: rgba(255, 152, 0, 0.25); color: var(--color-fertile); }
+.calendar-day.luteal { background: rgba(156, 39, 176, 0.2); color: var(--color-luteal); }
+
+.calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding: 0.75rem;
+    background: var(--bg-tertiary);
+    border-radius: 10px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+}
+
+.legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}
+
+.legend-color.menstruation { background: var(--color-menstruation); }
+.legend-color.follicular { background: var(--color-follicular); }
+.legend-color.ovulation { background: var(--color-ovulation); }
+.legend-color.fertile { background: var(--color-fertile); }
+.legend-color.luteal { background: var(--color-luteal); }
+
+/* Symptoms form */
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.range-input {
+    width: 100%;
+    accent-color: var(--accent-primary);
+}
+
+.symptoms-history { display: flex; flex-direction: column; gap: 0.75rem; }
+
+.symptom-entry {
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border-radius: 12px;
+    border-left: 4px solid var(--accent-primary);
+}
+
+.symptom-entry-date {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--accent-primary);
+}
+
+.symptom-entry-details {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.symptom-entry-summary {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: var(--bg-secondary);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+/* Settings */
+.data-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.data-actions .btn { flex: 1; min-width: 140px; }
+
+/* Survey */
+.survey-progress-bar {
+    height: 8px;
+    background: var(--bg-tertiary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.survey-progress-fill {
+    height: 100%;
+    background: var(--accent-gradient);
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.survey-question {
+    font-size: 1.05rem;
+    font-weight: 500;
+}
+
+.survey-answers { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.survey-answer-item {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.survey-answer-item.selected {
+    border-color: var(--accent-primary);
+    background: rgba(233, 30, 99, 0.08);
+}
+
+.survey-answer-item input { margin-right: 0.5rem; }
+
+/* Day options modal */
+.day-options-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.day-option-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+.day-option-btn i { color: var(--accent-primary); width: 20px; }
+
+.day-option-btn:active { background: var(--bg-secondary); }
+
+#dayOptionsModal .modal-content {
+    border-radius: 16px;
+    border: none;
+}
+
+#dayOptionsModal .modal-header {
+    background: var(--accent-gradient);
+    color: #fff;
+    border-radius: 16px 16px 0 0;
+}
+
+#dayOptionsModal .modal-header .btn-close { filter: invert(1); }
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--text-secondary);
+}
+
+.empty-icon {
+    font-size: 2.5rem;
+    color: var(--text-tertiary);
+    margin-bottom: 0.75rem;
+}
+
+/* Toast */
+.toast-container {
+    position: fixed;
+    top: 80px;
+    right: 1rem;
+    left: 1rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    pointer-events: none;
+}
+
+@media (min-width: 480px) {
+    .toast-container { left: auto; max-width: 360px; }
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg);
+    border-left: 4px solid var(--accent-primary);
+    transform: translateX(110%);
+    transition: transform 0.3s ease;
+    pointer-events: auto;
+}
+
+.toast.show { transform: translateX(0); }
+
+.toast-success { border-left-color: #4caf50; }
+.toast-error { border-left-color: #f44336; }
+.toast-warning { border-left-color: #ff9800; }
+.toast-info { border-left-color: #2196f3; }
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: var(--text-tertiary);
+    cursor: pointer;
+    padding: 0.25rem;
+}
+
+/* Confirm dialog */
+.confirm-dialog-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.confirm-dialog {
+    background: var(--bg-secondary);
+    border-radius: 16px;
+    padding: 1.5rem;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+}
+
+.confirm-dialog-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.confirm-dialog-message {
+    color: var(--text-secondary);
+    margin-bottom: 1.25rem;
+}
+
+.confirm-dialog-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.confirm-dialog-actions .btn { flex: 1; }
+
+/* Bootstrap overrides */
+.btn-primary {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background: var(--accent-secondary);
+    border-color: var(--accent-secondary);
+}
+
+.form-control,
+.form-select {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+}
+
+.form-control:focus {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 0.2rem rgba(233, 30, 99, 0.2);
+}
+
+.form-label { color: var(--text-primary); }
+
+.modal-content {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+/* Dark theme extras */
+[data-theme="dark"] .card {
+    border-color: #404040;
+}
+
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .form-select {
+    background: #1a1a1a;
+    border-color: #505050;
+    color: #fff;
+}
+
+[data-theme="dark"] .action-btn {
+    background: #1a1a1a;
+    border-color: #505050;
+}
+
+[data-theme="dark"] .calendar-day {
+    background: #1a1a1a;
+}
+
+[data-theme="dark"] .checkbox-label {
+    background: #1a1a1a;
+}
+
+[data-theme="dark"] .symptom-entry {
+    background: #1a1a1a;
+}
+
+[data-theme="dark"] .alert-info {
+    background: rgba(33, 150, 243, 0.15);
+    border-color: #42a5f5;
+    color: #90caf9;
+}
+
+/* Responsive */
+@media (max-width: 360px) {
+    .quick-actions-grid { grid-template-columns: 1fr; }
+    .checkbox-group { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+</style>
 </head>
 <body>
-    <div class="app-container">
+<div class="app-container">
         <!-- Header -->
         <header class="app-header">
             <div class="header-content">
@@ -104,11 +905,11 @@
                         </div>
                         <div class="stat-grid" id="statisticsGrid">
                             <div class="stat-item">
-                                <div class="stat-value" id="avgCycleLength">-</div>
+                                <div class="stat-value" id="statAvgCycleLength">-</div>
                                 <div class="stat-label">Prosečna dužina</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-value" id="avgPeriodLength">-</div>
+                                <div class="stat-value" id="statAvgPeriodLength">-</div>
                                 <div class="stat-label">Prosečna menstruacija</div>
                             </div>
                             <div class="stat-item">
@@ -167,6 +968,16 @@
                                 <div class="symptom-stat-value" id="avgLibidoValue">-</div>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Reminders -->
+                    <div class="card reminders-card">
+                        <h2 class="card-title"><i class="fas fa-bell"></i> Podsetnici</h2>
+                        <div id="remindersEmptyState" class="empty-state">
+                            <i class="fas fa-bell-slash empty-icon"></i>
+                            <p class="empty-message">Nema zakazanih podsetnika</p>
+                        </div>
+                        <div id="remindersItems" class="reminders-list"></div>
                     </div>
 
                     <!-- Quick Actions -->
@@ -441,19 +1252,19 @@
                         <h2 class="card-title">Podešavanja Ciklusa</h2>
                         <form id="settingsForm">
                             <div class="mb-3">
-                                <label for="avgCycleLength" class="form-label">
+                                <label for="settingsAvgCycleLength" class="form-label">
                                     Prosečna dužina ciklusa (dana)
                                     <i class="fas fa-info-circle text-muted ms-1" data-bs-toggle="tooltip" data-bs-placement="right" title="Dužina ciklusa se računa od prvog dana menstruacije do dana pre sledeće menstruacije. Normalan ciklus traje 21-35 dana (najčešće 28 dana)."></i>
                                 </label>
-                                <input type="number" class="form-control" id="avgCycleLength" min="21" max="35" value="28" required>
+                                <input type="number" class="form-control" id="settingsAvgCycleLength" min="21" max="35" value="28" required>
                                 <small class="form-text text-muted">Normalan opseg: 21-35 dana</small>
                             </div>
                             <div class="mb-3">
-                                <label for="avgPeriodLength" class="form-label">
+                                <label for="settingsAvgPeriodLength" class="form-label">
                                     Prosečna dužina menstruacije (dana)
                                     <i class="fas fa-info-circle text-muted ms-1" data-bs-toggle="tooltip" data-bs-placement="right" title="Dužina menstruacije je broj dana koliko traje krvarenje. Normalna menstruacija traje 3-7 dana (najčešće 5 dana)."></i>
                                 </label>
-                                <input type="number" class="form-control" id="avgPeriodLength" min="3" max="7" value="5" required>
+                                <input type="number" class="form-control" id="settingsAvgPeriodLength" min="3" max="7" value="5" required>
                                 <small class="form-text text-muted">Normalan opseg: 3-7 dana</small>
                             </div>
                             <div class="alert alert-info">
@@ -509,6 +1320,13 @@
 
                     <div class="card data-card">
                         <h2 class="card-title">Podaci</h2>
+                        <div class="mb-3">
+                            <label for="exportFormat" class="form-label">Format izvoza</label>
+                            <select class="form-select" id="exportFormat">
+                                <option value="json">JSON</option>
+                                <option value="csv">CSV</option>
+                            </select>
+                        </div>
                         <div class="data-actions">
                             <button class="btn btn-secondary" id="exportDataBtn">Izvezi Podatke</button>
                             <button class="btn btn-danger" id="clearDataBtn">Obriši Sve Podatke</button>
@@ -617,26 +1435,3349 @@
     <!-- Toast Container -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <!-- Scripts -->
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- App Scripts -->
-    <script src="app.js"></script>
-    <script src="js/toast.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/confirm-dialog.js"></script>
-    <script src="js/toast.js"></script>
-    <script src="js/dashboard.js"></script>
-    <script src="js/calendar.js"></script>
-    <script src="js/cycles.js"></script>
-    <script src="js/symptoms.js"></script>
-    <script src="js/formular-za-simptome.js"></script>
-    <script src="js/anketa.js"></script>
-    <script src="js/reminders.js"></script>
-    <script src="js/notifications.js"></script>
-    <script src="js/settings.js"></script>
-    <script src="js/theme.js"></script>
-    <script src="js/events.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+
+/* === app.js === */
+// Glavna klasa PeriodTracker
+class PeriodTracker {
+    constructor() {
+        this.cycles = [];
+        this.symptoms = [];
+        this.settings = {
+            avgCycleLength: 28,
+            avgPeriodLength: 5,
+            notifications: {
+                periodStart: true,
+                ovulation: true,
+                fertileWindow: true
+            }
+        };
+        this.reminders = [];
+        this.currentDate = new Date();
+        this.calendarDate = new Date();
+
+        this.surveyModule = new Anketa(this);
+        this.symptomFormModule = new FormularZaSimptome(this);
+
+        this.init();
+    }
+
+    init() {
+        this.loadData();
+        this.setupEventListeners();
+        this.updateDashboard();
+        this.renderCalendar();
+        this.updateSymptomsDisplay();
+        this.updateRemindersList();
+        this.loadSettings();
+        this.initTheme();
+        this.scheduleCycleNotifications();
+
+        if (this.updateNotificationStatus) {
+            this.updateNotificationStatus();
+        }
+
+        if (this.initMobileOptimizations) {
+            this.initMobileOptimizations();
+        }
+
+        this.handleInitialRoute();
+    }
+
+    handleInitialRoute() {
+        const hash = window.location.hash.replace('#', '');
+        if (hash && document.getElementById(hash)) {
+            this.switchTab(hash);
+        }
+    }
+}
+
+// Service Worker iskljucen u standalone verziji
+function startApp() {
+    window.tracker = new PeriodTracker();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startApp);
+} else {
+    startApp();
+}
+
+
+/* === js\toast.js === */
+// Modul za Toast notifikacije
+class Toast {
+    constructor() {
+        this.container = null;
+        this.init();
+    }
+    
+    init() {
+        // Kreiraj toast container ako ne postoji
+        if (!document.getElementById('toastContainer')) {
+            const container = document.createElement('div');
+            container.id = 'toastContainer';
+            container.className = 'toast-container';
+            document.body.appendChild(container);
+            this.container = container;
+        } else {
+            this.container = document.getElementById('toastContainer');
+        }
+    }
+    
+    show(message, type = 'info', duration = 3000) {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        const icon = this.getIcon(type);
+        const toastContent = `
+            <div class="toast-content">
+                <i class="${icon}"></i>
+                <span class="toast-message">${message}</span>
+            </div>
+            <button class="toast-close" aria-label="Zatvori">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        toast.innerHTML = toastContent;
+        this.container.appendChild(toast);
+        
+        // Animacija pojavljivanja
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        // Zatvori dugme
+        const closeBtn = toast.querySelector('.toast-close');
+        closeBtn.addEventListener('click', () => {
+            this.hide(toast);
+        });
+        
+        // Automatsko zatvaranje
+        if (duration > 0) {
+            setTimeout(() => {
+                this.hide(toast);
+            }, duration);
+        }
+        
+        return toast;
+    }
+    
+    hide(toast) {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }
+    
+    getIcon(type) {
+        const icons = {
+            success: 'fas fa-check-circle',
+            error: 'fas fa-exclamation-circle',
+            warning: 'fas fa-exclamation-triangle',
+            info: 'fas fa-info-circle'
+        };
+        return icons[type] || icons.info;
+    }
+    
+    success(message, duration = 3000) {
+        return this.show(message, 'success', duration);
+    }
+    
+    error(message, duration = 4000) {
+        return this.show(message, 'error', duration);
+    }
+    
+    warning(message, duration = 3500) {
+        return this.show(message, 'warning', duration);
+    }
+    
+    info(message, duration = 3000) {
+        return this.show(message, 'info', duration);
+    }
+}
+
+// Globalna instanca
+let toastInstance = null;
+
+// Helper funkcije za PeriodTracker
+PeriodTracker.prototype.showToast = function(message, type = 'info', duration = 3000) {
+    if (!toastInstance) {
+        toastInstance = new Toast();
+    }
+    return toastInstance.show(message, type, duration);
+};
+
+PeriodTracker.prototype.showSuccess = function(message, duration = 3000) {
+    if (!toastInstance) {
+        toastInstance = new Toast();
+    }
+    return toastInstance.success(message, duration);
+};
+
+PeriodTracker.prototype.showError = function(message, duration = 4000) {
+    if (!toastInstance) {
+        toastInstance = new Toast();
+    }
+    return toastInstance.error(message, duration);
+};
+
+PeriodTracker.prototype.showWarning = function(message, duration = 3500) {
+    if (!toastInstance) {
+        toastInstance = new Toast();
+    }
+    return toastInstance.warning(message, duration);
+};
+
+PeriodTracker.prototype.showInfo = function(message, duration = 3000) {
+    if (!toastInstance) {
+        toastInstance = new Toast();
+    }
+    return toastInstance.info(message, duration);
+};
+
+
+/* === js\storage.js === */
+// Modul za čuvanje podataka
+PeriodTracker.prototype.loadData = function() {
+    try {
+        const savedCycles = localStorage.getItem('periodi_cycles');
+        const savedSymptoms = localStorage.getItem('periodi_symptoms');
+        const savedSettings = localStorage.getItem('periodi_settings');
+        const savedReminders = localStorage.getItem('periodi_reminders');
+        
+        if (savedCycles) {
+            this.cycles = JSON.parse(savedCycles);
+            // Konvertuj string datume u Date objekte
+            this.cycles = this.cycles.map(cycle => ({
+                ...cycle,
+                startDate: new Date(cycle.startDate),
+                endDate: cycle.endDate ? new Date(cycle.endDate) : null
+            }));
+        }
+        
+        if (savedSymptoms) {
+            this.symptoms = JSON.parse(savedSymptoms);
+            // Konvertuj string datume u Date objekte
+            this.symptoms = this.symptoms.map(symptom => ({
+                ...symptom,
+                date: new Date(symptom.date)
+            }));
+        }
+        
+        if (savedSettings) {
+            this.settings = { ...this.settings, ...JSON.parse(savedSettings) };
+        }
+        
+        if (savedReminders) {
+            this.reminders = JSON.parse(savedReminders);
+            // Konvertuj string datume u Date objekte
+            this.reminders = this.reminders.map(reminder => ({
+                ...reminder,
+                date: new Date(reminder.date)
+            }));
+        }
+    } catch (error) {
+        console.error('Greška pri učitavanju podataka:', error);
+    }
+};
+
+PeriodTracker.prototype.saveData = function() {
+    try {
+        localStorage.setItem('periodi_cycles', JSON.stringify(this.cycles));
+        localStorage.setItem('periodi_symptoms', JSON.stringify(this.symptoms));
+        localStorage.setItem('periodi_settings', JSON.stringify(this.settings));
+        localStorage.setItem('periodi_reminders', JSON.stringify(this.reminders));
+    } catch (error) {
+        console.error('Greška pri čuvanju podataka:', error);
+    }
+};
+
+PeriodTracker.prototype.exportData = function(format = 'json') {
+    try {
+        if (format === 'json') {
+            const data = {
+                cycles: this.cycles,
+                symptoms: this.symptoms,
+                settings: this.settings,
+                reminders: this.reminders,
+                exportDate: new Date().toISOString()
+            };
+            
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `periodi-podaci-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            this.showSuccess('Podaci su uspešno izveženi u JSON format.');
+        } else if (format === 'csv') {
+            this.exportToCSV();
+        }
+    } catch (error) {
+        console.error('Greška pri izvozu:', error);
+        this.showError('Došlo je do greške pri izvozu podataka.');
+    }
+};
+
+PeriodTracker.prototype.exportToCSV = function() {
+    // CSV za cikluse
+    let csv = 'Tip,ID,Datum Početka,Datum Kraja,Dužina\n';
+    this.cycles.forEach(cycle => {
+        const start = this.formatDateShort(cycle.startDate);
+        const end = cycle.endDate ? this.formatDateShort(cycle.endDate) : 'Aktivan';
+        const length = cycle.duration || '-';
+        csv += `Ciklus,${cycle.id},${start},${end},${length}\n`;
+    });
+    
+    csv += '\nSimptomi\n';
+    csv += 'Datum,Energija,Raspoloženje,Bol,Libido,Dodatni Simptomi\n';
+    this.symptoms.forEach(symptom => {
+        const date = this.formatDateShort(symptom.date);
+        const energy = symptom.energy || '-';
+        const mood = symptom.mood || '-';
+        const pain = symptom.pain || '-';
+        const libido = symptom.libido || '-';
+        const additional = symptom.additionalSymptoms ? symptom.additionalSymptoms.join('; ') : '-';
+        csv += `${date},${energy},${mood},${pain},${libido},"${additional}"\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `periodi-podaci-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    this.showSuccess('Podaci su uspešno izveženi u CSV format.');
+};
+
+PeriodTracker.prototype.clearAllData = async function() {
+    const confirmed = await this.showConfirmDialog(
+        'Da li si sigurna da želiš da obrišeš sve podatke? Ova akcija se ne može poništiti.',
+        'Brisanje Podataka',
+        'Obriši',
+        'Otkaži'
+    );
+    
+    if (confirmed) {
+        localStorage.removeItem('periodi_cycles');
+        localStorage.removeItem('periodi_symptoms');
+        localStorage.removeItem('periodi_settings');
+        localStorage.removeItem('periodi_reminders');
+        localStorage.removeItem('periodi_scheduledNotifications');
+        localStorage.removeItem('periodi_lastSurveyDate');
+        
+        this.cycles = [];
+        this.symptoms = [];
+        this.settings = {
+            avgCycleLength: 28,
+            avgPeriodLength: 5,
+            notifications: {
+                periodStart: true,
+                ovulation: true,
+                fertileWindow: true
+            }
+        };
+        this.reminders = [];
+        
+        this.saveData();
+        this.updateDashboard();
+        this.renderCalendar();
+        this.updateSymptomsDisplay();
+        this.updateRemindersList();
+        
+        this.showSuccess('Svi podaci su uspešno obrisani.');
+    }
+};
+
+
+/* === js\utils.js === */
+// Pomoćne funkcije
+PeriodTracker.prototype.switchTab = function(tabName) {
+    // Sakrij sve tabove
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    
+    // Ukloni active klasu sa svih dugmadi
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // Prikaži odabrani tab
+    const targetTab = document.getElementById(tabName);
+    if (targetTab) {
+        targetTab.classList.add('active');
+    }
+    
+    // Aktiviraj odgovarajuće dugme
+    const targetBtn = document.querySelector(`[data-tab="${tabName}"]`);
+    if (targetBtn) {
+        targetBtn.classList.add('active');
+    }
+    
+    // Ažuriraj UI u zavisnosti od taba
+    if (tabName) {
+        window.location.hash = tabName;
+    }
+
+    if (tabName === 'dashboard') {
+        this.updateDashboard();
+    } else if (tabName === 'calendar') {
+        this.renderCalendar();
+    } else if (tabName === 'symptoms') {
+        this.updateSymptomsDisplay();
+    }
+};
+
+PeriodTracker.prototype.closeModal = function(modalId) {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+        // Koristi Bootstrap modal API ako je dostupan
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            } else {
+                // Fallback na custom implementaciju
+                modalElement.classList.remove('show');
+                modalElement.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                const backdrop = document.getElementById('customModalBackdrop') || document.querySelector('.modal-backdrop');
+                if (backdrop) backdrop.remove();
+            }
+        } else {
+            // Fallback na custom implementaciju
+            modalElement.classList.remove('show', 'active');
+            modalElement.style.display = 'none';
+            document.body.classList.remove('modal-open');
+            const backdrop = document.getElementById('customModalBackdrop') || document.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.remove();
+        }
+    }
+};
+
+PeriodTracker.prototype.openModal = function(modalId) {
+    const modalElement = document.getElementById(modalId);
+    if (modalElement) {
+        // Koristi Bootstrap modal API ako je dostupan
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            // Proveri da li modal već postoji
+            let modal = bootstrap.Modal.getInstance(modalElement);
+            if (!modal) {
+                modal = new bootstrap.Modal(modalElement, {
+                    backdrop: true,
+                    keyboard: true,
+                    focus: true
+                });
+            }
+            modal.show();
+        } else {
+            // Fallback na custom implementaciju
+            modalElement.classList.add('show', 'active');
+            modalElement.style.display = 'block';
+            // Dodaj backdrop
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            backdrop.id = 'customModalBackdrop';
+            document.body.appendChild(backdrop);
+            document.body.classList.add('modal-open');
+        }
+    }
+};
+
+PeriodTracker.prototype.fixGrammarErrors = function(text) {
+    // Ispravljanje čestih gramatičkih grešaka
+    let fixed = text;
+    
+    // Ispravljanje ijekavice u ekavicu
+    fixed = fixed.replace(/lijepo/gi, 'lepo');
+    fixed = fixed.replace(/dio/gi, 'deo');
+    fixed = fixed.replace(/mlijeko/gi, 'mleko');
+    fixed = fixed.replace(/sretan/gi, 'srećan');
+    fixed = fixed.replace(/želio/gi, 'želeo');
+    fixed = fixed.replace(/htio/gi, 'hteo');
+    fixed = fixed.replace(/lijep/gi, 'lep');
+    fixed = fixed.replace(/lijepa/gi, 'lepa');
+    fixed = fixed.replace(/lijepi/gi, 'lepi');
+    
+    // Ispravljanje trećeg lica množine u drugo lice jednine
+    fixed = fixed.replace(/ocenjujete/gi, 'ocenjuješ');
+    fixed = fixed.replace(/ste/gi, 'si');
+    fixed = fixed.replace(/biste/gi, 'bi');
+    fixed = fixed.replace(/imate/gi, 'imaš');
+    fixed = fixed.replace(/osećate/gi, 'osećaš');
+    
+    return fixed;
+};
+
+PeriodTracker.prototype.formatDate = function(date) {
+    if (!date) return '-';
+    
+    const d = new Date(date);
+    const months = [
+        'januar', 'februar', 'mart', 'april', 'maj', 'jun',
+        'jul', 'avgust', 'septembar', 'oktobar', 'novembar', 'decembar'
+    ];
+    
+    const days = [
+        'nedelja', 'ponedeljak', 'utorak', 'sreda', 'četvrtak', 'petak', 'subota'
+    ];
+    
+    const day = d.getDate();
+    const month = months[d.getMonth()];
+    const year = d.getFullYear();
+    const dayName = days[d.getDay()];
+    
+    return `${dayName}, ${day}. ${month} ${year}.`;
+};
+
+PeriodTracker.prototype.formatDateShort = function(date) {
+    if (!date) return '-';
+    
+    const d = new Date(date);
+    const day = d.getDate();
+    const month = d.getMonth() + 1;
+    const year = d.getFullYear();
+    
+    return `${day}.${month}.${year}.`;
+};
+
+PeriodTracker.prototype.getDaysBetween = function(date1, date2) {
+    const oneDay = 24 * 60 * 60 * 1000;
+    const firstDate = new Date(date1);
+    const secondDate = new Date(date2);
+    const diffTime = Math.abs(secondDate - firstDate);
+    return Math.round(diffTime / oneDay);
+};
+
+
+/* === js\confirm-dialog.js === */
+// Modul za konfirmacione dijaloge
+PeriodTracker.prototype.showConfirmDialog = function(message, title = 'Potvrda', confirmText = 'Potvrdi', cancelText = 'Otkaži') {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade show';
+        modal.style.display = 'flex';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">${title}</h5>
+                        <button type="button" class="btn-close" data-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>${message}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-action="cancel">${cancelText}</button>
+                        <button type="button" class="btn btn-primary" data-action="confirm">${confirmText}</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        const closeModal = () => {
+            modal.classList.remove('show');
+            setTimeout(() => {
+                document.body.removeChild(modal);
+            }, 300);
+        };
+        
+        modal.querySelector('[data-action="confirm"]').addEventListener('click', () => {
+            closeModal();
+            resolve(true);
+        });
+        
+        modal.querySelector('[data-action="cancel"]').addEventListener('click', () => {
+            closeModal();
+            resolve(false);
+        });
+        
+        modal.querySelector('.btn-close').addEventListener('click', () => {
+            closeModal();
+            resolve(false);
+        });
+        
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                closeModal();
+                resolve(false);
+            }
+        });
+    });
+};
+
+
+/* === js\cycles.js === */
+// Modul za upravljanje ciklusima
+PeriodTracker.prototype.getActiveCycle = function() {
+    if (this.cycles.length === 0) return null;
+    
+    // Pronađi ciklus koji je aktivan (nema endDate)
+    const activeCycle = this.cycles.find(cycle => !cycle.endDate);
+    if (activeCycle) return activeCycle;
+    
+    // Ako nema aktivnog ciklusa, vrati poslednji
+    return this.cycles[this.cycles.length - 1];
+};
+
+PeriodTracker.prototype.getCurrentCycleDay = function() {
+    const activeCycle = this.getActiveCycle();
+    if (!activeCycle) return null;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const startDate = new Date(activeCycle.startDate);
+    startDate.setHours(0, 0, 0, 0);
+    
+    const diffTime = today - startDate;
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    return diffDays + 1; // Dan 1 je prvi dan
+};
+
+PeriodTracker.prototype.getCyclePhase = function(day) {
+    if (!day) day = this.getCurrentCycleDay();
+    if (!day) return null;
+    
+    const activeCycle = this.getActiveCycle();
+    if (!activeCycle) return null;
+    
+    const cycleLength = this.calculateAverageCycleLength();
+    const periodLength = activeCycle.duration || this.settings.avgPeriodLength || 5;
+    
+    // Ovulacija se dešava oko 14 dana PRE početka sledeće menstruacije
+    // Lutealna faza je konstantna i traje oko 14 dana
+    const lutealPhaseLength = 14;
+    const ovulationDay = cycleLength - lutealPhaseLength;
+    
+    // Menstruacija: dani 1 do periodLength
+    if (day <= periodLength) {
+        return {
+            name: 'Menstruacija',
+            description: 'Period menstruacije'
+        };
+    }
+    
+    // Plodni dani: 5 dana pre ovulacije, dan ovulacije, i 1 dan posle
+    // Spermatozoidi mogu preživeti do 5 dana, jajna ćelija živi oko 24 sata
+    const fertileStart = ovulationDay - 5;
+    const fertileEnd = ovulationDay + 1;
+    
+    if (day === ovulationDay) {
+        return {
+            name: 'Ovulacija',
+            description: 'Dan ovulacije'
+        };
+    } else if (day >= fertileStart && day <= fertileEnd) {
+        return {
+            name: 'Plodni dani',
+            description: 'Plodni period'
+        };
+    } else if (day < ovulationDay) {
+        return {
+            name: 'Folikularna faza',
+            description: 'Faza rasta folikula'
+        };
+    } else {
+        return {
+            name: 'Lutealna faza',
+            description: 'Faza nakon ovulacije'
+        };
+    }
+};
+
+PeriodTracker.prototype.predictNextPeriod = function() {
+    const activeCycle = this.getActiveCycle();
+    if (!activeCycle) return null;
+    
+    const avgCycleLength = this.calculateAverageCycleLength();
+    const startDate = new Date(activeCycle.startDate);
+    const nextPeriodDate = new Date(startDate);
+    nextPeriodDate.setDate(nextPeriodDate.getDate() + avgCycleLength);
+    
+    return nextPeriodDate;
+};
+
+PeriodTracker.prototype.predictOvulation = function() {
+    const activeCycle = this.getActiveCycle();
+    if (!activeCycle) return null;
+    
+    const avgCycleLength = this.calculateAverageCycleLength();
+    // Ovulacija se dešava oko 14 dana PRE početka sledeće menstruacije
+    // Lutealna faza je konstantna i traje oko 14 dana
+    const lutealPhaseLength = 14;
+    const ovulationDay = avgCycleLength - lutealPhaseLength;
+    
+    const startDate = new Date(activeCycle.startDate);
+    const ovulationDate = new Date(startDate);
+    ovulationDate.setDate(ovulationDate.getDate() + ovulationDay);
+    
+    return ovulationDate;
+};
+
+PeriodTracker.prototype.predictFertileWindow = function() {
+    const ovulationDate = this.predictOvulation();
+    if (!ovulationDate) return null;
+    
+    // Plodni dani: 5 dana pre ovulacije, dan ovulacije, i 1 dan posle
+    // Spermatozoidi mogu preživeti do 5 dana u reproduktivnom traktu
+    // Jajna ćelija je sposobna za oplodnju oko 24 sata nakon ovulacije
+    const fertileStart = new Date(ovulationDate);
+    fertileStart.setDate(fertileStart.getDate() - 5);
+    
+    const fertileEnd = new Date(ovulationDate);
+    fertileEnd.setDate(fertileEnd.getDate() + 1);
+    
+    return {
+        start: fertileStart,
+        end: fertileEnd
+    };
+};
+
+PeriodTracker.prototype.startCycle = function(startDate, duration) {
+    // Završi prethodni ciklus ako postoji
+    const activeCycle = this.getActiveCycle();
+    if (activeCycle && !activeCycle.endDate) {
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() - 1);
+        activeCycle.endDate = endDate;
+    }
+    
+    // Kreiraj novi ciklus
+    const newCycle = {
+        id: Date.now(),
+        startDate: new Date(startDate),
+        duration: duration || this.settings.avgPeriodLength,
+        endDate: null
+    };
+    
+    this.cycles.push(newCycle);
+    this.saveData();
+    
+    return newCycle;
+};
+
+PeriodTracker.prototype.endCycle = function() {
+    const activeCycle = this.getActiveCycle();
+    if (activeCycle && !activeCycle.endDate) {
+        activeCycle.endDate = new Date();
+        this.saveData();
+        return true;
+    }
+    return false;
+};
+
+PeriodTracker.prototype.calculateAverageCycleLength = function() {
+    if (this.cycles.length < 2) {
+        return this.settings.avgCycleLength || 28;
+    }
+    
+    const completedCycles = this.cycles.filter(cycle => cycle.endDate);
+    if (completedCycles.length < 2) {
+        return this.settings.avgCycleLength || 28;
+    }
+    
+    let totalLength = 0;
+    for (let i = 1; i < completedCycles.length; i++) {
+        const prevCycle = completedCycles[i - 1];
+        const currCycle = completedCycles[i];
+        const length = this.getDaysBetween(prevCycle.startDate, currCycle.startDate);
+        totalLength += length;
+    }
+    
+    const average = Math.round(totalLength / (completedCycles.length - 1));
+    return average || this.settings.avgCycleLength || 28;
+};
+
+PeriodTracker.prototype.calculateAveragePeriodLength = function() {
+    if (this.cycles.length === 0) {
+        return this.settings.avgPeriodLength || 5;
+    }
+    
+    const completedCycles = this.cycles.filter(cycle => cycle.duration);
+    if (completedCycles.length === 0) {
+        return this.settings.avgPeriodLength || 5;
+    }
+    
+    const totalLength = completedCycles.reduce((sum, cycle) => sum + cycle.duration, 0);
+    const average = Math.round(totalLength / completedCycles.length);
+    return average || this.settings.avgPeriodLength || 5;
+};
+
+PeriodTracker.prototype.isMenstruationDay = function(date) {
+    return this.isMenstruationDayForDate(date);
+};
+
+PeriodTracker.prototype.isMenstruationDayForDate = function(date) {
+    if (!this.cycles || this.cycles.length === 0) return false;
+    
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    
+    // Proveri sve cikluse (prošle, trenutne i buduće)
+    for (let i = 0; i < this.cycles.length; i++) {
+        const cycle = this.cycles[i];
+        const startDate = new Date(cycle.startDate);
+        startDate.setHours(0, 0, 0, 0);
+        
+        const periodLength = cycle.duration || this.settings.avgPeriodLength || 5;
+        
+        // Proveri da li je datum u periodu menstruacije ovog ciklusa
+        const diffDays = this.getDaysBetween(startDate, checkDate);
+        const cycleDay = diffDays + 1;
+        
+        // Proveri da li je dan u periodu menstruacije (1 do periodLength)
+        if (cycleDay >= 1 && cycleDay <= periodLength) {
+            return true;
+        }
+        
+        // Ako je aktivni ciklus, proveri i sledeću menstruaciju
+        if (i === this.cycles.length - 1 && !cycle.endDate) {
+            const avgCycleLength = this.calculateAverageCycleLength();
+            const nextPeriodStart = new Date(startDate);
+            nextPeriodStart.setDate(nextPeriodStart.getDate() + avgCycleLength);
+            nextPeriodStart.setHours(0, 0, 0, 0);
+            
+            // Proveri da li je datum u budućoj menstruaciji
+            if (checkDate >= nextPeriodStart) {
+                const nextDiffDays = this.getDaysBetween(nextPeriodStart, checkDate);
+                const nextCycleDay = nextDiffDays + 1;
+                
+                if (nextCycleDay >= 1 && nextCycleDay <= periodLength) {
+                    return true;
+                }
+            }
+        }
+    }
+    
+    return false;
+};
+
+PeriodTracker.prototype.isOvulationDay = function(date) {
+    return this.isOvulationDayForDate(date);
+};
+
+PeriodTracker.prototype.isOvulationDayForDate = function(date) {
+    if (!this.cycles || this.cycles.length === 0) return false;
+    
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    const avgCycleLength = this.calculateAverageCycleLength();
+    const lutealPhaseLength = 14;
+    const ovulationDay = avgCycleLength - lutealPhaseLength;
+    
+    // Proveri sve cikluse
+    for (let i = 0; i < this.cycles.length; i++) {
+        const cycle = this.cycles[i];
+        const startDate = new Date(cycle.startDate);
+        startDate.setHours(0, 0, 0, 0);
+        
+        const diffDays = this.getDaysBetween(startDate, checkDate);
+        const cycleDay = diffDays + 1;
+        
+        // Proveri da li je dan ovulacije u ovom ciklusu
+        if (cycleDay === ovulationDay) {
+            // Proveri da li ovaj dan nije u periodu menstruacije
+            const periodLength = cycle.duration || this.settings.avgPeriodLength || 5;
+            if (cycleDay > periodLength) {
+                return true;
+            }
+        }
+        
+        // Ako je aktivni ciklus, proveri i sledeću ovulaciju
+        if (i === this.cycles.length - 1 && !cycle.endDate) {
+            const nextPeriodStart = new Date(startDate);
+            nextPeriodStart.setDate(nextPeriodStart.getDate() + avgCycleLength);
+            nextPeriodStart.setHours(0, 0, 0, 0);
+            
+            // Proveri da li je datum u budućem ciklusu
+            if (checkDate >= nextPeriodStart) {
+                const nextDiffDays = this.getDaysBetween(nextPeriodStart, checkDate);
+                const nextCycleDay = nextDiffDays + 1;
+                
+                if (nextCycleDay === ovulationDay) {
+                    // Proveri da li ovaj dan nije u periodu sledeće menstruacije
+                    const periodLength = cycle.duration || this.settings.avgPeriodLength || 5;
+                    if (nextCycleDay > periodLength) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    
+    return false;
+};
+
+PeriodTracker.prototype.isFertileDay = function(date) {
+    return this.isFertileDayForDate(date);
+};
+
+PeriodTracker.prototype.isFertileDayForDate = function(date) {
+    if (!this.cycles || this.cycles.length === 0) return false;
+    
+    // Ne prikazuj plodne dane ako je već menstruacija ili ovulacija
+    if (this.isMenstruationDayForDate(date) || this.isOvulationDayForDate(date)) {
+        return false;
+    }
+    
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    const avgCycleLength = this.calculateAverageCycleLength();
+    const lutealPhaseLength = 14;
+    const ovulationDay = avgCycleLength - lutealPhaseLength;
+    
+    // Proveri sve cikluse
+    for (let i = 0; i < this.cycles.length; i++) {
+        const cycle = this.cycles[i];
+        const startDate = new Date(cycle.startDate);
+        startDate.setHours(0, 0, 0, 0);
+        
+        const diffDays = this.getDaysBetween(startDate, checkDate);
+        const cycleDay = diffDays + 1;
+        
+        // Plodni dani: 5 dana pre ovulacije, dan ovulacije, i 1 dan posle
+        // Ali ne uključuj dan ovulacije (već je označen kao ovulacija)
+        if (cycleDay >= ovulationDay - 5 && cycleDay <= ovulationDay + 1 && cycleDay !== ovulationDay) {
+            return true;
+        }
+        
+        // Ako je aktivni ciklus, proveri i sledeće plodne dane
+        if (i === this.cycles.length - 1 && !cycle.endDate) {
+            const nextPeriodStart = new Date(startDate);
+            nextPeriodStart.setDate(nextPeriodStart.getDate() + avgCycleLength);
+            nextPeriodStart.setHours(0, 0, 0, 0);
+            
+            const nextDiffDays = this.getDaysBetween(nextPeriodStart, checkDate);
+            const nextCycleDay = nextDiffDays + 1;
+            
+            if (nextCycleDay >= ovulationDay - 5 && nextCycleDay <= ovulationDay + 1 && nextCycleDay !== ovulationDay) {
+                return true;
+            }
+        }
+    }
+    
+    return false;
+};
+
+
+/* === js\charts.js === */
+// Modul za grafikone (Canvas API)
+PeriodTracker.prototype.getThemeColor = function(cssVar, fallback) {
+    const value = getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
+    return value || fallback;
+};
+
+PeriodTracker.prototype.renderSymptomChart = function(canvasId, symptomType) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const symptoms = this.symptoms.slice(-30).sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    if (symptoms.length === 0) {
+        this.showEmptyChart(canvas, 'Nema podataka za prikaz');
+        return;
+    }
+    
+    const width = canvas.width = canvas.offsetWidth;
+    const height = canvas.height = 200;
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Chart area
+    const padding = { top: 20, right: 20, bottom: 30, left: 40 };
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
+    
+    // Get values
+    const values = symptoms.map(s => s[symptomType] || 0);
+    const dates = symptoms.map(s => new Date(s.date));
+    
+    const minValue = 0;
+    const maxValue = 10;
+    const valueRange = maxValue - minValue;
+    
+    const borderColor = this.getThemeColor('--border-color', '#e0e0e0');
+    const textSecondary = this.getThemeColor('--text-secondary', '#666666');
+    const accentPrimary = this.getThemeColor('--accent-primary', '#e91e63');
+    const textPrimary = this.getThemeColor('--text-primary', '#1a1a1a');
+
+    // Draw grid
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+        const y = padding.top + (chartHeight / 5) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(width - padding.right, y);
+        ctx.stroke();
+        
+        // Labels
+        ctx.fillStyle = textSecondary;
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'right';
+        ctx.fillText((10 - i * 2).toString(), padding.left - 5, y + 3);
+    }
+    
+    // Draw line
+    ctx.strokeStyle = accentPrimary;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    
+    values.forEach((value, index) => {
+        const x = padding.left + (chartWidth / (values.length - 1 || 1)) * index;
+        const y = padding.top + chartHeight - ((value - minValue) / valueRange) * chartHeight;
+        
+        if (index === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
+    
+    ctx.stroke();
+    
+    // Draw points
+    ctx.fillStyle = accentPrimary;
+    values.forEach((value, index) => {
+        const x = padding.left + (chartWidth / (values.length - 1 || 1)) * index;
+        const y = padding.top + chartHeight - ((value - minValue) / valueRange) * chartHeight;
+        
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+    });
+    
+    // Draw area under line
+    ctx.fillStyle = 'rgba(233, 30, 99, 0.1)';
+    ctx.beginPath();
+    ctx.moveTo(padding.left, padding.top + chartHeight);
+    values.forEach((value, index) => {
+        const x = padding.left + (chartWidth / (values.length - 1 || 1)) * index;
+        const y = padding.top + chartHeight - ((value - minValue) / valueRange) * chartHeight;
+        ctx.lineTo(x, y);
+    });
+    ctx.lineTo(padding.left + chartWidth, padding.top + chartHeight);
+    ctx.closePath();
+    ctx.fill();
+};
+
+PeriodTracker.prototype.showEmptyChart = function(canvas, message) {
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width = canvas.offsetWidth;
+    const height = canvas.height = 200;
+    
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = textSecondary;
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(message, width / 2, height / 2);
+};
+
+PeriodTracker.prototype.renderCycleLengthChart = function(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const completedCycles = this.cycles.filter(c => c.duration).slice(-12);
+    
+    if (completedCycles.length === 0) {
+        this.showEmptyChart(canvas, 'Nema podataka za prikaz');
+        return;
+    }
+    
+    const width = canvas.width = canvas.offsetWidth;
+    const height = canvas.height = 200;
+    
+    ctx.clearRect(0, 0, width, height);
+    
+    const padding = { top: 20, right: 20, bottom: 30, left: 40 };
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
+    
+    const lengths = completedCycles.map(c => c.duration);
+    const minLength = Math.min(...lengths, 21);
+    const maxLength = Math.max(...lengths, 35);
+    const range = maxLength - minLength || 1;
+    
+    const borderColor = this.getThemeColor('--border-color', '#e0e0e0');
+    const textSecondary = this.getThemeColor('--text-secondary', '#666666');
+    const accentPrimary = this.getThemeColor('--accent-primary', '#e91e63');
+    const textPrimary = this.getThemeColor('--text-primary', '#1a1a1a');
+
+    // Grid
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+        const y = padding.top + (chartHeight / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(width - padding.right, y);
+        ctx.stroke();
+        
+        ctx.fillStyle = textSecondary;
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'right';
+        const value = Math.round(maxLength - (range / 4) * i);
+        ctx.fillText(value.toString(), padding.left - 5, y + 3);
+    }
+    
+    // Bars
+    const barWidth = chartWidth / lengths.length * 0.7;
+    const barSpacing = chartWidth / lengths.length;
+    
+    lengths.forEach((length, index) => {
+        const x = padding.left + barSpacing * index + (barSpacing - barWidth) / 2;
+        const barHeight = ((length - minLength) / range) * chartHeight;
+        const y = padding.top + chartHeight - barHeight;
+        
+        // Bar
+        ctx.fillStyle = accentPrimary;
+        ctx.fillRect(x, y, barWidth, barHeight);
+        
+        // Value label
+        ctx.fillStyle = textPrimary;
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(length.toString(), x + barWidth / 2, y - 5);
+    });
+};
+
+
+/* === js\dashboard.js === */
+// Modul za dashboard
+PeriodTracker.prototype.updateDashboard = function() {
+    this.updateCycleStatus();
+    this.updatePredictions();
+    this.updateStatistics();
+    this.updateSymptomsStatistics();
+    
+};
+
+PeriodTracker.prototype.updateCycleStatus = function() {
+    const cycleDay = this.getCurrentCycleDay();
+    const cyclePhase = this.getCyclePhase(cycleDay);
+    const activeCycle = this.getActiveCycle();
+    
+    const cycleDayEl = document.getElementById('currentCycleDay');
+    const cyclePhaseEl = document.getElementById('currentCyclePhase');
+    const progressFill = document.getElementById('cycleProgress');
+    const progressLabel = document.getElementById('cycleProgressLabel');
+    
+    if (!activeCycle) {
+        if (cycleDayEl) cycleDayEl.textContent = '-';
+        if (cyclePhaseEl) cyclePhaseEl.textContent = 'Nema aktivnog ciklusa';
+        if (progressFill) progressFill.style.width = '0%';
+        if (progressLabel) progressLabel.textContent = '0%';
+        return;
+    }
+    
+    if (cycleDayEl) {
+        cycleDayEl.textContent = cycleDay || '-';
+    }
+    
+    if (cyclePhaseEl && cyclePhase) {
+        cyclePhaseEl.textContent = cyclePhase.name;
+    }
+    
+    // Izračunaj progress
+    const avgCycleLength = this.calculateAverageCycleLength();
+    const progress = cycleDay ? Math.min((cycleDay / avgCycleLength) * 100, 100) : 0;
+    
+    if (progressFill) {
+        progressFill.style.width = `${progress}%`;
+    }
+    
+    if (progressLabel) {
+        progressLabel.textContent = `${Math.round(progress)}%`;
+    }
+};
+
+PeriodTracker.prototype.updatePredictions = function() {
+    const nextPeriod = this.predictNextPeriod();
+    const ovulation = this.predictOvulation();
+    const fertileWindow = this.predictFertileWindow();
+    
+    const nextPeriodEl = document.getElementById('nextPeriodDate');
+    const ovulationEl = document.getElementById('ovulationDate');
+    const fertileEl = document.getElementById('fertileWindow');
+    
+    if (nextPeriodEl) {
+        nextPeriodEl.textContent = nextPeriod ? this.formatDateShort(nextPeriod) : '-';
+    }
+    
+    if (ovulationEl) {
+        ovulationEl.textContent = ovulation ? this.formatDateShort(ovulation) : '-';
+    }
+    
+    if (fertileEl) {
+        if (fertileWindow) {
+            fertileEl.textContent = `${this.formatDateShort(fertileWindow.start)} - ${this.formatDateShort(fertileWindow.end)}`;
+        } else {
+            fertileEl.textContent = '-';
+        }
+    }
+};
+
+PeriodTracker.prototype.updateStatistics = function() {
+    const emptyState = document.getElementById('statisticsEmptyState');
+    const statisticsGrid = document.getElementById('statisticsGrid');
+    const chartContainer = document.querySelector('#cycleLengthChart');
+    const chartParent = chartContainer ? chartContainer.parentElement : null;
+    
+    const avgCycleLength = this.calculateAverageCycleLength();
+    const avgPeriodLength = this.calculateAveragePeriodLength();
+    const totalCycles = this.cycles.length;
+    
+    // Empty state
+    if (this.cycles.length === 0) {
+        if (emptyState) emptyState.style.display = 'block';
+        if (statisticsGrid) statisticsGrid.style.display = 'none';
+        if (chartParent) chartParent.style.display = 'none';
+        return;
+    } else {
+        if (emptyState) emptyState.style.display = 'none';
+        if (statisticsGrid) statisticsGrid.style.display = 'grid';
+        if (chartParent) chartParent.style.display = 'block';
+    }
+    
+    const avgCycleEl = document.getElementById('statAvgCycleLength');
+    const avgPeriodEl = document.getElementById('statAvgPeriodLength');
+    const totalCyclesEl = document.getElementById('totalCycles');
+    
+    if (avgCycleEl) {
+        avgCycleEl.textContent = `${avgCycleLength} dana`;
+    }
+    
+    if (avgPeriodEl) {
+        avgPeriodEl.textContent = `${avgPeriodLength} dana`;
+    }
+    
+    if (totalCyclesEl) {
+        totalCyclesEl.textContent = totalCycles;
+    }
+    
+    // Napredna statistika
+    const completedCycles = this.cycles.filter(c => c.duration);
+    if (completedCycles.length > 0) {
+        const lengths = completedCycles.map(c => c.duration);
+        const shortest = Math.min(...lengths);
+        const longest = Math.max(...lengths);
+        
+        const shortestEl = document.getElementById('shortestCycle');
+        const longestEl = document.getElementById('longestCycle');
+        
+        if (shortestEl) {
+            shortestEl.textContent = `${shortest} dana`;
+        }
+        
+        if (longestEl) {
+            longestEl.textContent = `${longest} dana`;
+        }
+        
+        // Regularnost (standardna devijacija)
+        const mean = avgCycleLength;
+        const variance = lengths.reduce((sum, len) => sum + Math.pow(len - mean, 2), 0) / lengths.length;
+        const stdDev = Math.sqrt(variance);
+        const regularity = stdDev < 3 ? 'Regularan' : stdDev < 7 ? 'Umereno' : 'Neregularan';
+        
+        const regularityEl = document.getElementById('cycleRegularity');
+        if (regularityEl) {
+            regularityEl.textContent = regularity;
+        }
+        
+        // Renderuj grafikone
+        if (this.renderCycleLengthChart) {
+            this.renderCycleLengthChart('cycleLengthChart');
+        }
+    } else {
+        const shortestEl = document.getElementById('shortestCycle');
+        const longestEl = document.getElementById('longestCycle');
+        const regularityEl = document.getElementById('cycleRegularity');
+        
+        if (shortestEl) shortestEl.textContent = '-';
+        if (longestEl) longestEl.textContent = '-';
+        if (regularityEl) regularityEl.textContent = '-';
+    }
+};
+
+PeriodTracker.prototype.updateSymptomsStatistics = function() {
+    if (this.symptoms.length === 0) {
+        document.getElementById('avgEnergy').style.width = '0%';
+        document.getElementById('avgEnergyValue').textContent = '-';
+        document.getElementById('avgMood').style.width = '0%';
+        document.getElementById('avgMoodValue').textContent = '-';
+        document.getElementById('avgPain').style.width = '0%';
+        document.getElementById('avgPainValue').textContent = '-';
+        document.getElementById('avgLibido').style.width = '0%';
+        document.getElementById('avgLibidoValue').textContent = '-';
+        return;
+    }
+    
+    // Izračunaj proseke
+    const avgEnergy = this.symptoms.reduce((sum, s) => sum + (s.energy || 0), 0) / this.symptoms.length;
+    const avgMood = this.symptoms.reduce((sum, s) => sum + (s.mood || 0), 0) / this.symptoms.length;
+    const avgPain = this.symptoms.reduce((sum, s) => sum + (s.pain || 0), 0) / this.symptoms.length;
+    const avgLibido = this.symptoms.reduce((sum, s) => sum + (s.libido || 0), 0) / this.symptoms.length;
+    
+    // Ažuriraj UI
+    const energyFill = document.getElementById('avgEnergy');
+    const energyValue = document.getElementById('avgEnergyValue');
+    if (energyFill) energyFill.style.width = `${(avgEnergy / 10) * 100}%`;
+    if (energyValue) energyValue.textContent = `${avgEnergy.toFixed(1)}/10`;
+    
+    const moodFill = document.getElementById('avgMood');
+    const moodValue = document.getElementById('avgMoodValue');
+    if (moodFill) moodFill.style.width = `${(avgMood / 10) * 100}%`;
+    if (moodValue) moodValue.textContent = `${avgMood.toFixed(1)}/10`;
+    
+    const painFill = document.getElementById('avgPain');
+    const painValue = document.getElementById('avgPainValue');
+    if (painFill) painFill.style.width = `${(avgPain / 10) * 100}%`;
+    if (painValue) painValue.textContent = `${avgPain.toFixed(1)}/10`;
+    
+    const libidoFill = document.getElementById('avgLibido');
+    const libidoValue = document.getElementById('avgLibidoValue');
+    if (libidoFill) libidoFill.style.width = `${(avgLibido / 10) * 100}%`;
+    if (libidoValue) libidoValue.textContent = `${avgLibido.toFixed(1)}/10`;
+};
+
+
+/* === js\calendar.js === */
+// Modul za kalendar
+PeriodTracker.prototype.renderCalendar = function() {
+    if (!this.calendarDate) {
+        this.calendarDate = new Date();
+    }
+    
+    const year = this.calendarDate.getFullYear();
+    const month = this.calendarDate.getMonth();
+    
+    // Ažuriraj zaglavlje
+    this.updateCalendarHeader();
+    
+    // Kreiraj grid
+    const grid = document.getElementById('calendarGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+    
+    // Dodaj dane u nedelji
+    const dayNames = ['Pon', 'Uto', 'Sre', 'Čet', 'Pet', 'Sub', 'Ned'];
+    dayNames.forEach(dayName => {
+        const dayHeader = document.createElement('div');
+        dayHeader.className = 'calendar-day-header';
+        dayHeader.textContent = dayName;
+        grid.appendChild(dayHeader);
+    });
+    
+    // Prvi dan meseca
+    const firstDay = new Date(year, month, 1);
+    const firstDayOfWeek = (firstDay.getDay() + 6) % 7; // Ponedeljak = 0
+    
+    // Poslednji dan meseca
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    
+    // Prethodni mesec - poslednji dani
+    const prevMonthLastDay = new Date(year, month, 0).getDate();
+    
+    // Dodaj prazne ćelije za dane pre početka meseca
+    for (let i = 0; i < firstDayOfWeek; i++) {
+        const day = prevMonthLastDay - firstDayOfWeek + i + 1;
+        const date = new Date(year, month - 1, day);
+        const dayEl = this.createCalendarDay(date, true);
+        grid.appendChild(dayEl);
+    }
+    
+    // Dodaj dane trenutnog meseca
+    for (let day = 1; day <= daysInMonth; day++) {
+        const date = new Date(year, month, day);
+        const dayEl = this.createCalendarDay(date, false);
+        grid.appendChild(dayEl);
+    }
+    
+    // Dodaj prazne ćelije za dane posle kraja meseca
+    const totalCells = firstDayOfWeek + daysInMonth;
+    const remainingCells = 7 - (totalCells % 7);
+    if (remainingCells < 7) {
+        for (let day = 1; day <= remainingCells; day++) {
+            const date = new Date(year, month + 1, day);
+            const dayEl = this.createCalendarDay(date, true);
+            grid.appendChild(dayEl);
+        }
+    }
+};
+
+PeriodTracker.prototype.createCalendarDay = function(date, isOtherMonth) {
+    const dayEl = document.createElement('div');
+    dayEl.className = 'calendar-day';
+    dayEl.textContent = date.getDate();
+    dayEl.setAttribute('data-date', date.toISOString().split('T')[0]);
+    
+    if (isOtherMonth) {
+        dayEl.classList.add('other-month');
+    }
+    
+    // Proveri da li je danas
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    
+    if (checkDate.getTime() === today.getTime()) {
+        dayEl.classList.add('today');
+    }
+    
+    // Dodaj klase za ciklus
+    const dayClass = this.getDayClass(date);
+    if (dayClass) {
+        dayEl.classList.add(dayClass);
+    }
+    
+    // Dodaj event listener za klik
+    dayEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.showDayOptions(date);
+    });
+    
+    return dayEl;
+};
+
+PeriodTracker.prototype.showDayOptions = function(date) {
+    const dateStr = this.formatDateShort(date);
+    const isMenstruationDay = this.isMenstruationDayForDate(date);
+    const activeCycle = this.getActiveCycle();
+    const hasSymptoms = this.symptoms.some(s => {
+        const sDate = new Date(s.date);
+        sDate.setHours(0, 0, 0, 0);
+        const checkDate = new Date(date);
+        checkDate.setHours(0, 0, 0, 0);
+        return sDate.getTime() === checkDate.getTime();
+    });
+    
+    // Kreiraj modal sa opcijama
+    const modal = document.createElement('div');
+    modal.className = 'modal fade show';
+    modal.style.display = 'flex';
+    modal.id = 'dayOptionsModal';
+    modal.innerHTML = `
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-calendar-day"></i> Opcije za ${dateStr}
+                    </h5>
+                    <button type="button" class="btn-close" data-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="day-options-list">
+                        ${!activeCycle || !isMenstruationDay ? `
+                            <button class="day-option-btn" data-action="start-cycle">
+                                <i class="fas fa-play"></i>
+                                <span>Počni Menstruaciju</span>
+                            </button>
+                        ` : ''}
+                        ${isMenstruationDay && activeCycle ? `
+                            <button class="day-option-btn" data-action="end-cycle">
+                                <i class="fas fa-stop"></i>
+                                <span>Prekini Menstruaciju</span>
+                            </button>
+                            <button class="day-option-btn" data-action="continue-cycle">
+                                <i class="fas fa-clock"></i>
+                                <span>Menstruacija Još Traje</span>
+                            </button>
+                        ` : ''}
+                        <button class="day-option-btn" data-action="add-symptoms">
+                            <i class="fas fa-edit"></i>
+                            <span>${hasSymptoms ? 'Izmeni Simptome' : 'Dodaj Simptome'}</span>
+                        </button>
+                        <button class="day-option-btn" data-action="start-survey">
+                            <i class="fas fa-clipboard-list"></i>
+                            <span>Popuni Anketu</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Event listeneri
+    const closeModal = () => {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            if (modal.parentNode) {
+                modal.parentNode.removeChild(modal);
+            }
+        }, 300);
+    };
+    
+    modal.querySelector('.btn-close').addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeModal();
+        }
+    });
+    
+    // Opcije
+    modal.querySelectorAll('.day-option-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const action = e.currentTarget.getAttribute('data-action');
+            closeModal();
+            this.handleDayOption(action, date);
+        });
+    });
+};
+
+PeriodTracker.prototype.handleDayOption = function(action, date) {
+    switch(action) {
+        case 'start-cycle':
+            this.startCycleFromDate(date);
+            break;
+        case 'end-cycle':
+            this.endCycleFromDate(date);
+            break;
+        case 'continue-cycle':
+            this.continueCycleFromDate(date);
+            break;
+        case 'add-symptoms':
+            this.addSymptomsForDate(date);
+            break;
+        case 'start-survey':
+            this.startSurveyForDate(date);
+            break;
+    }
+};
+
+PeriodTracker.prototype.startCycleFromDate = function(date) {
+    const dateInput = document.getElementById('cycleStartDate');
+    const durationInput = document.getElementById('cycleDuration');
+    
+    if (dateInput) {
+        dateInput.value = date.toISOString().split('T')[0];
+    }
+    
+    if (durationInput) {
+        durationInput.value = this.settings.avgPeriodLength || 5;
+    }
+    
+    this.openModal('startCycleModal');
+};
+
+PeriodTracker.prototype.endCycleFromDate = async function(date) {
+    const activeCycle = this.getActiveCycle();
+    if (!activeCycle) {
+        this.showWarning('Nema aktivnog ciklusa.');
+        return;
+    }
+    
+    const confirmed = await this.showConfirmDialog(
+        `Da li želiš da prekineš menstruaciju na dan ${this.formatDateShort(date)}?`,
+        'Prekini Menstruaciju',
+        'Prekini',
+        'Otkaži'
+    );
+    
+    if (confirmed) {
+        const startDate = new Date(activeCycle.startDate);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(date);
+        endDate.setHours(0, 0, 0, 0);
+        
+        const diffDays = this.getDaysBetween(startDate, endDate);
+        
+        if (diffDays < 0) {
+            this.showError('Datum prekida ne može biti pre početka ciklusa.');
+            return;
+        }
+        
+        activeCycle.duration = diffDays + 1;
+        activeCycle.endDate = date;
+        
+        this.saveData();
+        this.updateDashboard();
+        this.renderCalendar();
+        this.showSuccess(`Menstruacija je prekinuta na dan ${this.formatDateShort(date)}.`);
+    }
+};
+
+PeriodTracker.prototype.continueCycleFromDate = function(date) {
+    const activeCycle = this.getActiveCycle();
+    if (!activeCycle) {
+        this.showWarning('Nema aktivnog ciklusa.');
+        return;
+    }
+    
+    const startDate = new Date(activeCycle.startDate);
+    startDate.setHours(0, 0, 0, 0);
+    const continueDate = new Date(date);
+    continueDate.setHours(0, 0, 0, 0);
+    
+    const diffDays = this.getDaysBetween(startDate, continueDate);
+    
+    if (diffDays < 0) {
+        this.showError('Datum ne može biti pre početka ciklusa.');
+        return;
+    }
+    
+    // Ažuriraj dužinu menstruacije
+    activeCycle.duration = diffDays + 1;
+    
+    this.saveData();
+    this.updateDashboard();
+    this.renderCalendar();
+    this.showInfo(`Menstruacija je označena da traje do ${this.formatDateShort(date)}.`);
+};
+
+PeriodTracker.prototype.addSymptomsForDate = function(date) {
+    const dateInput = document.getElementById('symptomDate');
+    if (dateInput) {
+        dateInput.value = date.toISOString().split('T')[0];
+    }
+    
+    // Proveri da li već postoji unos
+    const existingSymptom = this.symptoms.find(s => {
+        const sDate = new Date(s.date);
+        sDate.setHours(0, 0, 0, 0);
+        const checkDate = new Date(date);
+        checkDate.setHours(0, 0, 0, 0);
+        return sDate.getTime() === checkDate.getTime();
+    });
+    
+    if (existingSymptom) {
+        // Popuni formu sa postojećim podacima
+        document.getElementById('energyRange').value = existingSymptom.energy || 5;
+        document.getElementById('moodRange').value = existingSymptom.mood || 5;
+        document.getElementById('painRange').value = existingSymptom.pain || 1;
+        document.getElementById('libidoRange').value = existingSymptom.libido || 5;
+        
+        // Ažuriraj vrednosti
+        document.getElementById('energyValue').textContent = existingSymptom.energy || 5;
+        document.getElementById('moodValue').textContent = existingSymptom.mood || 5;
+        document.getElementById('painValue').textContent = existingSymptom.pain || 1;
+        document.getElementById('libidoValue').textContent = existingSymptom.libido || 5;
+        
+        // Checkboxe
+        if (existingSymptom.additionalSymptoms) {
+            existingSymptom.additionalSymptoms.forEach(symptom => {
+                const checkbox = document.querySelector(`input[name="symptoms"][value="${symptom}"]`);
+                if (checkbox) {
+                    checkbox.checked = true;
+                }
+            });
+        }
+    }
+    
+    // Prebaci na Symptoms tab
+    const symptomsTab = document.querySelector('[data-tab="symptoms"]');
+    if (symptomsTab) {
+        symptomsTab.click();
+    }
+    
+    // Scrolluj do forme
+    setTimeout(() => {
+        const form = document.getElementById('symptomForm');
+        if (form) {
+            form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }, 300);
+};
+
+PeriodTracker.prototype.startSurveyForDate = function(date) {
+    // Prebaci na Dashboard tab
+    const dashboardTab = document.querySelector('[data-tab="dashboard"]');
+    if (dashboardTab) {
+        dashboardTab.click();
+    }
+    
+    // Pokreni anketu
+    setTimeout(() => {
+        if (this.surveyModule) {
+            this.surveyModule.startDailySurvey(true);
+        }
+    }, 300);
+};
+
+PeriodTracker.prototype.getDayClass = function(date) {
+    const activeCycle = this.getActiveCycle();
+    if (!activeCycle) return null;
+    
+    const startDate = new Date(activeCycle.startDate);
+    startDate.setHours(0, 0, 0, 0);
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    
+    const diffDays = this.getDaysBetween(startDate, checkDate);
+    const cycleDay = diffDays + 1;
+    
+    // Proveri da li je dan u ovom ciklusu
+    const cycleLength = this.calculateAverageCycleLength();
+    if (cycleDay < 1 || cycleDay > cycleLength) {
+        // Proveri da li je dan u budućem ciklusu
+        const nextPeriodStart = new Date(startDate);
+        nextPeriodStart.setDate(nextPeriodStart.getDate() + cycleLength);
+        nextPeriodStart.setHours(0, 0, 0, 0);
+        
+        if (checkDate >= nextPeriodStart) {
+            const nextDiffDays = this.getDaysBetween(nextPeriodStart, checkDate);
+            const nextCycleDay = nextDiffDays + 1;
+            
+            if (nextCycleDay <= cycleLength) {
+                return this.getPhaseClassForDay(nextCycleDay, activeCycle, cycleLength);
+            }
+        }
+        return null;
+    }
+    
+    return this.getPhaseClassForDay(cycleDay, activeCycle, cycleLength);
+};
+
+PeriodTracker.prototype.getPhaseClassForDay = function(day, activeCycle, cycleLength) {
+    const periodLength = activeCycle.duration || this.settings.avgPeriodLength || 5;
+    const lutealPhaseLength = 14;
+    const ovulationDay = cycleLength - lutealPhaseLength;
+    
+    // Menstruacija: dani 1 do periodLength
+    if (day <= periodLength) {
+        return 'menstruation';
+    }
+    
+    // Ovulacija: tačan dan ovulacije
+    if (day === ovulationDay) {
+        return 'ovulation';
+    }
+    
+    // Plodni dani: 5 dana pre ovulacije, dan ovulacije, i 1 dan posle (ali ne uključuj dan ovulacije jer je već označen)
+    const fertileStart = ovulationDay - 5;
+    const fertileEnd = ovulationDay + 1;
+    if (day >= fertileStart && day <= fertileEnd && day !== ovulationDay) {
+        return 'fertile';
+    }
+    
+    // Folikularna faza: od kraja menstruacije do početka plodnih dana
+    if (day > periodLength && day < fertileStart) {
+        return 'follicular';
+    }
+    
+    // Lutealna faza: od kraja plodnih dana do kraja ciklusa
+    if (day > fertileEnd) {
+        return 'luteal';
+    }
+    
+    return null;
+};
+
+PeriodTracker.prototype.changeMonth = function(direction) {
+    if (!this.calendarDate) {
+        this.calendarDate = new Date();
+    }
+    
+    if (direction === 'prev') {
+        this.calendarDate.setMonth(this.calendarDate.getMonth() - 1);
+    } else if (direction === 'next') {
+        this.calendarDate.setMonth(this.calendarDate.getMonth() + 1);
+    }
+    
+    this.renderCalendar();
+};
+
+PeriodTracker.prototype.updateCalendarHeader = function() {
+    if (!this.calendarDate) {
+        this.calendarDate = new Date();
+    }
+    
+    const months = [
+        'Januar', 'Februar', 'Mart', 'April', 'Maj', 'Jun',
+        'Jul', 'Avgust', 'Septembar', 'Oktobar', 'Novembar', 'Decembar'
+    ];
+    
+    const monthYear = document.getElementById('calendarMonthYear');
+    if (monthYear) {
+        monthYear.textContent = `${months[this.calendarDate.getMonth()]} ${this.calendarDate.getFullYear()}`;
+    }
+};
+
+
+/* === js\symptoms.js === */
+// Modul za simptome
+PeriodTracker.prototype.updateSymptomsDisplay = function() {
+    const historyContainer = document.getElementById('symptomsHistory');
+    if (!historyContainer) return;
+    
+    if (this.symptoms.length === 0) {
+        historyContainer.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-clipboard-list empty-icon"></i>
+                <p class="empty-message">Nema zabeleženih simptoma</p>
+                <button class="btn btn-primary btn-sm" onclick="document.getElementById('recordSymptomsBtn').click()">
+                    <i class="fas fa-plus"></i> Zabeleži Prvi Simptom
+                </button>
+            </div>
+        `;
+        return;
+    }
+    
+    // Sortiraj simptome po datumu (najnoviji prvi)
+    const sortedSymptoms = [...this.symptoms].sort((a, b) => {
+        return new Date(b.date) - new Date(a.date);
+    });
+    
+    historyContainer.innerHTML = '';
+    
+    sortedSymptoms.forEach(symptom => {
+        const entry = document.createElement('div');
+        entry.className = 'symptom-entry';
+        
+        const header = document.createElement('div');
+        header.className = 'symptom-entry-header';
+        
+        const date = document.createElement('div');
+        date.className = 'symptom-entry-date';
+        date.textContent = this.formatDate(symptom.date);
+        header.appendChild(date);
+        
+        entry.appendChild(header);
+        
+        // Vrednosti simptoma
+        const values = document.createElement('div');
+        values.className = 'symptom-entry-values';
+        
+        if (symptom.energy !== undefined) {
+            const energy = document.createElement('div');
+            energy.className = 'symptom-entry-value';
+            energy.textContent = `Energija: ${symptom.energy}/10`;
+            values.appendChild(energy);
+        }
+        
+        if (symptom.mood !== undefined) {
+            const mood = document.createElement('div');
+            mood.className = 'symptom-entry-value';
+            mood.textContent = `Raspoloženje: ${symptom.mood}/10`;
+            values.appendChild(mood);
+        }
+        
+        if (symptom.pain !== undefined) {
+            const pain = document.createElement('div');
+            pain.className = 'symptom-entry-value';
+            pain.textContent = `Bol: ${symptom.pain}/10`;
+            values.appendChild(pain);
+        }
+        
+        if (symptom.libido !== undefined) {
+            const libido = document.createElement('div');
+            libido.className = 'symptom-entry-value';
+            libido.textContent = `Libido: ${symptom.libido}/10`;
+            values.appendChild(libido);
+        }
+        
+        if (symptom.additionalSymptoms && symptom.additionalSymptoms.length > 0) {
+            const additional = document.createElement('div');
+            additional.className = 'symptom-entry-value';
+            additional.textContent = `Dodatni: ${symptom.additionalSymptoms.join(', ')}`;
+            values.appendChild(additional);
+        }
+        
+        entry.appendChild(values);
+        
+        // AI sažetak ako postoji
+        if (symptom.aiSummary) {
+            const summary = document.createElement('div');
+            summary.className = 'symptom-entry-summary';
+            summary.textContent = symptom.aiSummary;
+            entry.appendChild(summary);
+        }
+        
+        historyContainer.appendChild(entry);
+    });
+};
+
+// updateSymptomsStatistics je implementirana u dashboard.js
+// Ne treba duplikat ovde jer bi to stvorilo beskonačnu rekurziju
+
+PeriodTracker.prototype.getSymptomNameInSerbian = function(symptomKey) {
+    const translations = {
+        'glavobolja': 'Glavobolja',
+        'grčevi': 'Grčevi',
+        'nadutost': 'Nadutost',
+        'osetljivost_grudi': 'Osetljivost grudi',
+        'umor': 'Umor',
+        'akne': 'Akne'
+    };
+    
+    return translations[symptomKey] || symptomKey;
+};
+
+PeriodTracker.prototype.generateSurveySummary = async function(symptomEntry) {
+    // Ova metoda će biti pozvana iz anketa.js kada se anketa završi
+    // Za sada vraćamo prazan string, ali će se implementirati sa Groq API-jem
+    return '';
+};
+
+
+/* === js\formular-za-simptome.js === */
+// Modul za formular simptoma
+class FormularZaSimptome {
+    constructor(tracker) {
+        this.tracker = tracker;
+        this.init();
+    }
+    
+    init() {
+        const form = document.getElementById('symptomForm');
+        if (!form) return;
+        
+        // Postavi datum na danas
+        const dateInput = document.getElementById('symptomDate');
+        if (dateInput) {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.value = today;
+        }
+        
+        // Event listeneri za range inpute
+        const ranges = ['energyRange', 'moodRange', 'painRange', 'libidoRange'];
+        ranges.forEach(rangeId => {
+            const range = document.getElementById(rangeId);
+            if (range) {
+                range.addEventListener('input', (e) => {
+                    this.updateRangeValue(e.target);
+                });
+            }
+        });
+        
+        // Submit formulara
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.saveSymptoms();
+        });
+    }
+    
+    updateRangeValue(range) {
+        const valueId = range.id.replace('Range', 'Value');
+        const valueEl = document.getElementById(valueId);
+        if (valueEl) {
+            valueEl.textContent = range.value;
+        }
+    }
+    
+    async saveSymptoms() {
+        const dateInput = document.getElementById('symptomDate');
+        const energyRange = document.getElementById('energyRange');
+        const moodRange = document.getElementById('moodRange');
+        const painRange = document.getElementById('painRange');
+        const libidoRange = document.getElementById('libidoRange');
+        const additionalCheckboxes = document.querySelectorAll('input[name="symptoms"]:checked');
+        
+        if (!dateInput || !dateInput.value) {
+            this.tracker.showWarning('Molimo te izaberi datum.');
+            return;
+        }
+        
+        const symptomEntry = {
+            id: Date.now(),
+            date: new Date(dateInput.value),
+            energy: parseInt(energyRange.value),
+            mood: parseInt(moodRange.value),
+            pain: parseInt(painRange.value),
+            libido: parseInt(libidoRange.value),
+            additionalSymptoms: Array.from(additionalCheckboxes).map(cb => {
+                return this.tracker.getSymptomNameInSerbian(cb.value);
+            })
+        };
+        
+        // Proveri da li već postoji unos za taj datum
+        const existingIndex = this.tracker.symptoms.findIndex(s => {
+            const sDate = new Date(s.date).toISOString().split('T')[0];
+            const entryDate = new Date(symptomEntry.date).toISOString().split('T')[0];
+            return sDate === entryDate;
+        });
+        
+        if (existingIndex !== -1) {
+            const confirmed = await this.tracker.showConfirmDialog(
+                'Već postoji unos za ovaj datum. Da li želiš da ga zameniš?',
+                'Zameni Unos',
+                'Zameni',
+                'Otkaži'
+            );
+            if (confirmed) {
+                this.tracker.symptoms[existingIndex] = symptomEntry;
+            } else {
+                return;
+            }
+        } else {
+            this.tracker.symptoms.push(symptomEntry);
+        }
+        
+        this.tracker.saveData();
+        this.tracker.updateSymptomsDisplay();
+        this.tracker.updateDashboard();
+        
+        // Resetuj formular
+        document.getElementById('symptomForm').reset();
+        const today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+        
+        // Resetuj range vrednosti
+        document.getElementById('energyValue').textContent = '5';
+        document.getElementById('moodValue').textContent = '5';
+        document.getElementById('painValue').textContent = '1';
+        document.getElementById('libidoValue').textContent = '5';
+        
+        this.tracker.showSuccess('Simptomi su uspešno sačuvani!');
+    }
+}
+
+
+/* === js\anketa.js === */
+// Modul za AI anketu
+class Anketa {
+    constructor(tracker) {
+        this.tracker = tracker;
+        this.currentQuestions = [];
+        this.currentQuestionIndex = 0;
+        this.answers = {};
+        this.groqApiKey = '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';
+        this.groqApiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+        this.model = 'llama-3.1-8b-instant';
+        this.temperature = 0.7;
+        this.lastSurveyDate = null;
+    }
+    
+    async startDailySurvey(force = false) {
+        const today = new Date().toISOString().split('T')[0];
+        const lastSurvey = localStorage.getItem('periodi_lastSurveyDate');
+        
+        if (!force && lastSurvey === today) {
+            return; // Anketa je već popunjena danas
+        }
+        
+        // Resetuj anketu
+        this.currentQuestionIndex = 0;
+        this.answers = {};
+        
+        // Resetuj event listener atribut
+        const submitBtn = document.getElementById('submitSurvey');
+        if (submitBtn) {
+            submitBtn.removeAttribute('data-listener-attached');
+        }
+        
+        // Generiši pitanja
+        await this.generateSurveyQuestions();
+        
+        // Prikaži modal
+        if (this.currentQuestions.length > 0) {
+            this.tracker.openModal('surveyModal');
+            this.displayCurrentQuestion();
+        }
+    }
+    
+    async generateSurveyQuestions() {
+        try {
+            const cycleDay = this.tracker.getCurrentCycleDay();
+            const cyclePhase = this.tracker.getCyclePhase(cycleDay);
+            
+            const prompt = `Generiši 5 pitanja na srpskom jeziku (ekavski dijalekt, latinica) za dnevnu anketu o menstrualnom ciklusu. 
+Korisnica je trenutno u ${cyclePhase ? cyclePhase.name : 'početnoj'} fazi ciklusa, ${cycleDay || 1}. dan.
+Pitanja moraju biti:
+- Na srpskom jeziku (ekavski dijalekt, latinica)
+- U drugom licu jednine (ti, tebe, tvoj)
+- Upućena ženskoj osobi
+- Bez ijekavice (koristi lepo, deo, mleko, srećan, želeo, hteo)
+- Bez engleskih reči
+- Relevantna za fazu ciklusa
+
+Vrati JSON format:
+{
+  "questions": [
+    {
+      "type": "scale",
+      "question": "Pitanje na srpskom",
+      "min": 1,
+      "max": 10
+    },
+    {
+      "type": "checkbox",
+      "question": "Pitanje na srpskom",
+      "options": ["Opcija 1", "Opcija 2", "Opcija 3"]
+    },
+    {
+      "type": "radio",
+      "question": "Pitanje na srpskom",
+      "options": ["Opcija 1", "Opcija 2", "Opcija 3"]
+    }
+  ]
+}
+
+Tipovi pitanja: "scale" (skala 1-10), "checkbox" (više izbora), "radio" (jedan izbor).`;
+
+            const response = await fetch(this.groqApiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.groqApiKey}`
+                },
+                body: JSON.stringify({
+                    model: this.model,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'Ti si asistent koji generiše pitanja za dnevnu anketu o menstrualnom ciklusu. Sve odgovore daješ na srpskom jeziku (ekavski dijalekt, latinica).'
+                        },
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ],
+                    temperature: this.temperature,
+                    max_tokens: 1000
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('API greška');
+            }
+            
+            const data = await response.json();
+            const content = data.choices[0].message.content;
+            
+            // Pokušaj da parsiraš JSON iz odgovora
+            let jsonMatch = content.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                if (parsed.questions && Array.isArray(parsed.questions)) {
+                    this.currentQuestions = parsed.questions.slice(0, 5);
+                    // Validacija i ispravljanje gramatike
+                    this.currentQuestions = this.currentQuestions.map(q => ({
+                        ...q,
+                        question: this.tracker.fixGrammarErrors(q.question)
+                    }));
+                    return;
+                }
+            }
+            
+            throw new Error('Nevalidan format odgovora');
+        } catch (error) {
+            console.error('Greška pri generisanju pitanja:', error);
+            // Fallback na podrazumevana pitanja
+            this.currentQuestions = this.getDefaultSerbianQuestions();
+        }
+    }
+    
+    getDefaultSerbianQuestions() {
+        const cycleDay = this.tracker.getCurrentCycleDay();
+        const cyclePhase = this.tracker.getCyclePhase(cycleDay);
+        
+        return [
+            {
+                type: 'scale',
+                question: `Kako ocenjuješ svoju energiju danas? (1 = vrlo niska, 10 = vrlo visoka)`,
+                min: 1,
+                max: 10
+            },
+            {
+                type: 'scale',
+                question: 'Kako se osećaš danas? (1 = vrlo loše, 10 = odlično)',
+                min: 1,
+                max: 10
+            },
+            {
+                type: 'scale',
+                question: 'Koliko boli osećaš? (1 = nema boli, 10 = jaka bol)',
+                min: 1,
+                max: 10
+            },
+            {
+                type: 'checkbox',
+                question: 'Koje dodatne simptome osećaš danas?',
+                options: ['Glavobolja', 'Grčevi', 'Nadutost', 'Osetljivost grudi', 'Umor', 'Akne']
+            },
+            {
+                type: 'radio',
+                question: 'Kako bi opisala svoj danasnji dan?',
+                options: ['Odličan', 'Dobar', 'Prosečan', 'Loš', 'Vrlo loš']
+            }
+        ];
+    }
+    
+    displayCurrentQuestion() {
+        if (this.currentQuestions.length === 0) return;
+        
+        const question = this.currentQuestions[this.currentQuestionIndex];
+        const questionEl = document.getElementById('surveyQuestion');
+        const answersEl = document.getElementById('surveyAnswers');
+        const nextBtn = document.getElementById('nextSurveyQuestion');
+        const prevBtn = document.getElementById('prevSurveyQuestion');
+        const submitBtn = document.getElementById('submitSurvey');
+        const progressFill = document.getElementById('surveyProgressFill');
+        const progressText = document.getElementById('surveyProgressText');
+        
+        if (!questionEl || !answersEl) return;
+        
+        // Ažuriraj progress
+        const progress = ((this.currentQuestionIndex + 1) / this.currentQuestions.length) * 100;
+        if (progressFill) progressFill.style.width = `${progress}%`;
+        if (progressText) progressText.textContent = `Pitanje ${this.currentQuestionIndex + 1} od ${this.currentQuestions.length}`;
+        
+        // Prikaži pitanje
+        questionEl.textContent = question.question;
+        
+        // Prikaži odgovore
+        answersEl.innerHTML = '';
+        
+        if (question.type === 'scale') {
+            const scaleContainer = document.createElement('div');
+            scaleContainer.style.display = 'flex';
+            scaleContainer.style.flexDirection = 'column';
+            scaleContainer.style.gap = '1rem';
+            
+            const rangeInput = document.createElement('input');
+            rangeInput.type = 'range';
+            rangeInput.min = question.min || 1;
+            rangeInput.max = question.max || 10;
+            rangeInput.value = this.answers[this.currentQuestionIndex] || Math.floor((question.min + question.max) / 2);
+            rangeInput.className = 'range-input';
+            rangeInput.style.width = '100%';
+            
+            const valueDisplay = document.createElement('div');
+            valueDisplay.style.textAlign = 'center';
+            valueDisplay.style.fontSize = '1.5rem';
+            valueDisplay.style.fontWeight = '600';
+            valueDisplay.style.color = 'var(--accent-primary)';
+            valueDisplay.textContent = rangeInput.value;
+            
+            rangeInput.addEventListener('input', (e) => {
+                valueDisplay.textContent = e.target.value;
+                this.answers[this.currentQuestionIndex] = parseInt(e.target.value);
+            });
+            
+            scaleContainer.appendChild(valueDisplay);
+            scaleContainer.appendChild(rangeInput);
+            
+            const labels = document.createElement('div');
+            labels.style.display = 'flex';
+            labels.style.justifyContent = 'space-between';
+            labels.style.fontSize = '0.85rem';
+            labels.style.color = 'var(--text-secondary)';
+            labels.innerHTML = `<span>${question.min || 1}</span><span>${question.max || 10}</span>`;
+            scaleContainer.appendChild(labels);
+            
+            answersEl.appendChild(scaleContainer);
+            
+            // Sačuvaj početnu vrednost
+            this.answers[this.currentQuestionIndex] = parseInt(rangeInput.value);
+        } else if (question.type === 'checkbox' || question.type === 'radio') {
+            question.options.forEach((option, index) => {
+                const answerItem = document.createElement('div');
+                answerItem.className = 'survey-answer-item';
+                
+                const input = document.createElement('input');
+                input.type = question.type;
+                input.name = `question_${this.currentQuestionIndex}`;
+                input.value = option;
+                input.id = `answer_${this.currentQuestionIndex}_${index}`;
+                
+                const label = document.createElement('label');
+                label.htmlFor = `answer_${this.currentQuestionIndex}_${index}`;
+                label.textContent = option;
+                label.style.cursor = 'pointer';
+                label.style.marginLeft = '0.5rem';
+                
+                answerItem.appendChild(input);
+                answerItem.appendChild(label);
+                
+                // Event listener
+                input.addEventListener('change', () => {
+                    if (question.type === 'checkbox') {
+                        if (!this.answers[this.currentQuestionIndex]) {
+                            this.answers[this.currentQuestionIndex] = [];
+                        }
+                        if (input.checked) {
+                            this.answers[this.currentQuestionIndex].push(option);
+                        } else {
+                            this.answers[this.currentQuestionIndex] = this.answers[this.currentQuestionIndex].filter(v => v !== option);
+                        }
+                    } else {
+                        this.answers[this.currentQuestionIndex] = option;
+                    }
+                });
+                
+                answerItem.addEventListener('click', (e) => {
+                    if (e.target !== input) {
+                        input.click();
+                    }
+                });
+                
+                answersEl.appendChild(answerItem);
+            });
+        }
+        
+        // Ažuriraj dugmad
+        if (prevBtn) {
+            prevBtn.style.display = this.currentQuestionIndex > 0 ? 'block' : 'none';
+        }
+        
+        if (nextBtn) {
+            nextBtn.style.display = this.currentQuestionIndex < this.currentQuestions.length - 1 ? 'block' : 'none';
+        }
+        
+        if (submitBtn) {
+            const isLastQuestion = this.currentQuestionIndex === this.currentQuestions.length - 1;
+            submitBtn.style.display = isLastQuestion ? 'block' : 'none';
+            
+            // Postavi event listener direktno na dugme ako je poslednje pitanje
+            if (isLastQuestion) {
+                // Ukloni stare event listenere
+                const oldSubmitBtn = submitBtn;
+                const newSubmitBtn = oldSubmitBtn.cloneNode(true);
+                oldSubmitBtn.parentNode.replaceChild(newSubmitBtn, oldSubmitBtn);
+                
+                // Postavi novi event listener
+                newSubmitBtn.addEventListener('click', async (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Submit survey clicked'); // Debug
+                    await this.submitSurvey();
+                }, { once: false });
+            }
+        }
+    }
+    
+    nextSurveyQuestion() {
+        if (this.currentQuestionIndex < this.currentQuestions.length - 1) {
+            this.currentQuestionIndex++;
+            this.displayCurrentQuestion();
+        }
+    }
+    
+    prevSurveyQuestion() {
+        if (this.currentQuestionIndex > 0) {
+            this.currentQuestionIndex--;
+            this.displayCurrentQuestion();
+        }
+    }
+    
+    async submitSurvey() {
+        try {
+            console.log('Submit survey started', {
+                answers: this.answers,
+                questions: this.currentQuestions,
+                tracker: this.tracker
+            });
+            
+            // Proveri da li postoje odgovori
+            if (!this.answers || Object.keys(this.answers).length === 0) {
+                throw new Error('Nema odgovora za čuvanje');
+            }
+            
+            // Procesiraj odgovore i sačuvaj kao simptome
+            await this.processSurveyAnswers();
+            
+            // Sačuvaj datum ankete
+            const today = new Date().toISOString().split('T')[0];
+            localStorage.setItem('periodi_lastSurveyDate', today);
+            
+            // Zatvori modal
+            if (this.tracker && this.tracker.closeModal) {
+                this.tracker.closeModal('surveyModal');
+            }
+            
+            this.tracker.showSuccess('Anketa je uspešno popunjena!');
+        } catch (error) {
+            console.error('Greška pri završetku ankete:', error);
+            console.error('Error details:', {
+                message: error.message,
+                stack: error.stack,
+                answers: this.answers,
+                questions: this.currentQuestions
+            });
+            this.tracker.showError(`Došlo je do greške pri završetku ankete: ${error.message}. Molimo te pokušaj ponovo.`);
+        }
+    }
+    
+    async processSurveyAnswers() {
+        try {
+            // Konvertuj odgovore u format simptoma
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const symptomEntry = {
+                id: Date.now(),
+                date: today,
+                energy: null,
+                mood: null,
+                pain: null,
+                libido: null,
+                additionalSymptoms: [],
+                surveyAnswers: this.answers
+            };
+            
+            // Pokušaj da mapiraš odgovore na simptome
+            if (this.currentQuestions && this.currentQuestions.length > 0) {
+                this.currentQuestions.forEach((question, index) => {
+                    const answer = this.answers[index];
+                    
+                    if (!answer && answer !== 0) {
+                        return; // Preskoči ako nema odgovora
+                    }
+                    
+                    if (question.type === 'scale') {
+                        const questionLower = question.question.toLowerCase();
+                        if (questionLower.includes('energij')) {
+                            symptomEntry.energy = parseInt(answer) || null;
+                        } else if (questionLower.includes('osećaš') || questionLower.includes('raspoložen')) {
+                            symptomEntry.mood = parseInt(answer) || null;
+                        } else if (questionLower.includes('bol')) {
+                            symptomEntry.pain = parseInt(answer) || null;
+                        } else if (questionLower.includes('libido')) {
+                            symptomEntry.libido = parseInt(answer) || null;
+                        }
+                    } else if (question.type === 'checkbox' && Array.isArray(answer)) {
+                        symptomEntry.additionalSymptoms = answer;
+                    }
+                });
+            }
+            
+            // Generiši AI sažetak (ne blokira ako ne uspe)
+            try {
+                const summary = await this.generateAISummary(symptomEntry);
+                if (summary && summary.trim()) {
+                    symptomEntry.aiSummary = summary;
+                }
+            } catch (error) {
+                console.error('Greška pri generisanju sažetka:', error);
+                // Nastavi bez sažetka
+            }
+            
+            // Proveri da li već postoji unos za danas
+            if (!this.tracker.symptoms) {
+                this.tracker.symptoms = [];
+            }
+            
+            const todayStr = today.toISOString().split('T')[0];
+            const existingIndex = this.tracker.symptoms.findIndex(s => {
+                if (!s || !s.date) return false;
+                try {
+                    const sDate = new Date(s.date);
+                    const sDateStr = sDate.toISOString().split('T')[0];
+                    return sDateStr === todayStr;
+                } catch (e) {
+                    return false;
+                }
+            });
+            
+            if (existingIndex !== -1) {
+                // Ažuriraj postojeći unos
+                this.tracker.symptoms[existingIndex] = {
+                    ...this.tracker.symptoms[existingIndex],
+                    ...symptomEntry
+                };
+            } else {
+                // Dodaj novi unos
+                this.tracker.symptoms.push(symptomEntry);
+            }
+            
+            // Sačuvaj podatke
+            if (this.tracker.saveData) {
+                this.tracker.saveData();
+            }
+            
+            // Ažuriraj prikaz
+            if (this.tracker.updateSymptomsDisplay) {
+                this.tracker.updateSymptomsDisplay();
+            }
+            
+            if (this.tracker.updateDashboard) {
+                this.tracker.updateDashboard();
+            }
+        } catch (error) {
+            console.error('Greška u processSurveyAnswers:', error);
+            throw error; // Prosledi grešku dalje
+        }
+    }
+    
+    async generateAISummary(symptomEntry) {
+        try {
+            // Proveri da li postoje odgovori
+            if (!symptomEntry.surveyAnswers || Object.keys(symptomEntry.surveyAnswers).length === 0) {
+                return '';
+            }
+            
+            const prompt = `Na osnovu sledećih odgovora iz ankete, generiši kratak sažetak (1-2 rečenice) na srpskom jeziku (ekavski dijalekt, latinica) o tome kako se korisnica oseća.
+Odgovori: ${JSON.stringify(symptomEntry.surveyAnswers)}
+Sažetak mora biti:
+- Na srpskom jeziku (ekavski dijalekt, latinica)
+- U drugom licu jednine
+- Fokus na osećanja, ne na brojeve
+- Gramatički ispravan
+- Kratak i jasan`;
+
+            const response = await fetch(this.groqApiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.groqApiKey}`
+                },
+                body: JSON.stringify({
+                    model: this.model,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: 'Ti si asistent koji generiše kratke sažetke o osećanjima. Sve odgovore daješ na srpskom jeziku (ekavski dijalekt, latinica).'
+                        },
+                        {
+                            role: 'user',
+                            content: prompt
+                        }
+                    ],
+                    temperature: this.temperature,
+                    max_tokens: 200
+                })
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('API greška:', response.status, errorText);
+                throw new Error(`API greška: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (!data.choices || !data.choices[0] || !data.choices[0].message) {
+                throw new Error('Nevalidan format odgovora od API-ja');
+            }
+            
+            const summary = data.choices[0].message.content.trim();
+            
+            if (!summary) {
+                return '';
+            }
+            
+            // Ispravi gramatičke greške
+            if (this.tracker && this.tracker.fixGrammarErrors) {
+                return this.tracker.fixGrammarErrors(summary);
+            }
+            
+            return summary;
+        } catch (error) {
+            console.error('Greška pri generisanju sažetka:', error);
+            // Vrati prazan string umesto da baci grešku
+            return '';
+        }
+    }
+}
+
+
+/* === js\reminders.js === */
+// Modul za podsetnike
+PeriodTracker.prototype.showReminderModal = function() {
+    const dateInput = document.getElementById('reminderDate');
+    if (dateInput) {
+        dateInput.value = new Date().toISOString().split('T')[0];
+    }
+    this.openModal('reminderModal');
+};
+
+PeriodTracker.prototype.updateRemindersList = function() {
+    const emptyState = document.getElementById('remindersEmptyState');
+    const itemsContainer = document.getElementById('remindersItems');
+
+    if (!emptyState || !itemsContainer) return;
+
+    const upcomingReminders = this.getUpcomingReminders();
+
+    if (upcomingReminders.length === 0) {
+        emptyState.style.display = 'block';
+        itemsContainer.innerHTML = '';
+        return;
+    }
+
+    emptyState.style.display = 'none';
+    itemsContainer.innerHTML = '';
+
+    upcomingReminders.slice(0, 5).forEach(reminder => {
+        const item = document.createElement('div');
+        item.className = 'reminder-item';
+
+        const reminderDateTime = new Date(reminder.date);
+        const parts = reminder.time.split(':');
+        reminderDateTime.setHours(parseInt(parts[0], 10), parseInt(parts[1], 10), 0, 0);
+
+        if (reminderDateTime < new Date()) {
+            item.classList.add('reminder-past');
+        }
+
+        item.innerHTML =
+            '<div class="reminder-item-content">' +
+                '<div class="reminder-item-header">' +
+                    '<h4 class="reminder-item-title">' + reminder.title + '</h4>' +
+                    (reminder.repeat ? '<span class="badge bg-info ms-1"><i class="fas fa-repeat"></i></span>' : '') +
+                '</div>' +
+                '<div class="reminder-item-details">' +
+                    '<i class="fas fa-calendar"></i> ' + this.formatDate(reminder.date) +
+                    ' <span class="ms-2"><i class="fas fa-clock"></i> ' + reminder.time + '</span>' +
+                '</div>' +
+            '</div>' +
+            '<button class="btn btn-sm btn-danger reminder-delete-btn" data-reminder-id="' + reminder.id + '">' +
+                '<i class="fas fa-trash"></i>' +
+            '</button>';
+
+        itemsContainer.appendChild(item);
+    });
+
+    itemsContainer.querySelectorAll('.reminder-delete-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const reminderId = parseInt(e.currentTarget.getAttribute('data-reminder-id'), 10);
+            const confirmed = await this.showConfirmDialog(
+                'Da li si sigurna da želiš da obrišeš ovaj podsetnik?',
+                'Brisanje Podsetnika',
+                'Obriši',
+                'Otkaži'
+            );
+            if (confirmed) {
+                this.deleteReminder(reminderId);
+                this.updateRemindersList();
+                this.showSuccess('Podsetnik je obrisan.');
+            }
+        });
+    });
+};
+
+PeriodTracker.prototype.saveReminder = function(reminderData) {
+    const reminder = {
+        id: Date.now(),
+        title: reminderData.title,
+        date: new Date(reminderData.date),
+        time: reminderData.time,
+        repeat: reminderData.repeat || false
+    };
+
+    this.reminders.push(reminder);
+    this.saveData();
+    this.scheduleCycleNotifications();
+    this.updateRemindersList();
+
+    return reminder;
+};
+
+PeriodTracker.prototype.deleteReminder = function(id) {
+    this.reminders = this.reminders.filter(r => r.id !== id);
+    this.saveData();
+    this.scheduleCycleNotifications();
+    this.updateRemindersList();
+};
+
+PeriodTracker.prototype.getUpcomingReminders = function() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return this.reminders.filter(reminder => {
+        const reminderDate = new Date(reminder.date);
+        reminderDate.setHours(0, 0, 0, 0);
+        return reminderDate >= today;
+    }).sort((a, b) => new Date(a.date) - new Date(b.date));
+};
+
+
+/* === js\notifications.js === */
+// Modul za notifikacije
+PeriodTracker.prototype.requestNotificationPermission = async function() {
+    if (!('Notification' in window)) {
+        this.showWarning('Tvoj pregledač ne podržava notifikacije.');
+        return;
+    }
+
+    if (Notification.permission === 'granted') {
+        this.showInfo('Dozvola za notifikacije je već data.');
+        this.updateNotificationStatus();
+        this.scheduleCycleNotifications();
+        return;
+    }
+
+    if (Notification.permission === 'denied') {
+        this.showWarning('Dozvola za notifikacije je odbijena. Omogući notifikacije u podešavanjima pregledača.');
+        this.updateNotificationStatus();
+        return;
+    }
+
+    try {
+        const permission = await Notification.requestPermission();
+        this.updateNotificationStatus();
+        if (permission === 'granted') {
+            this.showSuccess('Dozvola za notifikacije je data!');
+            this.scheduleCycleNotifications();
+        } else {
+            this.showWarning('Dozvola za notifikacije je odbijena.');
+        }
+    } catch (error) {
+        console.error('Error requesting notification permission:', error);
+        this.showWarning('Greška pri traženju dozvole za notifikacije.');
+    }
+};
+
+PeriodTracker.prototype.updateNotificationStatus = function() {
+    const statusEl = document.getElementById('notificationStatus');
+    if (!statusEl) return;
+
+    if (!('Notification' in window)) {
+        statusEl.innerHTML = '<span class="badge bg-secondary">Nije podržano</span>';
+        return;
+    }
+
+    const permission = Notification.permission;
+    if (permission === 'granted') {
+        statusEl.innerHTML = '<span class="badge bg-success"><i class="fas fa-check-circle"></i> Omogućeno</span>';
+    } else if (permission === 'denied') {
+        statusEl.innerHTML = '<span class="badge bg-danger"><i class="fas fa-times-circle"></i> Onemogućeno</span>';
+    } else {
+        statusEl.innerHTML = '<span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> Nije traženo</span>';
+    }
+};
+
+PeriodTracker.prototype.scheduleCycleNotifications = function() {
+    if (Notification.permission !== 'granted') {
+        return;
+    }
+
+    this.clearScheduledNotifications();
+
+    const activeCycle = this.getActiveCycle();
+    if (!activeCycle) return;
+
+    const nextPeriod = this.predictNextPeriod();
+    const ovulation = this.predictOvulation();
+    const fertileWindow = this.predictFertileWindow();
+
+    if (this.settings.notifications.periodStart && nextPeriod) {
+        this.scheduleNotificationForDate(
+            nextPeriod,
+            9,
+            'Početak Menstruacije',
+            'Očekuje se početak menstruacije danas.',
+            'period-start'
+        );
+    }
+
+    if (this.settings.notifications.ovulation && ovulation) {
+        this.scheduleNotificationForDate(
+            ovulation,
+            9,
+            'Ovulacija',
+            'Danas je dan ovulacije.',
+            'ovulation'
+        );
+    }
+
+    if (this.settings.notifications.fertileWindow && fertileWindow) {
+        this.scheduleNotificationForDate(
+            fertileWindow.start,
+            9,
+            'Plodni Dani',
+            'Plodni period počinje danas i traje do ' + this.formatDateShort(fertileWindow.end) + '.',
+            'fertile-window'
+        );
+    }
+
+    if (this.reminders && this.reminders.length > 0) {
+        this.reminders.forEach(reminder => {
+            const reminderDateTime = new Date(reminder.date);
+            const parts = reminder.time.split(':');
+            const hours = parseInt(parts[0], 10);
+            const minutes = parseInt(parts[1], 10);
+            reminderDateTime.setHours(hours, minutes, 0, 0);
+
+            this.scheduleNotificationForDate(
+                reminderDateTime,
+                hours,
+                reminder.title,
+                'Podsetnik',
+                'reminder-' + reminder.id
+            );
+        });
+    }
+
+    this.startDailyNotificationCheck();
+};
+
+PeriodTracker.prototype.scheduleNotificationForDate = function(date, hour, title, body, tag) {
+    const notificationDate = new Date(date);
+    notificationDate.setHours(hour, 0, 0, 0);
+    const now = new Date();
+
+    if (notificationDate <= now) {
+        return;
+    }
+
+    const scheduledNotifications = JSON.parse(localStorage.getItem('periodi_scheduledNotifications') || '[]');
+    scheduledNotifications.push({
+        date: notificationDate.toISOString(),
+        title: title,
+        body: body,
+        tag: tag
+    });
+    localStorage.setItem('periodi_scheduledNotifications', JSON.stringify(scheduledNotifications));
+};
+
+PeriodTracker.prototype.clearScheduledNotifications = function() {
+    localStorage.removeItem('periodi_scheduledNotifications');
+    if (this.notificationCheckInterval) {
+        clearInterval(this.notificationCheckInterval);
+    }
+};
+
+PeriodTracker.prototype.startDailyNotificationCheck = function() {
+    if (this.notificationCheckInterval) {
+        clearInterval(this.notificationCheckInterval);
+    }
+
+    this.checkScheduledNotifications();
+
+    this.notificationCheckInterval = setInterval(() => {
+        this.checkScheduledNotifications();
+    }, 5 * 60 * 1000);
+};
+
+PeriodTracker.prototype.checkScheduledNotifications = function() {
+    if (Notification.permission !== 'granted') {
+        return;
+    }
+
+    const scheduledNotifications = JSON.parse(localStorage.getItem('periodi_scheduledNotifications') || '[]');
+    const now = new Date();
+    const toShow = [];
+    const toKeep = [];
+
+    scheduledNotifications.forEach(notif => {
+        const notifDate = new Date(notif.date);
+        const timeDiff = now - notifDate;
+
+        if (timeDiff >= 0 && timeDiff < 30 * 60 * 1000) {
+            toShow.push(notif);
+        } else if (notifDate > now) {
+            toKeep.push(notif);
+        }
+    });
+
+    toShow.forEach(notif => {
+        this.showNotification(notif.title, notif.body, { tag: notif.tag });
+    });
+
+    localStorage.setItem('periodi_scheduledNotifications', JSON.stringify(toKeep));
+};
+
+PeriodTracker.prototype.showNotification = async function(title, body, options) {
+    options = options || {};
+
+    if (Notification.permission !== 'granted') {
+        return;
+    }
+
+    const icon = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" rx="20" fill="%23e91e63"/%3E%3Ctext x="50" y="70" font-size="60" text-anchor="middle" fill="white"%3E%F0%9F%A9%B8%3C/text%3E%3C/svg%3E';
+    const payload = {
+        body: body,
+        icon: icon,
+        tag: options.tag || 'periodi-notification',
+        requireInteraction: false
+    };
+
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+        try {
+            const registration = await navigator.serviceWorker.getRegistration();
+            if (registration) {
+                await registration.showNotification(title, payload);
+                return;
+            }
+        } catch (error) {
+            console.warn('Service Worker notification failed:', error);
+        }
+    }
+
+    try {
+        const notification = new Notification(title, payload);
+        notification.onclick = function() {
+            window.focus();
+            notification.close();
+        };
+        setTimeout(function() {
+            notification.close();
+        }, 10000);
+    } catch (error) {
+        console.error('Error showing notification:', error);
+    }
+};
+
+
+/* === js\settings.js === */
+// Modul za podešavanja
+PeriodTracker.prototype.loadSettings = function() {
+    const avgCycleLengthInput = document.getElementById('settingsAvgCycleLength');
+    const avgPeriodLengthInput = document.getElementById('settingsAvgPeriodLength');
+    const notifyPeriodStart = document.getElementById('notifyPeriodStart');
+    const notifyOvulation = document.getElementById('notifyOvulation');
+    const notifyFertileWindow = document.getElementById('notifyFertileWindow');
+    
+    if (avgCycleLengthInput) {
+        avgCycleLengthInput.value = this.settings.avgCycleLength || 28;
+    }
+    
+    if (avgPeriodLengthInput) {
+        avgPeriodLengthInput.value = this.settings.avgPeriodLength || 5;
+    }
+    
+    if (notifyPeriodStart) {
+        notifyPeriodStart.checked = this.settings.notifications.periodStart !== false;
+    }
+    
+    if (notifyOvulation) {
+        notifyOvulation.checked = this.settings.notifications.ovulation !== false;
+    }
+    
+    if (notifyFertileWindow) {
+        notifyFertileWindow.checked = this.settings.notifications.fertileWindow !== false;
+    }
+    
+    // Ažuriraj status notifikacija
+    if (this.updateNotificationStatus) {
+        this.updateNotificationStatus();
+    }
+};
+
+PeriodTracker.prototype.saveSettings = function() {
+    const avgCycleLengthInput = document.getElementById('settingsAvgCycleLength');
+    const avgPeriodLengthInput = document.getElementById('settingsAvgPeriodLength');
+    const notifyPeriodStart = document.getElementById('notifyPeriodStart');
+    const notifyOvulation = document.getElementById('notifyOvulation');
+    const notifyFertileWindow = document.getElementById('notifyFertileWindow');
+    
+    if (avgCycleLengthInput) {
+        this.settings.avgCycleLength = parseInt(avgCycleLengthInput.value);
+    }
+    
+    if (avgPeriodLengthInput) {
+        this.settings.avgPeriodLength = parseInt(avgPeriodLengthInput.value);
+    }
+    
+    if (notifyPeriodStart) {
+        this.settings.notifications.periodStart = notifyPeriodStart.checked;
+    }
+    
+    if (notifyOvulation) {
+        this.settings.notifications.ovulation = notifyOvulation.checked;
+    }
+    
+    if (notifyFertileWindow) {
+        this.settings.notifications.fertileWindow = notifyFertileWindow.checked;
+    }
+    
+    this.saveData();
+    this.scheduleCycleNotifications();
+    
+    this.showSuccess('Podešavanja su uspešno sačuvana!');
+};
+
+
+/* === js\theme.js === */
+// Modul za temu
+PeriodTracker.prototype.initTheme = function() {
+    const savedTheme = localStorage.getItem('periodi_theme') || 'light';
+    this.setTheme(savedTheme);
+    
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            this.toggleTheme();
+        });
+    }
+};
+
+PeriodTracker.prototype.toggleTheme = function() {
+    const currentTheme = this.getTheme();
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    this.setTheme(newTheme);
+};
+
+PeriodTracker.prototype.getTheme = function() {
+    return document.documentElement.getAttribute('data-theme') || 'light';
+};
+
+PeriodTracker.prototype.setTheme = function(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('periodi_theme', theme);
+    
+    const themeIcon = document.querySelector('.theme-icon');
+    if (themeIcon) {
+        if (theme === 'light') {
+            themeIcon.className = 'fas fa-moon theme-icon';
+        } else {
+            themeIcon.className = 'fas fa-sun theme-icon';
+        }
+    }
+};
+
+
+/* === js\mobile-optimization.js === */
+// Mobile optimizacije i stabilnost
+PeriodTracker.prototype.initMobileOptimizations = function() {
+    // Prevencija double-tap zoom na iOS
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', (e) => {
+        const now = Date.now();
+        if (now - lastTouchEnd <= 300) {
+            e.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+    
+    // Prevencija pull-to-refresh
+    let touchStartY = 0;
+    document.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+    
+    document.addEventListener('touchmove', (e) => {
+        if (window.scrollY === 0 && e.touches[0].clientY > touchStartY) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+    
+    // Optimizacija za performanse
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+            this.optimizeForMobile();
+        });
+    } else {
+        setTimeout(() => {
+            this.optimizeForMobile();
+        }, 1000);
+    }
+    
+    // Fix za iOS Safari viewport
+    this.fixIOSViewport();
+    
+    // Prevencija zoom na input focus (iOS)
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        if (input.type === 'text' || input.type === 'number' || input.type === 'date' || input.type === 'time') {
+            input.addEventListener('focus', () => {
+                const viewport = document.querySelector('meta[name="viewport"]');
+                if (viewport) {
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                }
+            });
+            
+            input.addEventListener('blur', () => {
+                const viewport = document.querySelector('meta[name="viewport"]');
+                if (viewport) {
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
+                }
+            });
+        }
+    });
+};
+
+PeriodTracker.prototype.optimizeForMobile = function() {
+    // Debounce za scroll events
+    let scrollTimeout;
+    const handleScroll = () => {
+        if (scrollTimeout) {
+            clearTimeout(scrollTimeout);
+        }
+        scrollTimeout = setTimeout(() => {
+            // Performans optimizacije tokom scroll-a
+        }, 150);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Lazy loading za grafikone
+    const observerOptions = {
+        root: null,
+        rootMargin: '50px',
+        threshold: 0.1
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const canvas = entry.target;
+                if (canvas && canvas.id === 'cycleLengthChart' && this.renderCycleLengthChart) {
+                    this.renderCycleLengthChart('cycleLengthChart');
+                    observer.unobserve(canvas);
+                }
+            }
+        });
+    }, observerOptions);
+    
+    const chartCanvas = document.getElementById('cycleLengthChart');
+    if (chartCanvas) {
+        observer.observe(chartCanvas);
+    }
+};
+
+PeriodTracker.prototype.fixIOSViewport = function() {
+    // Fix za iOS Safari viewport height
+    const setViewportHeight = () => {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+    
+    setViewportHeight();
+    window.addEventListener('resize', setViewportHeight);
+    window.addEventListener('orientationchange', () => {
+        setTimeout(setViewportHeight, 100);
+    });
+    
+    // Fix za iOS Safari address bar
+    if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop === 0) {
+                setViewportHeight();
+            }
+        }, { passive: true });
+    }
+};
+
+
+/* === js\events.js === */
+// Modul za event listeners
+PeriodTracker.prototype.setupEventListeners = function() {
+    // Tab navigacija
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const tabName = e.currentTarget.getAttribute('data-tab');
+            this.switchTab(tabName);
+        });
+    });
+    
+    // Dashboard akcije
+    const startCycleBtn = document.getElementById('startCycleBtn');
+    if (startCycleBtn) {
+        startCycleBtn.addEventListener('click', () => {
+            this.openModal('startCycleModal');
+        });
+    }
+    
+    const recordSymptomsBtn = document.getElementById('recordSymptomsBtn');
+    if (recordSymptomsBtn) {
+        recordSymptomsBtn.addEventListener('click', () => {
+            this.switchTab('symptoms');
+        });
+    }
+    
+    const addReminderBtn = document.getElementById('addReminderBtn');
+    if (addReminderBtn) {
+        addReminderBtn.addEventListener('click', () => {
+            this.showReminderModal();
+        });
+    }
+    
+    const startSurveyBtn = document.getElementById('startSurveyBtn');
+    if (startSurveyBtn) {
+        startSurveyBtn.addEventListener('click', () => {
+            this.surveyModule.startDailySurvey(true);
+        });
+    }
+    
+    // Kalendar navigacija
+    const prevMonthBtn = document.getElementById('prevMonthBtn');
+    if (prevMonthBtn) {
+        prevMonthBtn.addEventListener('click', () => {
+            this.changeMonth('prev');
+        });
+    }
+    
+    const nextMonthBtn = document.getElementById('nextMonthBtn');
+    if (nextMonthBtn) {
+        nextMonthBtn.addEventListener('click', () => {
+            this.changeMonth('next');
+        });
+    }
+    
+    // Modal zatvaranje
+    const closeStartCycleModal = document.getElementById('closeStartCycleModal');
+    if (closeStartCycleModal) {
+        closeStartCycleModal.addEventListener('click', () => {
+            this.closeModal('startCycleModal');
+        });
+    }
+    
+    const closeReminderModal = document.getElementById('closeReminderModal');
+    if (closeReminderModal) {
+        closeReminderModal.addEventListener('click', () => {
+            this.closeModal('reminderModal');
+        });
+    }
+    
+    const cancelReminderBtn = document.getElementById('cancelReminderBtn');
+    if (cancelReminderBtn) {
+        cancelReminderBtn.addEventListener('click', () => {
+            const reminderForm = document.getElementById('reminderForm');
+            if (reminderForm) {
+                reminderForm.reset();
+            }
+            this.closeModal('reminderModal');
+        });
+    }
+    
+    const closeSurveyModal = document.getElementById('closeSurveyModal');
+    if (closeSurveyModal) {
+        closeSurveyModal.addEventListener('click', () => {
+            this.closeModal('surveyModal');
+        });
+    }
+    
+    // Zatvori modal klikom van njega
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    });
+    
+    // Start Cycle Form
+    const startCycleForm = document.getElementById('startCycleForm');
+    if (startCycleForm) {
+        startCycleForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const dateInput = document.getElementById('cycleStartDate');
+            const durationInput = document.getElementById('cycleDuration');
+            
+            if (dateInput && durationInput) {
+                this.startCycle(dateInput.value, parseInt(durationInput.value));
+                this.closeModal('startCycleModal');
+                this.updateDashboard();
+                this.renderCalendar();
+                this.showSuccess('Ciklus je uspešno započet!');
+            }
+        });
+    }
+    
+    // Reminder Form
+    const reminderForm = document.getElementById('reminderForm');
+    if (reminderForm) {
+        reminderForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const titleInput = document.getElementById('reminderTitle');
+            const dateInput = document.getElementById('reminderDate');
+            const timeInput = document.getElementById('reminderTime');
+            const repeatInput = document.getElementById('reminderRepeat');
+            
+            if (titleInput && dateInput && timeInput) {
+                this.saveReminder({
+                    title: titleInput.value,
+                    date: dateInput.value,
+                    time: timeInput.value,
+                    repeat: repeatInput ? repeatInput.checked : false
+                });
+                this.closeModal('reminderModal');
+                reminderForm.reset();
+                this.updateRemindersList();
+                this.showSuccess('Podsetnik je uspešno dodat!');
+            }
+        });
+    }
+    
+    // Settings Form
+    const settingsForm = document.getElementById('settingsForm');
+    if (settingsForm) {
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.saveSettings();
+        });
+    }
+    
+    // Export Data
+    const exportDataBtn = document.getElementById('exportDataBtn');
+    if (exportDataBtn) {
+        exportDataBtn.addEventListener('click', () => {
+            const formatSelect = document.getElementById('exportFormat');
+            const format = formatSelect ? formatSelect.value : 'json';
+            this.exportData(format);
+        });
+    }
+    
+    // Clear Data
+    const clearDataBtn = document.getElementById('clearDataBtn');
+    if (clearDataBtn) {
+        clearDataBtn.addEventListener('click', () => {
+            this.clearAllData();
+        });
+    }
+    
+    // Request Notification Permission
+    const requestNotificationPermissionBtn = document.getElementById('requestNotificationPermission');
+    if (requestNotificationPermissionBtn) {
+        requestNotificationPermissionBtn.addEventListener('click', () => {
+            this.requestNotificationPermission();
+        });
+    }
+    
+    // Survey Navigation
+    const nextSurveyQuestion = document.getElementById('nextSurveyQuestion');
+    if (nextSurveyQuestion) {
+        nextSurveyQuestion.addEventListener('click', () => {
+            this.surveyModule.nextSurveyQuestion();
+        });
+    }
+    
+    const prevSurveyQuestion = document.getElementById('prevSurveyQuestion');
+    if (prevSurveyQuestion) {
+        prevSurveyQuestion.addEventListener('click', () => {
+            this.surveyModule.prevSurveyQuestion();
+        });
+    }
+    
+    // Event listener za submitSurvey se postavlja direktno u anketa.js
+    // kada se prikaže poslednje pitanje
+    
+    // Toggle Cycle Info
+    const toggleCycleInfo = document.getElementById('toggleCycleInfo');
+    if (toggleCycleInfo) {
+        toggleCycleInfo.addEventListener('click', (e) => {
+            e.preventDefault();
+            const content = document.getElementById('cycleInfoContent');
+            const icon = document.getElementById('cycleInfoIcon');
+            if (content && icon) {
+                if (content.style.display === 'none') {
+                    content.style.display = 'block';
+                    icon.className = 'fas fa-chevron-up';
+                } else {
+                    content.style.display = 'none';
+                    icon.className = 'fas fa-chevron-down';
+                }
+            }
+        });
+    }
+    
+    // Initialize Bootstrap tooltips
+    if (typeof bootstrap !== 'undefined' && bootstrap.Tooltip) {
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    }
+};
+
+</script>
 </body>
 </html>
