@@ -24,7 +24,6 @@
   }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  /* AUTH SCREEN */
   #auth-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
   .auth-card { background: var(--surface); border-radius: 16px; padding: 32px 24px; width: 100%; max-width: 360px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
   .auth-logo { text-align: center; margin-bottom: 24px; }
@@ -33,8 +32,8 @@
   .auth-logo p { font-size: 13px; color: var(--text2); margin-top: 4px; }
   .form-group { margin-bottom: 14px; }
   .form-group label { display: block; font-size: 13px; color: var(--text2); margin-bottom: 5px; font-weight: 500; }
-  .form-group input, .form-group select { width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 10px 12px; font-size: 14px; color: var(--text); background: var(--surface); transition: border 0.15s; }
-  .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
+  .form-group input { width: 100%; border: 1.5px solid var(--border); border-radius: var(--radius); padding: 10px 12px; font-size: 14px; color: var(--text); background: var(--surface); transition: border 0.15s; }
+  .form-group input:focus { outline: none; border-color: var(--accent); }
   .btn { border: none; border-radius: var(--radius); padding: 11px 16px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.15s; width: 100%; }
   .btn-primary { background: var(--accent); color: #fff; }
   .btn-primary:hover { background: var(--accent-d); }
@@ -45,7 +44,6 @@
   .auth-switch { text-align: center; margin-top: 16px; font-size: 13px; color: var(--text2); }
   .auth-switch a { color: var(--accent); cursor: pointer; text-decoration: none; font-weight: 500; }
 
-  /* MAIN APP */
   #main-app { display: none; max-width: 480px; margin: 0 auto; min-height: 100vh; }
   .topbar { background: #1e1b4b; color: #fff; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
   .topbar-left h2 { font-size: 16px; font-weight: 700; }
@@ -63,7 +61,6 @@
   .screen { display: none; padding: 12px; }
   .screen.active { display: block; }
 
-  /* RIDE CARDS */
   .section-title { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; margin: 12px 0 8px; font-weight: 600; }
   .ride-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 13px; margin-bottom: 8px; }
   .ride-card.urgent { border-left: 4px solid var(--amber); }
@@ -77,7 +74,6 @@
   .badge-taken { background: #dcfce7; color: #14532d; }
   .badge-done { background: #f4f4f5; color: #52525b; }
   .ride-meta { display: flex; flex-wrap: wrap; gap: 10px; font-size: 12px; color: var(--text2); margin: 9px 0; }
-  .ride-meta span { display: flex; align-items: center; gap: 3px; }
   .ride-actions { display: flex; gap: 7px; flex-wrap: wrap; }
   .ride-creator { font-size: 11px; color: var(--text3); margin-top: 8px; }
 
@@ -85,7 +81,6 @@
   .empty-state .empty-icon { font-size: 40px; display: block; margin-bottom: 12px; }
   .empty-state p { font-size: 14px; }
 
-  /* NOVA VOZNJA FORM */
   .new-ride-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; }
   .new-ride-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 14px; }
   .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -93,7 +88,6 @@
   .urgent-toggle input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; }
   .urgent-toggle label { font-size: 13px; color: var(--text2); cursor: pointer; font-weight: 500; }
 
-  /* VOZACI */
   .driver-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; }
   .driver-avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; flex-shrink: 0; }
   .driver-info { flex: 1; }
@@ -107,21 +101,12 @@
   .badge-admin { background: #ede9fe; color: #5b21b6; }
   .badge-me { background: #dbeafe; color: #1e40af; }
 
-  /* TOAST */
   #toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(80px); background: #18181b; color: #fff; padding: 10px 20px; border-radius: 30px; font-size: 13px; font-weight: 500; z-index: 999; transition: transform 0.3s; opacity: 0; white-space: nowrap; }
   #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
-
-  /* FIREBASE SETUP INFO */
-  .setup-banner { background: #fffbeb; border: 1.5px solid #fde68a; border-radius: var(--radius); padding: 14px; margin: 12px; }
-  .setup-banner h3 { font-size: 13px; font-weight: 600; color: #92400e; margin-bottom: 6px; }
-  .setup-banner p { font-size: 12px; color: #a16207; line-height: 1.5; }
-  .setup-banner code { background: #fef3c7; padding: 1px 5px; border-radius: 4px; font-size: 11px; font-family: monospace; }
-  .setup-banner a { color: var(--accent); }
 </style>
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
 <div id="auth-screen">
   <div class="auth-card">
     <div class="auth-logo">
@@ -129,7 +114,6 @@
       <h1>Valjevo Taxi Mreža</h1>
       <p>Dispatcher sistem za vozače</p>
     </div>
-
     <div id="login-form">
       <div class="form-group">
         <label>Email adresa</label>
@@ -142,7 +126,6 @@
       <button class="btn btn-primary" onclick="loginUser()">Prijavi se</button>
       <div class="auth-switch">Nemaš nalog? <a onclick="toggleAuth()">Registruj se</a></div>
     </div>
-
     <div id="register-form" style="display:none">
       <div class="form-group">
         <label>Ime i prezime</label>
@@ -167,7 +150,6 @@
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="main-app">
   <div class="topbar">
     <div class="topbar-left">
@@ -176,7 +158,6 @@
     </div>
     <button class="btn-logout" onclick="logoutUser()">Odjavi se</button>
   </div>
-
   <div class="tabs">
     <button class="tab-btn active" onclick="showScreen('voznje', this)">
       🚗 Vožnje <span class="notif-count" id="notif-count" style="display:none">0</span>
@@ -187,10 +168,7 @@
 
   <div id="screen-voznje" class="screen active">
     <div id="rides-container">
-      <div class="empty-state">
-        <span class="empty-icon">⏳</span>
-        <p>Učitavanje vožnji...</p>
-      </div>
+      <div class="empty-state"><span class="empty-icon">⏳</span><p>Učitavanje vožnji...</p></div>
     </div>
   </div>
 
@@ -243,10 +221,7 @@
 
   <div id="screen-vozaci" class="screen">
     <div id="drivers-container">
-      <div class="empty-state">
-        <span class="empty-icon">👥</span>
-        <p>Učitavanje vozača...</p>
-      </div>
+      <div class="empty-state"><span class="empty-icon">👥</span><p>Učitavanje vozača...</p></div>
     </div>
     <div style="padding: 12px 0; text-align: center;">
       <button class="btn btn-secondary btn-sm" onclick="toggleAvailability()">Promeni status (slobodan/zauzet)</button>
@@ -256,88 +231,58 @@
 
 <div id="toast"></div>
 
-<!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getDatabase, ref, set, push, onValue, update, remove, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
-// =============================================
-// 🔧 OVDE UNESITE VAŠE FIREBASE PODATKE
-// Idite na: https://console.firebase.google.com
-// Kreirajte projekat → Web app → kopirajte config
-// =============================================
 const firebaseConfig = {
-    apiKey: "AIzaSyCB4hWUdUfKb86PS_bT-zeJ1snsGKautjc",
-    authDomain: "valjevo-taxi-91b1e.firebaseapp.com",
-    projectId: "valjevo-taxi-91b1e",
-    storageBucket: "valjevo-taxi-91b1e.firebasestorage.app",
-    messagingSenderId: "901144673761",
-    appId: "1:901144673761:web:18053dd747d4b249a266a0",
-    measurementId: "G-TQ1NEQ7YDW"
-  };
-// =============================================
+  apiKey: "AIzaSyCB4hWUdUfKb86PS_bT-zeJ1snsGKautjc",
+  authDomain: "valjevo-taxi-91b1e.firebaseapp.com",
+  databaseURL: "https://valjevo-taxi-91b1e-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "valjevo-taxi-91b1e",
+  storageBucket: "valjevo-taxi-91b1e.firebasestorage.app",
+  messagingSenderId: "901144673761",
+  appId: "1:901144673761:web:18053dd747d4b249a266a0",
+  measurementId: "G-TQ1NEQ7YDW"
+};
 
-let app, auth, db;
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
 let currentUser = null;
 let currentUserData = null;
 
-try {
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-  db = getDatabase(app);
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+    const userRef = ref(db, 'vozaci/' + user.uid);
+    onValue(userRef, (snap) => {
+      currentUserData = snap.val();
+      if (currentUserData) {
+        document.getElementById('user-name-display').textContent = currentUserData.ime;
+        update(ref(db, 'vozaci/' + user.uid), { online: true, posledniOnline: serverTimestamp() });
+      }
+    });
+    document.getElementById('auth-screen').style.display = 'none';
+    document.getElementById('main-app').style.display = 'block';
+    loadRides();
+    loadDrivers();
+  } else {
+    currentUser = null;
+    document.getElementById('auth-screen').style.display = 'flex';
+    document.getElementById('main-app').style.display = 'none';
+  }
+});
 
-  // AUTH STATE
-  onAuthStateChanged(auth, async (user) => {
-    if (user) {
-      currentUser = user;
-      const userRef = ref(db, 'vozaci/' + user.uid);
-      onValue(userRef, (snap) => {
-        currentUserData = snap.val();
-        if (currentUserData) {
-          document.getElementById('user-name-display').textContent = currentUserData.ime;
-          update(ref(db, 'vozaci/' + user.uid), { posledniOnline: serverTimestamp(), online: true });
-        }
-      });
-      document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('main-app').style.display = 'block';
-      loadRides();
-      loadDrivers();
-    } else {
-      currentUser = null;
-      document.getElementById('auth-screen').style.display = 'flex';
-      document.getElementById('main-app').style.display = 'none';
-    }
-  });
-} catch(e) {
-  showConfigBanner();
-}
-
-function showConfigBanner() {
-  document.getElementById('auth-screen').style.display = 'none';
-  document.getElementById('main-app').style.display = 'block';
-  document.getElementById('rides-container').innerHTML = `
-    <div class="setup-banner">
-      <h3>🔧 Potrebna Firebase konfiguracija</h3>
-      <p>Da bi app radila, potrebno je:</p>
-      <p>1. Kreirajte besplatan Firebase projekat na <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a></p>
-      <p>2. Uključite <strong>Authentication → Email/Password</strong></p>
-      <p>3. Uključite <strong>Realtime Database</strong></p>
-      <p>4. Otvorite HTML fajl u tekst editoru i unesite vaš <code>firebaseConfig</code> (linija 180)</p>
-      <p style="margin-top:8px">Potrebna vam je pomoć oko podešavanja? Pitajte Claude-a!</p>
-    </div>`;
-}
-
-// AUTH FUNCTIONS
 window.loginUser = async () => {
   const email = document.getElementById('login-email').value.trim();
   const pass = document.getElementById('login-pass').value;
   try {
     await signInWithEmailAndPassword(auth, email, pass);
     showToast('Dobrodošli! ✓');
-  } catch(e) {
-    showAuthError(getErrorMsg(e.code));
-  }
+  } catch(e) { showAuthError(getErrorMsg(e.code)); }
 };
 
 window.registerUser = async () => {
@@ -356,13 +301,11 @@ window.registerUser = async () => {
       admin: false
     });
     showToast('Nalog kreiran! ✓');
-  } catch(e) {
-    showAuthError(getErrorMsg(e.code));
-  }
+  } catch(e) { showAuthError(getErrorMsg(e.code)); }
 };
 
 window.logoutUser = async () => {
-  if (currentUser) update(ref(db, 'vozaci/' + currentUser.uid), { online: false });
+  if (currentUser) await update(ref(db, 'vozaci/' + currentUser.uid), { online: false });
   await signOut(auth);
 };
 
@@ -374,12 +317,9 @@ window.toggleAuth = () => {
   document.getElementById('auth-error').style.display = 'none';
 };
 
-// RIDE FUNCTIONS
 function loadRides() {
-  const ridesRef = ref(db, 'voznje');
-  onValue(ridesRef, (snap) => {
-    const data = snap.val();
-    renderRides(data);
+  onValue(ref(db, 'voznje'), (snap) => {
+    renderRides(snap.val());
   });
 }
 
@@ -398,11 +338,9 @@ function renderRides(data) {
   });
   const waiting = rides.filter(r => r.status === 'ceka');
   const taken = rides.filter(r => r.status !== 'ceka');
-  let notifCount = waiting.length;
   const nc = document.getElementById('notif-count');
-  nc.style.display = notifCount > 0 ? 'inline' : 'none';
-  nc.textContent = notifCount;
-
+  nc.style.display = waiting.length > 0 ? 'inline' : 'none';
+  nc.textContent = waiting.length;
   let html = '';
   if (waiting.length) {
     html += '<div class="section-title">Čekaju prihvatanje (' + waiting.length + ')</div>';
@@ -421,9 +359,8 @@ function rideCardHTML(r) {
   let badgeHTML = '';
   if (r.hitna && r.status === 'ceka') badgeHTML = '<span class="badge badge-urgent">⚠️ Hitno</span>';
   else if (r.status === 'ceka') badgeHTML = '<span class="badge badge-wait">Čeka</span>';
-  else if (r.status === 'preuzeto') badgeHTML = '<span class="badge badge-taken">✓ ' + (r.preuzeoBroj || 'Preuzeto') + '</span>';
+  else if (r.status === 'preuzeto') badgeHTML = '<span class="badge badge-taken">✓ ' + (r.preuzeoIme || 'Preuzeto') + '</span>';
   else badgeHTML = '<span class="badge badge-done">Završeno</span>';
-
   let actionsHTML = '';
   if (r.status === 'ceka' && currentUser && r.kreatorId !== currentUser.uid) {
     actionsHTML += `<button class="btn btn-primary btn-sm" onclick="acceptRide('${r.id}')">Prihvati</button>`;
@@ -435,10 +372,6 @@ function rideCardHTML(r) {
   if (isMine && r.status === 'ceka') {
     actionsHTML += `<button class="btn btn-danger btn-sm" onclick="deleteRide('${r.id}')">Obriši</button>`;
   }
-
-  const phone = r.telefon ? `<span>📞 ${r.telefon}</span>` : '';
-  const note = r.napomena ? `<span>💬 ${r.napomena}</span>` : '';
-
   return `
     <div class="ride-card ${r.hitna && r.status === 'ceka' ? 'urgent' : ''} ${taken ? 'taken' : ''}">
       <div class="ride-card-header">
@@ -451,8 +384,8 @@ function rideCardHTML(r) {
       <div class="ride-meta">
         ${r.putnici ? `<span>👥 ${r.putnici} put.</span>` : ''}
         ${r.cena ? `<span>💰 ${Number(r.cena).toLocaleString('sr')} din</span>` : ''}
-        ${phone}
-        ${note}
+        ${r.telefon ? `<span>📞 ${r.telefon}</span>` : ''}
+        ${r.napomena ? `<span>💬 ${r.napomena}</span>` : ''}
       </div>
       ${actionsHTML ? '<div class="ride-actions">' + actionsHTML + '</div>' : ''}
       <div class="ride-creator">Kreirao: ${isMine ? 'ti' : (r.kreatorIme || 'nepoznat')}</div>
@@ -466,41 +399,33 @@ window.createRide = async () => {
   const datum = document.getElementById('new-date').value;
   const vreme = document.getElementById('new-time').value;
   if (!od || !doo || !datum || !vreme) { showToast('Popunite obavezna polja ⚠️'); return; }
-  const rideData = {
-    od, do: doo, datum, vreme,
-    putnici: document.getElementById('new-passengers').value || '1',
-    cena: document.getElementById('new-price').value || '',
-    telefon: document.getElementById('new-phone').value.trim(),
-    napomena: document.getElementById('new-note').value.trim(),
-    hitna: document.getElementById('new-urgent').checked,
-    status: 'ceka',
-    kreatorId: currentUser.uid,
-    kreatorIme: currentUserData ? currentUserData.ime : 'Vozač',
-    kreirano: serverTimestamp()
-  };
   try {
-    await push(ref(db, 'voznje'), rideData);
-    document.getElementById('new-from').value = '';
-    document.getElementById('new-to').value = '';
-    document.getElementById('new-date').value = '';
+    await push(ref(db, 'voznje'), {
+      od, do: doo, datum, vreme,
+      putnici: document.getElementById('new-passengers').value || '1',
+      cena: document.getElementById('new-price').value || '',
+      telefon: document.getElementById('new-phone').value.trim(),
+      napomena: document.getElementById('new-note').value.trim(),
+      hitna: document.getElementById('new-urgent').checked,
+      status: 'ceka',
+      kreatorId: currentUser.uid,
+      kreatorIme: currentUserData ? currentUserData.ime : 'Vozač',
+      kreirano: serverTimestamp()
+    });
+    ['new-from','new-to','new-passengers','new-price','new-phone','new-note'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('new-date').value = new Date().toISOString().split('T')[0];
     document.getElementById('new-time').value = '';
-    document.getElementById('new-passengers').value = '';
-    document.getElementById('new-price').value = '';
-    document.getElementById('new-phone').value = '';
-    document.getElementById('new-note').value = '';
     document.getElementById('new-urgent').checked = false;
     showToast('Vožnja objavljena! ✓');
-    showScreen('voznje', document.querySelector('.tab-btn'));
+    document.querySelector('.tab-btn').click();
   } catch(e) { showToast('Greška: ' + e.message); }
 };
 
 window.acceptRide = async (id) => {
   if (!currentUser || !currentUserData) return;
   await update(ref(db, 'voznje/' + id), {
-    status: 'preuzeto',
-    preuzeoBroj: currentUser.uid,
-    preuzeoIme: currentUserData.ime,
-    preuzeoVreme: serverTimestamp()
+    status: 'preuzeto', preuzeoBroj: currentUser.uid,
+    preuzeoIme: currentUserData.ime, preuzeoVreme: serverTimestamp()
   });
   await update(ref(db, 'vozaci/' + currentUser.uid), { slobodan: false });
   showToast('Vožnja prihvaćena! ✓');
@@ -525,25 +450,16 @@ window.deleteRide = async (id) => {
   }
 };
 
-// DRIVERS
 function loadDrivers() {
-  const driversRef = ref(db, 'vozaci');
-  onValue(driversRef, (snap) => {
-    const data = snap.val();
-    renderDrivers(data);
-  });
+  onValue(ref(db, 'vozaci'), (snap) => { renderDrivers(snap.val()); });
 }
 
 function renderDrivers(data) {
   const container = document.getElementById('drivers-container');
   if (!data) { container.innerHTML = '<div class="empty-state"><span class="empty-icon">👥</span><p>Nema registrovanih vozača</p></div>'; return; }
   const drivers = Object.entries(data).map(([id, v]) => ({ id, ...v }));
-  drivers.sort((a, b) => {
-    if (a.online && !b.online) return -1;
-    if (!a.online && b.online) return 1;
-    return 0;
-  });
-  const colors = ['#dbeafe|#1e40af', '#dcfce7|#14532d', '#fce7f3|#9d174d', '#ede9fe|#5b21b6', '#fef3c7|#92400e'];
+  drivers.sort((a, b) => (b.online ? 1 : 0) - (a.online ? 1 : 0));
+  const colors = ['#dbeafe|#1e40af','#dcfce7|#14532d','#fce7f3|#9d174d','#ede9fe|#5b21b6','#fef3c7|#92400e'];
   let html = '';
   drivers.forEach((d, i) => {
     const isMe = currentUser && d.uid === currentUser.uid;
@@ -551,8 +467,6 @@ function renderDrivers(data) {
     const initials = d.ime ? d.ime.split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2) : '??';
     const statusDot = d.online ? (d.slobodan ? 's-free' : 's-busy') : 's-offline';
     const statusText = d.online ? (d.slobodan ? 'Slobodan' : 'Zauzet / Na vožnji') : 'Offline';
-    const adminBadge = d.admin ? '<span class="driver-badge badge-admin">Admin</span>' : '';
-    const meBadge = isMe ? '<span class="driver-badge badge-me">Ti</span>' : '';
     html += `
       <div class="driver-card">
         <div class="driver-avatar" style="background:${bg};color:${fg}">${initials}</div>
@@ -560,7 +474,10 @@ function renderDrivers(data) {
           <div class="driver-name">${d.ime || 'Nepoznat'}</div>
           <div class="driver-status"><span class="status-dot ${statusDot}"></span>${statusText}</div>
         </div>
-        <div style="display:flex;gap:4px;flex-direction:column;align-items:flex-end">${adminBadge}${meBadge}</div>
+        <div style="display:flex;gap:4px;flex-direction:column;align-items:flex-end">
+          ${d.admin ? '<span class="driver-badge badge-admin">Admin</span>' : ''}
+          ${isMe ? '<span class="driver-badge badge-me">Ti</span>' : ''}
+        </div>
       </div>`;
   });
   container.innerHTML = html;
@@ -573,7 +490,6 @@ window.toggleAvailability = async () => {
   showToast(newStatus ? 'Status: Slobodan ✓' : 'Status: Zauzet ✓');
 };
 
-// UTILS
 window.showScreen = (name, el) => {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
@@ -607,10 +523,7 @@ function getErrorMsg(code) {
   return map[code] || 'Greška: ' + code;
 }
 
-// Set today as default date
-const today = new Date().toISOString().split('T')[0];
-document.getElementById('new-date').value = today;
-
+document.getElementById('new-date').value = new Date().toISOString().split('T')[0];
 </script>
 </body>
 </html>
